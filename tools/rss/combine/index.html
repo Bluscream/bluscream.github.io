@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Combined Atom Feed</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlsParam = new URLSearchParams(window.location.search);
+            const urls = urlsParam.getAll('urls'); // Get the 'urls' parameter as an array
+
+            if (urls.length === 0) {
+                alert('Please provide a comma-separated list of Atom feed URLs via the "urls" query parameter.');
+                return;
+            }
+
+            let combinedXml = '<?xml version="1.0" encoding="UTF-8"?><feeds>';
+
+            for (const url of urls) {
+                fetch(url)
+                .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to load ${url}`);
+                        }
+                        return response.text();
+                    })
+                .then(text => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(text, 'application/xml');
+                        const entries = doc.getElementsByTagName('entry');
+
+                        for (const entry of entries) {
+                            combinedXml += doc.documentElement.outerHTML;
+                        }
+                    })
+                .catch(error => {
+                        console.error(error);
+                        combinedXml += `<error>${error.message}</error>`;
+                    });
+            }
+
+            combinedXml += '</feeds>';
+
+            // Replace the entire HTML document with the combined XML feed
+            document.documentElement.outerHTML = combinedXml;
+
+            // Set the Content-Type header to application/xml
+            document.querySelector('meta[name="Content-Type"]').setAttribute('content', 'application/xml');
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>
