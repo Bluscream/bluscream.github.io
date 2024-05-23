@@ -13,7 +13,7 @@
                 return;
             }
 
-            let combinedXml = '<?xml version="1.0" encoding="UTF-8"?><feeds>';
+            let combinedXml = '<?xml version="1.0" encoding="UTF-8"?>';
 
             for (const url of urls) {
                 fetch(url)
@@ -26,19 +26,20 @@
                 .then(text => {
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(text, 'application/xml');
-                        const entries = doc.getElementsByTagName('entry');
+                        const feeds = doc.getElementsByTagName('feed');
 
-                        for (const entry of entries) {
-                            combinedXml += doc.documentElement.outerHTML;
+                        for (const feed of feeds) {
+                            combinedXml += feed.outerHTML;
                         }
                     })
                 .catch(error => {
                         console.error(error);
                         combinedXml += `<error>${error.message}</error>`;
+                        // return error.message;
                     });
             }
 
-            combinedXml += '</feeds>';
+            combinedXml += '</>';
 
             // Replace the entire HTML document with the combined XML feed
             document.documentElement.outerHTML = combinedXml;
