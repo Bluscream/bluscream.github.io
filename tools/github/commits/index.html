@@ -163,14 +163,18 @@
                 try {
                     // Extract owner, repo, and branch from URL
                     console.log('Extracting URL parts...');
-                    const urlParts = repoUrl.replace('https://github.com/', '').replace('.git', '').split('/');
-                    console.log('URL parts:', urlParts);
+                    const urlMatch = repoUrl.match(/https:\/\/github\.com\/([^\/]+)\/([^\/]+)(?:\/(?:tree|blob)\/([^\/]+))?/);
+                    console.log('URL match:', urlMatch);
                     
-                    let [owner, repo, treeKeyword, branch] = urlParts;
-                    console.log('Extracted values:', { owner, repo, treeKeyword, branch });
+                    if (!urlMatch) {
+                        throw new Error('Invalid GitHub URL format. Please use: https://github.com/owner/repo or https://github.com/owner/repo/tree/branch');
+                    }
+                    
+                    const [, owner, repo, branch] = urlMatch;
+                    console.log('Extracted values:', { owner, repo, branch });
                     
                     // If no branch specified in URL, get default branch
-                    if (!treeKeyword || !branch) {
+                    if (!branch) {
                         console.log('No branch specified, fetching default branch...');
                         const branchUrl = `https://api.github.com/repos/${owner}/${repo}`;
                         console.log('Fetching from:', branchUrl);
@@ -314,8 +318,8 @@
                     
                     // Extract owner and repo from the current URL or form input
                     const repoUrl = document.getElementById('repoUrl').value;
-                    const urlParts = repoUrl.replace('https://github.com/', '').replace('.git', '').split('/');
-                    const [owner, repo] = urlParts;
+                    const urlMatch = repoUrl.match(/https:\/\/github\.com\/([^\/]+)\/([^\/]+)/);
+                    const [, owner, repo] = urlMatch || [];
                     const commitUrl = `https://github.com/${owner}/${repo}/commit/${commit.sha}`;
                     
                     console.log(`Commit ${index} details:`, {
@@ -363,7 +367,7 @@
                     A: '<span class="text-success">+</span>', // Added
                     D: '<span class="text-danger">-</span>', // Deleted
                     R: '<span class="text-info">↗️</span>', // Renamed
-                    T: '<span class="text-secondary">🔄</span>'  // Type changed
+                    T: '<span class="turl fiext-secondary">🔄</span>'  // Type changed
                 };
                 return statusIcons[status] || '<span class="text-muted">?</span>';
             }
