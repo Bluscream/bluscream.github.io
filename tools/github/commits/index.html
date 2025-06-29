@@ -40,6 +40,12 @@
                                aria-label="GitHub repository URL">
                         <button type="submit" class="btn btn-primary">Fetch Commits</button>
                     </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="detailedCheckbox">
+                        <label class="form-check-label" for="detailedCheckbox">
+                            Detailed (includes file changes - uses more API calls)
+                        </label>
+                    </div>
                 </form>
             </div>
         </div>
@@ -59,17 +65,27 @@
             const repoInput = document.getElementById('repoUrl');
             const commitsList = document.getElementById('commitsList');
             const errorMessage = document.getElementById('errorMessage');
+            const detailedCheckbox = document.getElementById('detailedCheckbox');
 
-            // Handle URL parameter
+            // Handle URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             const initialUrl = urlParams.get('url');
+            const detailedParam = urlParams.get('detailed');
+            
             if (initialUrl) {
                 repoInput.value = initialUrl;
+            }
+            
+            if (detailedParam) {
+                detailedCheckbox.checked = true;
+            }
+            
+            if (initialUrl) {
                 form.submit();
             }
 
-            async function fetchCommits(repoUrl) {
-                console.log('Starting fetchCommits with URL:', repoUrl);
+            async function fetchCommits(repoUrl, detailed = false) {
+                console.log('Starting fetchCommits with URL:', repoUrl, 'Detailed:', detailed);
                 
                 // Reset display
                 commitsList.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
@@ -104,9 +120,9 @@
                         console.log('Using default branch:', branch);
                     }
 
-                    // Fetch commits
+                    // Fetch commits (limit to 10 to avoid too many API calls)
                     console.log('Fetching commits...');
-                    const commitsUrl = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=100&sha=${branch}`;
+                    const commitsUrl = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=10&sha=${branch}`;
                     console.log('Commits URL:', commitsUrl);
                     
                     const commitsResponse = await fetch(commitsUrl);
@@ -123,7 +139,39 @@
                     console.log('Commits data received:', commitsData);
                     console.log('Number of commits:', commitsData.length);
 
-                    renderCommits(commitsData);
+                    let finalCommits = commitsData;
+
+                    // Fetch detailed commit information if requested
+                    if (detailed) {
+                        console.log('Fetching detailed commit information...');
+                        commitsList.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Fetching commit details...</div></div>';
+                        
+                        finalCommits = await Promise.all(
+                            commitsData.map(async (commit, index) => {
+                                console.log(`Fetching details for commit ${index + 1}/${commitsData.length}: ${commit.sha.substring(0, 8)}`);
+                                const detailUrl = `https://api.github.com/repos/${owner}/${repo}/commits/${commit.sha}`;
+                                const detailResponse = await fetch(detailUrl);
+                                
+                                if (!detailResponse.ok) {
+                                    console.warn(`Failed to fetch details for commit ${commit.sha}: ${detailResponse.status}`);
+                                    return commit; // Return original commit if detail fetch fails
+                                }
+                                
+                                const detailData = await detailResponse.json();
+                                console.log(`Commit ${index + 1} details:`, {
+                                    sha: detailData.sha.substring(0, 8),
+                                    files: detailData.files ? detailData.files.length : 0
+                                });
+                                return detailData;
+                            })
+                        );
+
+                        console.log('All detailed commits fetched:', finalCommits.length);
+                    } else {
+                        console.log('Skipping detailed commit information (detailed mode disabled)');
+                    }
+
+                    renderCommits(finalCommits);
                 } catch (error) {
                     console.error('Error in fetchCommits:', error);
                     console.error('Error stack:', error.stack);
@@ -148,12 +196,14 @@
                     const author = commit.author?.login || 'Unknown';
                     const date = new Date(commit.commit.author.date).toLocaleString();
                     const filesCount = commit.files ? commit.files.length : 0;
+                    const hasFiles = commit.files && commit.files.length > 0;
                     
                     console.log(`Commit ${index} details:`, {
                         message: commitMessage,
                         author: author,
                         date: date,
-                        filesCount: filesCount
+                        filesCount: filesCount,
+                        hasFiles: hasFiles
                     });
                     
                     commitElement.innerHTML = `
@@ -162,16 +212,18 @@
                             <small class="text-muted">by ${author} • ${date}</small>
                         </div>
                         <div class="file-changes mt-2">
-                            Changed ${filesCount} file${filesCount !== 1 ? 's' : ''}
+                            ${hasFiles ? `Changed ${filesCount} file${filesCount !== 1 ? 's' : ''}` : 'No file information available'}
                         </div>
+                        ${hasFiles ? `
                         <div class="files-list mt-2">
-                            ${commit.files ? commit.files.map(file => `
+                            ${commit.files.map(file => `
                                 <div class="mb-1">
                                     <span>${getFileStatusIcon(file.status)}</span>
                                     <span>${file.filename}</span>
                                 </div>
-                            `).join('') : ''}
+                            `).join('')}
                         </div>
+                        ` : ''}
                     `;
                     
                     commitsList.appendChild(commitElement);
@@ -194,14 +246,8 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 console.log('Form submitted with URL:', repoInput.value);
-                await fetchCommits(repoInput.value);
+                await fetchCommits(repoInput.value, detailedCheckbox.checked);
             });
-
-            // Handle URL parameter submission
-            if (initialUrl) {
-                console.log('Initial URL found in parameters:', initialUrl);
-                form.submit();
-            }
         });
     </script>
 </body>
