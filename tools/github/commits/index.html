@@ -120,35 +120,77 @@
                         console.log('Using default branch:', branch);
                     }
 
-                    // Fetch commits (limit to 10 to avoid too many API calls)
-                    console.log('Fetching commits...');
-                    const commitsUrl = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=10&sha=${branch}`;
-                    console.log('Commits URL:', commitsUrl);
+                    // Fetch all commits using pagination
+                    console.log('Fetching all commits...');
+                    commitsList.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Fetching commits...</div></div>';
                     
-                    const commitsResponse = await fetch(commitsUrl);
-                    console.log('Commits response status:', commitsResponse.status);
-                    console.log('Commits response headers:', Object.fromEntries(commitsResponse.headers.entries()));
+                    let allCommits = [];
+                    let page = 1;
+                    const perPage = 100; // GitHub API max per page
                     
-                    if (!commitsResponse.ok) {
-                        const errorText = await commitsResponse.text();
-                        console.error('Commits response error:', errorText);
-                        throw new Error(`Failed to fetch commits: ${commitsResponse.status} ${commitsResponse.statusText}`);
+                    while (true) {
+                        const commitsUrl = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=${perPage}&page=${page}&sha=${branch}`;
+                        console.log(`Fetching commits page ${page}:`, commitsUrl);
+                        
+                        // Update loading message with progress
+                        commitsList.innerHTML = `<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Fetching commits... (${allCommits.length} so far)</div></div>`;
+                        
+                        const commitsResponse = await fetch(commitsUrl);
+                        console.log(`Page ${page} response status:`, commitsResponse.status);
+                        
+                        if (!commitsResponse.ok) {
+                            const errorText = await commitsResponse.text();
+                            console.error('Commits response error:', errorText);
+                            throw new Error(`Failed to fetch commits: ${commitsResponse.status} ${commitsResponse.statusText}`);
+                        }
+                        
+                        const pageCommits = await commitsResponse.json();
+                        console.log(`Page ${page} commits received:`, pageCommits.length);
+                        
+                        if (pageCommits.length === 0) {
+                            console.log('No more commits, stopping pagination');
+                            break;
+                        }
+                        
+                        allCommits = allCommits.concat(pageCommits);
+                        console.log(`Total commits so far: ${allCommits.length}`);
+                        
+                        // Check if we've reached the last page
+                        const linkHeader = commitsResponse.headers.get('link');
+                        if (!linkHeader || !linkHeader.includes('rel="next"')) {
+                            console.log('No next page link found, stopping pagination');
+                            break;
+                        }
+                        
+                        page++;
+                        
+                        // Safety check to prevent infinite loops
+                        if (page > 50) {
+                            console.warn('Reached safety limit of 50 pages, stopping pagination');
+                            break;
+                        }
                     }
                     
-                    const commitsData = await commitsResponse.json();
-                    console.log('Commits data received:', commitsData);
-                    console.log('Number of commits:', commitsData.length);
+                    console.log('All commits fetched:', allCommits.length);
+                    console.log('Commits data received:', allCommits);
 
-                    let finalCommits = commitsData;
+                    let finalCommits = allCommits;
 
                     // Fetch detailed commit information if requested
                     if (detailed) {
                         console.log('Fetching detailed commit information...');
-                        commitsList.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Fetching commit details...</div></div>';
+                        
+                        // Warn about potential rate limiting
+                        if (allCommits.length > 50) {
+                            console.warn(`Warning: Fetching details for ${allCommits.length} commits may hit GitHub API rate limits`);
+                            commitsList.innerHTML = `<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Fetching commit details... (${allCommits.length} commits)</div><div class="mt-2 text-warning">This may take a while and could hit API rate limits</div></div>`;
+                        } else {
+                            commitsList.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Fetching commit details...</div></div>';
+                        }
                         
                         finalCommits = await Promise.all(
-                            commitsData.map(async (commit, index) => {
-                                console.log(`Fetching details for commit ${index + 1}/${commitsData.length}: ${commit.sha.substring(0, 8)}`);
+                            allCommits.map(async (commit, index) => {
+                                console.log(`Fetching details for commit ${index + 1}/${allCommits.length}: ${commit.sha.substring(0, 8)}`);
                                 const detailUrl = `https://api.github.com/repos/${owner}/${repo}/commits/${commit.sha}`;
                                 const detailResponse = await fetch(detailUrl);
                                 
