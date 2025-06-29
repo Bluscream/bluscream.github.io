@@ -69,61 +69,115 @@
             }
 
             async function fetchCommits(repoUrl) {
+                console.log('Starting fetchCommits with URL:', repoUrl);
+                
                 // Reset display
                 commitsList.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
                 errorMessage.style.display = 'none';
 
                 try {
                     // Extract owner, repo, and branch from URL
+                    console.log('Extracting URL parts...');
                     const urlParts = repoUrl.replace('https://github.com/', '').replace('.git', '').split('/');
-                    const [owner, repo, treeKeyword, branch] = urlParts;
+                    console.log('URL parts:', urlParts);
+                    
+                    let [owner, repo, treeKeyword, branch] = urlParts;
+                    console.log('Extracted values:', { owner, repo, treeKeyword, branch });
                     
                     // If no branch specified in URL, get default branch
                     if (!treeKeyword || !branch) {
-                        const branchResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+                        console.log('No branch specified, fetching default branch...');
+                        const branchUrl = `https://api.github.com/repos/${owner}/${repo}`;
+                        console.log('Fetching from:', branchUrl);
+                        
+                        const branchResponse = await fetch(branchUrl);
+                        console.log('Branch response status:', branchResponse.status);
+                        console.log('Branch response headers:', Object.fromEntries(branchResponse.headers.entries()));
+                        
+                        if (!branchResponse.ok) {
+                            throw new Error(`Failed to fetch repo info: ${branchResponse.status} ${branchResponse.statusText}`);
+                        }
+                        
                         const branchData = await branchResponse.json();
+                        console.log('Branch data:', branchData);
                         branch = branchData.default_branch;
+                        console.log('Using default branch:', branch);
                     }
 
                     // Fetch commits
-                    const commitsResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=100&sha=${branch}`);
+                    console.log('Fetching commits...');
+                    const commitsUrl = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=100&sha=${branch}`;
+                    console.log('Commits URL:', commitsUrl);
+                    
+                    const commitsResponse = await fetch(commitsUrl);
+                    console.log('Commits response status:', commitsResponse.status);
+                    console.log('Commits response headers:', Object.fromEntries(commitsResponse.headers.entries()));
+                    
+                    if (!commitsResponse.ok) {
+                        const errorText = await commitsResponse.text();
+                        console.error('Commits response error:', errorText);
+                        throw new Error(`Failed to fetch commits: ${commitsResponse.status} ${commitsResponse.statusText}`);
+                    }
+                    
                     const commitsData = await commitsResponse.json();
+                    console.log('Commits data received:', commitsData);
+                    console.log('Number of commits:', commitsData.length);
 
                     renderCommits(commitsData);
                 } catch (error) {
-                    errorMessage.textContent = 'Error fetching commits. Please check the repository URL.';
+                    console.error('Error in fetchCommits:', error);
+                    console.error('Error stack:', error.stack);
+                    errorMessage.textContent = `Error fetching commits: ${error.message}. Please check the repository URL.`;
                     errorMessage.style.display = 'block';
                 }
             }
 
             function renderCommits(commits) {
+                console.log('Starting renderCommits with:', commits);
+                console.log('Commits array length:', commits.length);
+                
                 commitsList.innerHTML = '';
                 
-                commits.forEach(commit => {
+                commits.forEach((commit, index) => {
+                    console.log(`Processing commit ${index}:`, commit);
+                    
                     const commitElement = document.createElement('div');
                     commitElement.className = 'commit-item border rounded';
                     
+                    const commitMessage = commit.commit.message.split('\n')[0];
+                    const author = commit.author?.login || 'Unknown';
+                    const date = new Date(commit.commit.author.date).toLocaleString();
+                    const filesCount = commit.files ? commit.files.length : 0;
+                    
+                    console.log(`Commit ${index} details:`, {
+                        message: commitMessage,
+                        author: author,
+                        date: date,
+                        filesCount: filesCount
+                    });
+                    
                     commitElement.innerHTML = `
                         <div class="commit-header">
-                            <strong>${commit.commit.message.split('\n')[0]}</strong>
-                            <small class="text-muted">by ${commit.author?.login || 'Unknown'} • 
-                                ${new Date(commit.commit.author.date).toLocaleString()}</small>
+                            <strong>${commitMessage}</strong>
+                            <small class="text-muted">by ${author} • ${date}</small>
                         </div>
                         <div class="file-changes mt-2">
-                            Changed ${commit.files.length} file${commit.files.length !== 1 ? 's' : ''}
+                            Changed ${filesCount} file${filesCount !== 1 ? 's' : ''}
                         </div>
                         <div class="files-list mt-2">
-                            ${commit.files.map(file => `
+                            ${commit.files ? commit.files.map(file => `
                                 <div class="mb-1">
                                     <span>${getFileStatusIcon(file.status)}</span>
                                     <span>${file.filename}</span>
                                 </div>
-                            `).join('')}
+                            `).join('') : ''}
                         </div>
                     `;
                     
                     commitsList.appendChild(commitElement);
                 });
+                
+                console.log('Finished rendering commits');
             }
 
             function getFileStatusIcon(status) {
@@ -139,11 +193,13 @@
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                console.log('Form submitted with URL:', repoInput.value);
                 await fetchCommits(repoInput.value);
             });
 
             // Handle URL parameter submission
             if (initialUrl) {
+                console.log('Initial URL found in parameters:', initialUrl);
                 form.submit();
             }
         });
