@@ -36,7 +36,7 @@
                         <input type="text" 
                                id="repoUrl" 
                                class="form-control" 
-                               placeholder="Enter GitHub repo URL (e.g., https://github.com/user/repo)"
+                               placeholder="Enter GitHub repo URL (e.g., https://github.com/user/repo or https://github.com/user/repo/tree/branch)"
                                aria-label="GitHub repository URL">
                         <button type="submit" class="btn btn-primary">Fetch Commits</button>
                     </div>
@@ -74,14 +74,16 @@
                 errorMessage.style.display = 'none';
 
                 try {
-                    // Extract owner and repo from URL
+                    // Extract owner, repo, and branch from URL
                     const urlParts = repoUrl.replace('https://github.com/', '').replace('.git', '').split('/');
-                    const [owner, repo] = urlParts;
-
-                    // Default branch detection
-                    const branchResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
-                    const branchData = await branchResponse.json();
-                    const branch = branchData.default_branch;
+                    const [owner, repo, treeKeyword, branch] = urlParts;
+                    
+                    // If no branch specified in URL, get default branch
+                    if (!treeKeyword || !branch) {
+                        const branchResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+                        const branchData = await branchResponse.json();
+                        branch = branchData.default_branch;
+                    }
 
                     // Fetch commits
                     const commitsResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=100&sha=${branch}`);
