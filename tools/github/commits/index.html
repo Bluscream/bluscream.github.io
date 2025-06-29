@@ -40,11 +40,26 @@
                                aria-label="GitHub repository URL">
                         <button type="submit" class="btn btn-primary">Fetch Commits</button>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="detailedCheckbox">
-                        <label class="form-check-label" for="detailedCheckbox">
-                            Detailed (includes file changes - uses more API calls)
-                        </label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="detailedCheckbox">
+                                <label class="form-check-label" for="detailedCheckbox">
+                                    Detailed (includes file changes - uses more API calls)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="apiKey" class="form-label">GitHub API Key (optional)</label>
+                                <input type="password" 
+                                       id="apiKey" 
+                                       class="form-control form-control-sm" 
+                                       placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                                       aria-label="GitHub API Key">
+                                <small class="form-text text-muted">Increases rate limit from 60 to 5000 requests/hour</small>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -52,6 +67,12 @@
 
         <div class="row">
             <div class="col-md-8 offset-md-2">
+                <div id="rateLimitInfo" class="alert alert-info" style="display: none;">
+                    <small>
+                        <strong>Rate Limit Status:</strong> 
+                        <span id="rateLimitStatus">Loading...</span>
+                    </small>
+                </div>
                 <div id="commitsList"></div>
                 <div id="errorMessage" class="error-message" style="display: none;"></div>
             </div>
@@ -66,11 +87,15 @@
             const commitsList = document.getElementById('commitsList');
             const errorMessage = document.getElementById('errorMessage');
             const detailedCheckbox = document.getElementById('detailedCheckbox');
+            const apiKeyInput = document.getElementById('apiKey');
+            const rateLimitInfo = document.getElementById('rateLimitInfo');
+            const rateLimitStatus = document.getElementById('rateLimitStatus');
 
             // Handle URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             const initialUrl = urlParams.get('url');
             const detailedParam = urlParams.get('detailed');
+            const apiKeyParam = urlParams.get('apikey');
             
             if (initialUrl) {
                 repoInput.value = initialUrl;
@@ -80,12 +105,56 @@
                 detailedCheckbox.checked = true;
             }
             
+            if (apiKeyParam) {
+                apiKeyInput.value = apiKeyParam;
+            }
+            
             if (initialUrl) {
                 form.submit();
             }
 
-            async function fetchCommits(repoUrl, detailed = false) {
-                console.log('Starting fetchCommits with URL:', repoUrl, 'Detailed:', detailed);
+            // Function to update rate limit display
+            function updateRateLimitDisplay(response) {
+                const limit = response.headers.get('x-ratelimit-limit');
+                const remaining = response.headers.get('x-ratelimit-remaining');
+                const reset = response.headers.get('x-ratelimit-reset');
+                
+                if (limit && remaining) {
+                    const resetDate = reset ? new Date(reset * 1000).toLocaleTimeString() : 'Unknown';
+                    const percentage = Math.round((remaining / limit) * 100);
+                    
+                    let statusClass = 'text-success';
+                    if (percentage < 20) statusClass = 'text-warning';
+                    if (percentage < 5) statusClass = 'text-danger';
+                    
+                    rateLimitStatus.innerHTML = `
+                        <span class="${statusClass}">${remaining}/${limit} requests remaining</span> 
+                        (resets at ${resetDate})
+                    `;
+                    rateLimitInfo.style.display = 'block';
+                }
+            }
+
+            async function fetchCommits(repoUrl, detailed = false, apiKey = null) {
+                console.log('Starting fetchCommits with URL:', repoUrl, 'Detailed:', detailed, 'API Key provided:', !!apiKey);
+                
+                // Helper function to create fetch options with authentication
+                function createFetchOptions() {
+                    const options = {
+                        headers: {
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    };
+                    
+                    if (apiKey) {
+                        options.headers['Authorization'] = `token ${apiKey}`;
+                        console.log('Using API key for authentication');
+                    } else {
+                        console.log('No API key provided, using unauthenticated requests');
+                    }
+                    
+                    return options;
+                }
                 
                 // Reset display
                 commitsList.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
@@ -106,9 +175,10 @@
                         const branchUrl = `https://api.github.com/repos/${owner}/${repo}`;
                         console.log('Fetching from:', branchUrl);
                         
-                        const branchResponse = await fetch(branchUrl);
+                        const branchResponse = await fetch(branchUrl, createFetchOptions());
                         console.log('Branch response status:', branchResponse.status);
                         console.log('Branch response headers:', Object.fromEntries(branchResponse.headers.entries()));
+                        updateRateLimitDisplay(branchResponse);
                         
                         if (!branchResponse.ok) {
                             throw new Error(`Failed to fetch repo info: ${branchResponse.status} ${branchResponse.statusText}`);
@@ -135,8 +205,9 @@
                         // Update loading message with progress
                         commitsList.innerHTML = `<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Fetching commits... (${allCommits.length} so far)</div></div>`;
                         
-                        const commitsResponse = await fetch(commitsUrl);
+                        const commitsResponse = await fetch(commitsUrl, createFetchOptions());
                         console.log(`Page ${page} response status:`, commitsResponse.status);
+                        updateRateLimitDisplay(commitsResponse);
                         
                         if (!commitsResponse.ok) {
                             const errorText = await commitsResponse.text();
@@ -181,7 +252,7 @@
                         console.log('Fetching detailed commit information...');
                         
                         // Warn about potential rate limiting
-                        if (allCommits.length > 50) {
+                        if (allCommits.length > 50 && !apiKey) {
                             console.warn(`Warning: Fetching details for ${allCommits.length} commits may hit GitHub API rate limits`);
                             commitsList.innerHTML = `<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Fetching commit details... (${allCommits.length} commits)</div><div class="mt-2 text-warning">This may take a while and could hit API rate limits</div></div>`;
                         } else {
@@ -192,7 +263,7 @@
                             allCommits.map(async (commit, index) => {
                                 console.log(`Fetching details for commit ${index + 1}/${allCommits.length}: ${commit.sha.substring(0, 8)}`);
                                 const detailUrl = `https://api.github.com/repos/${owner}/${repo}/commits/${commit.sha}`;
-                                const detailResponse = await fetch(detailUrl);
+                                const detailResponse = await fetch(detailUrl, createFetchOptions());
                                 
                                 if (!detailResponse.ok) {
                                     console.warn(`Failed to fetch details for commit ${commit.sha}: ${detailResponse.status}`);
@@ -288,7 +359,7 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 console.log('Form submitted with URL:', repoInput.value);
-                await fetchCommits(repoInput.value, detailedCheckbox.checked);
+                await fetchCommits(repoInput.value, detailedCheckbox.checked, apiKeyInput.value);
             });
         });
     </script>
