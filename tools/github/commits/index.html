@@ -310,19 +310,31 @@
                     const date = new Date(commit.commit.author.date).toLocaleString();
                     const filesCount = commit.files ? commit.files.length : 0;
                     const hasFiles = commit.files && commit.files.length > 0;
+                    const shortSha = commit.sha.substring(0, 8);
+                    
+                    // Extract owner and repo from the current URL or form input
+                    const repoUrl = document.getElementById('repoUrl').value;
+                    const urlParts = repoUrl.replace('https://github.com/', '').replace('.git', '').split('/');
+                    const [owner, repo] = urlParts;
+                    const commitUrl = `https://github.com/${owner}/${repo}/commit/${commit.sha}`;
                     
                     console.log(`Commit ${index} details:`, {
                         message: commitMessage,
                         author: author,
                         date: date,
                         filesCount: filesCount,
-                        hasFiles: hasFiles
+                        hasFiles: hasFiles,
+                        commitUrl: commitUrl
                     });
                     
                     commitElement.innerHTML = `
                         <div class="commit-header">
                             <strong>${commitMessage}</strong>
                             <small class="text-muted">by ${author} • ${date}</small>
+                            <br>
+                            <a href="${commitUrl}" target="_blank" class="text-decoration-none">
+                                <code class="text-primary">${shortSha}</code>
+                            </a>
                         </div>
                         <div class="file-changes mt-2">
                             ${hasFiles ? `Changed ${filesCount} file${filesCount !== 1 ? 's' : ''}` : 'No file information available'}
@@ -331,8 +343,8 @@
                         <div class="files-list mt-2">
                             ${commit.files.map(file => `
                                 <div class="mb-1">
-                                    <span>${getFileStatusIcon(file.status)}</span>
-                                    <span>${file.filename}</span>
+                                    ${getFileStatusIcon(file.status)}
+                                    <span class="ms-1">${file.filename}</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -347,13 +359,13 @@
 
             function getFileStatusIcon(status) {
                 const statusIcons = {
-                    M: '📝', // Modified
-                    A: '✨', // Added
-                    D: '❌', // Deleted
-                    R: '↗️', // Renamed
-                    T: '🔄'  // Type changed
+                    M: '<span class="text-warning">%</span>', // Modified
+                    A: '<span class="text-success">+</span>', // Added
+                    D: '<span class="text-danger">-</span>', // Deleted
+                    R: '<span class="text-info">↗️</span>', // Renamed
+                    T: '<span class="text-secondary">🔄</span>'  // Type changed
                 };
-                return statusIcons[status] || '?';
+                return statusIcons[status] || '<span class="text-muted">?</span>';
             }
 
             form.addEventListener('submit', async (e) => {
