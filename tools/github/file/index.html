@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub File History Finder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .result-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        
+        .file-info {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .error-message {
+            color: #721c24;
+            background-color: #f8d7da;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+        
+        .success-message {
+            color: #155724;
+            background-color: #d4edda;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+        
+        .file-link {
+            word-break: break-all;
+        }
+        
+        .commit-info {
+            background-color: #e9ecef;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-8 offset-md-2">
+                <h2 class="text-center mb-4">GitHub File History Finder</h2>
+                <p class="text-center text-muted mb-4">
+                    Find the latest commit where a file still existed in a branch's history
+                </p>
+                <form id="fileForm">
+                    <div class="input-group mb-3">
+                        <input type="text" 
+                               id="fileUrl" 
+                               class="form-control" 
+                               placeholder="Enter GitHub file URL (e.g., https://github.com/user/repo/blob/branch/path/to/file)"
+                               aria-label="GitHub file URL">
+                        <button type="submit" class="btn btn-primary">Find File History</button>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="apiKey" class="form-label">GitHub API Key (optional)</label>
+                                <input type="password" 
+                                       id="apiKey" 
+                                       class="form-control form-control-sm" 
+                                       placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                                       aria-label="GitHub API Key">
+                                <small class="form-text text-muted">Increases rate limit from 60 to 5000 requests/hour</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Search Mode</label>
+                                <div class="form-control form-control-sm bg-light">
+                                    <small class="text-muted">Will search through ALL commits in the branch history</small>
+                                </div>
+                                <small class="form-text text-muted">This may take a while for repositories with many commits</small>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div id="rateLimitInfo" class="alert alert-info" style="display: none;">
+                    <small>
+                        <strong>Rate Limit Status:</strong> 
+                        <span id="rateLimitStatus">Loading...</span>
+                    </small>
+                </div>
+                <div id="resultsList"></div>
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                <div id="successMessage" class="success-message" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('fileForm');
+            const fileInput = document.getElementById('fileUrl');
+            const resultsList = document.getElementById('resultsList');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const apiKeyInput = document.getElementById('apiKey');
+            const rateLimitInfo = document.getElementById('rateLimitInfo');
+            const rateLimitStatus = document.getElementById('rateLimitStatus');
+
+            // Handle URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialUrl = urlParams.get('url');
+            const apiKeyParam = urlParams.get('apikey');
+            
+            if (initialUrl) {
+                fileInput.value = initialUrl;
+            }
+            
+            if (apiKeyParam) {
+                apiKeyInput.value = apiKeyParam;
+            }
+            
+            if (initialUrl) {
+                form.submit();
+            }
+
+            // Function to update rate limit display
+            function updateRateLimitDisplay(response) {
+                const limit = response.headers.get('x-ratelimit-limit');
+                const remaining = response.headers.get('x-ratelimit-remaining');
+                const reset = response.headers.get('x-ratelimit-reset');
+                
+                if (limit && remaining) {
+                    const resetDate = reset ? new Date(reset * 1000).toLocaleTimeString() : 'Unknown';
+                    const percentage = Math.round((remaining / limit) * 100);
+                    
+                    let statusClass = 'text-success';
+                    if (percentage < 20) statusClass = 'text-warning';
+                    if (percentage < 5) statusClass = 'text-danger';
+                    
+                    rateLimitStatus.innerHTML = `
+                        <span class="${statusClass}">${remaining}/${limit} requests remaining</span> 
+                        (resets at ${resetDate})
+                    `;
+                    rateLimitInfo.style.display = 'block';
+                }
+            }
+
+            // Function to parse GitHub file URL
+            function parseGitHubFileUrl(url) {
+                // Handle various GitHub URL formats
+                let cleanUrl = url.replace('?raw=true', '').replace('.git', '');
+                
+                // Extract parts from URL
+                const urlMatch = cleanUrl.match(/github\.com\/([^\/]+)\/([^\/]+)\/(?:blob|raw)\/([^\/]+)\/(.+)/);
+                if (!urlMatch) {
+                    throw new Error('Invalid GitHub file URL format');
+                }
+                
+                const [, owner, repo, branch, filePath] = urlMatch;
+                return { owner, repo, branch, filePath };
+            }
+
+            async function findFileHistory(fileUrl, apiKey = null) {
+                console.log('Starting findFileHistory with URL:', fileUrl, 'API Key provided:', !!apiKey);
+                
+                // Helper function to create fetch options with authentication
+                function createFetchOptions() {
+                    const options = {
+                        headers: {
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    };
+                    
+                    if (apiKey) {
+                        options.headers['Authorization'] = `token ${apiKey}`;
+                        console.log('Using API key for authentication');
+                    } else {
+                        console.log('No API key provided, using unauthenticated requests');
+                    }
+                    
+                    return options;
+                }
+                
+                // Reset display
+                resultsList.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+                errorMessage.style.display = 'none';
+                successMessage.style.display = 'none';
+
+                try {
+                    // Parse the GitHub file URL
+                    const { owner, repo, branch, filePath } = parseGitHubFileUrl(fileUrl);
+                    console.log('Parsed URL:', { owner, repo, branch, filePath });
+
+                    // First, check if the file currently exists
+                    const currentFileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=${branch}`;
+                    console.log('Checking current file existence:', currentFileUrl);
+                    
+                    const currentFileResponse = await fetch(currentFileUrl, createFetchOptions());
+                    updateRateLimitDisplay(currentFileResponse);
+                    
+                    const fileCurrentlyExists = currentFileResponse.status === 200;
+                    console.log('File currently exists:', fileCurrentlyExists);
+
+                    if (fileCurrentlyExists) {
+                        const fileData = await currentFileResponse.json();
+                        showSuccess(`File currently exists in the latest commit!`, {
+                            owner,
+                            repo,
+                            branch,
+                            filePath,
+                            commit: fileData.sha,
+                            currentUrl: `https://github.com/${owner}/${repo}/blob/${branch}/${filePath}`,
+                            rawUrl: `https://github.com/${owner}/${repo}/raw/${branch}/${filePath}`
+                        });
+                        return;
+                    }
+
+                    // File doesn't exist currently, search through commit history
+                    console.log('File not found in current commit, searching history...');
+                    resultsList.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Searching commit history for file...</div></div>';
+
+                    // Get ALL commits for the branch using pagination
+                    console.log('Fetching all commits using pagination...');
+                    let allCommits = [];
+                    let page = 1;
+                    const perPage = 100; // GitHub API max per page
+                    
+                    while (true) {
+                        const commitsUrl = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=${perPage}&page=${page}&sha=${branch}`;
+                        console.log(`Fetching commits page ${page}:`, commitsUrl);
+                        
+                        // Update loading message with progress
+                        resultsList.innerHTML = `<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Fetching commits... (${allCommits.length} so far)</div></div>`;
+                        
+                        const commitsResponse = await fetch(commitsUrl, createFetchOptions());
+                        updateRateLimitDisplay(commitsResponse);
+                        
+                        if (!commitsResponse.ok) {
+                            throw new Error(`Failed to fetch commits: ${commitsResponse.status} ${commitsResponse.statusText}`);
+                        }
+                        
+                        const pageCommits = await commitsResponse.json();
+                        console.log(`Page ${page} commits received:`, pageCommits.length);
+                        
+                        if (pageCommits.length === 0) {
+                            console.log('No more commits, stopping pagination');
+                            break;
+                        }
+                        
+                        allCommits = allCommits.concat(pageCommits);
+                        console.log(`Total commits so far: ${allCommits.length}`);
+                        
+                        // Check if we've reached the last page
+                        const linkHeader = commitsResponse.headers.get('link');
+                        if (!linkHeader || !linkHeader.includes('rel="next"')) {
+                            console.log('No next page link found, stopping pagination');
+                            break;
+                        }
+                        
+                        page++;
+                        
+                        // Safety check to prevent infinite loops (very high limit)
+                        if (page > 1000) {
+                            console.warn('Reached safety limit of 1000 pages, stopping pagination');
+                            break;
+                        }
+                    }
+                    
+                    console.log(`Fetched ${allCommits.length} total commits`);
+
+                    // Search through ALL commits to find when the file last existed
+                    let foundCommit = null;
+                    let checkedCommits = 0;
+                    
+                    resultsList.innerHTML = `<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Searching through ${allCommits.length} commits for file...</div></div>`;
+                    
+                    for (const commit of allCommits) {
+                        checkedCommits++;
+                        console.log(`Checking commit ${checkedCommits}/${allCommits.length}: ${commit.sha.substring(0, 8)}`);
+                        
+                        // Update progress every 10 commits to avoid too frequent UI updates
+                        if (checkedCommits % 10 === 0 || checkedCommits === allCommits.length) {
+                            resultsList.innerHTML = `<div class="text-center"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Searching commit history... (${checkedCommits}/${allCommits.length})</div></div>`;
+                        }
+                        
+                        // Check if file exists in this commit
+                        const commitFileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=${commit.sha}`;
+                        const fileResponse = await fetch(commitFileUrl, createFetchOptions());
+                        
+                        if (fileResponse.status === 200) {
+                            console.log(`File found in commit ${commit.sha.substring(0, 8)}`);
+                            foundCommit = commit;
+                            break;
+                        }
+                        
+                        // Rate limiting check
+                        if (fileResponse.status === 403) {
+                            console.warn('Rate limit hit, stopping search');
+                            showError(`Rate limit reached after checking ${checkedCommits} commits. Consider using a GitHub API key for higher limits.`);
+                            return;
+                        }
+                    }
+
+                    if (foundCommit) {
+                        const fileData = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=${foundCommit.sha}`, createFetchOptions()).then(r => r.json());
+                        
+                        showSuccess(`Found file in commit history!`, {
+                            owner,
+                            repo,
+                            branch,
+                            filePath,
+                            commit: foundCommit.sha,
+                            commitMessage: foundCommit.commit.message.split('\n')[0],
+                            commitDate: new Date(foundCommit.commit.author.date).toLocaleString(),
+                            commitAuthor: foundCommit.author?.login || foundCommit.commit.author.name,
+                            currentUrl: `https://github.com/${owner}/${repo}/blob/${foundCommit.sha}/${filePath}`,
+                            rawUrl: `https://github.com/${owner}/${repo}/raw/${foundCommit.sha}/${filePath}`,
+                            checkedCommits
+                        });
+                    } else {
+                        showError(`File not found in any of the ${checkedCommits} commits in the ${branch} branch. The file may have been deleted or never existed in this branch.`);
+                    }
+
+                } catch (error) {
+                    console.error('Error in findFileHistory:', error);
+                    showError(`Error searching file history: ${error.message}`);
+                }
+            }
+
+            function showSuccess(message, data) {
+                resultsList.innerHTML = `
+                    <div class="result-item border-success">
+                        <h5 class="text-success">✅ ${message}</h5>
+                        <div class="file-info">
+                            <strong>Repository:</strong> ${data.owner}/${data.repo}<br>
+                            <strong>Branch:</strong> ${data.branch}<br>
+                            <strong>File Path:</strong> ${data.filePath}<br>
+                            <strong>Commit:</strong> <code>${data.commit.substring(0, 8)}</code>
+                        </div>
+                        ${data.commitMessage ? `
+                        <div class="commit-info">
+                            <strong>Commit Message:</strong> ${data.commitMessage}<br>
+                            <strong>Author:</strong> ${data.commitAuthor}<br>
+                            <strong>Date:</strong> ${data.commitDate}
+                        </div>
+                        ` : ''}
+                        <div class="mt-3">
+                            <a href="${data.currentUrl}" target="_blank" class="btn btn-primary btn-sm me-2">
+                                View File on GitHub
+                            </a>
+                            <a href="${data.rawUrl}" target="_blank" class="btn btn-secondary btn-sm">
+                                Download Raw File
+                            </a>
+                        </div>
+                        ${data.checkedCommits ? `<small class="text-muted">Searched through ${data.checkedCommits} commits</small>` : ''}
+                    </div>
+                `;
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                resultsList.innerHTML = '';
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                console.log('Form submitted with URL:', fileInput.value);
+                await findFileHistory(fileInput.value, apiKeyInput.value);
+            });
+        });
+    </script>
+</body>
+</html>
