@@ -91,17 +91,20 @@
                     // First, analyze commented pins from raw text
                     this.analyzeCommentedPins(yamlText);
 
-                    // Analyze pins from raw text (fallback method)
-                    this.analyzeRawText(yamlText);
-
-                    // Try to parse YAML with ESPHome tag handling
+                    // Try to parse YAML with ESPHome tag handling first (preferred method)
+                    let yamlParsed = false;
                     try {
                         const cleanedYaml = this.preprocessESPHomeYAML(yamlText);
                         const yamlDoc = jsyaml.load(cleanedYaml);
                         this.traverseObject(yamlDoc, '', '');
+                        yamlParsed = true;
                     } catch (yamlError) {
-                        // If YAML parsing fails, we still have the raw text analysis
-                        console.warn('YAML parsing failed, using text-based analysis only:', yamlError);
+                        console.warn('YAML parsing failed, falling back to text-based analysis:', yamlError);
+                    }
+
+                    // Only use raw text analysis as fallback if YAML parsing failed or found no pins
+                    if (!yamlParsed || this.pinUsage.size === 0) {
+                        this.analyzeRawText(yamlText);
                     }
 
                     return this.generateReport();
@@ -160,10 +163,14 @@
                 if (typeof obj === 'object') {
                     if (Array.isArray(obj)) {
                         obj.forEach((item, index) => {
-                            // Try to find a name property for better context
+                            // Try to find a name or id property for better context
                             let itemName = '';
-                            if (item && typeof item === 'object' && item.name) {
-                                itemName = ` (${item.name})`;
+                            if (item && typeof item === 'object') {
+                                if (item.name) {
+                                    itemName = ` (${item.name})`;
+                                } else if (item.id) {
+                                    itemName = ` (${item.id})`;
+                                }
                             }
                             this.traverseObject(item, `${path}[${index}]${itemName}`, parentKey);
                         });
@@ -180,8 +187,10 @@
                         });
                     }
                 } else if (typeof obj === 'string') {
-                    // Check if the string value might be a pin
-                    this.findPinsInLine(obj, path, false);
+                    // Only check string values if they might be pins and we're in a pin context
+                    if (parentKey && this.isPinKey(parentKey)) {
+                        this.handlePinValue(obj, path, parentKey);
+                    }
                 }
             }
 
@@ -199,16 +208,26 @@
                 if (typeof value === 'string') {
                     const normalizedPin = value.toUpperCase();
                     if (this.isValidPin(normalizedPin)) {
-                        if (!this.pinUsage.has(normalizedPin)) {
-                            this.pinUsage.set(normalizedPin, `${path} (${pinType})`);
+                        // Only update if we don't have this pin yet, or if the new path is more detailed
+                        const currentPath = this.pinUsage.get(normalizedPin);
+                        if (!currentPath || currentPath.includes('line ')) {
+                            this.pinUsage.set(normalizedPin, path);
                         }
                     }
                 } else if (typeof value === 'object' && value !== null) {
                     if (value.number && this.isValidPin(value.number)) {
                         const normalizedPin = value.number.toString().toUpperCase();
-                        const pinInfo = `${normalizedPin}${value.inverted ? ' (inverted)' : ''}${value.mode ? ` (${value.mode})` : ''}`;
-                        if (!this.pinUsage.has(normalizedPin)) {
-                            this.pinUsage.set(normalizedPin, `${path} = ${pinInfo}`);
+                        const pinDetails = [];
+                        if (value.inverted) pinDetails.push('inverted');
+                        if (value.mode) pinDetails.push(value.mode);
+
+                        const pinInfo = pinDetails.length > 0 ?
+                            `${path} = ${normalizedPin} (${pinDetails.join(', ')})` :
+                            path;
+
+                        const currentPath = this.pinUsage.get(normalizedPin);
+                        if (!currentPath || currentPath.includes('line ')) {
+                            this.pinUsage.set(normalizedPin, pinInfo);
                         }
                     }
                     // Handle other pin object properties
@@ -217,8 +236,9 @@
                             // Already handled above
                         } else if (this.isValidPin(value[key])) {
                             const normalizedPin = value[key].toString().toUpperCase();
-                            if (!this.pinUsage.has(normalizedPin)) {
-                                this.pinUsage.set(normalizedPin, `${path}.${key} (${pinType})`);
+                            const currentPath = this.pinUsage.get(normalizedPin);
+                            if (!currentPath || currentPath.includes('line ')) {
+                                this.pinUsage.set(normalizedPin, `${path}.${key}`);
                             }
                         }
                     });
@@ -227,8 +247,9 @@
                     const pinStr = value.toString();
                     if (this.isValidPin(pinStr) || this.isValidPin(`GPIO${pinStr}`)) {
                         const normalizedPin = pinStr.toUpperCase();
-                        if (!this.pinUsage.has(normalizedPin)) {
-                            this.pinUsage.set(normalizedPin, `${path} (${pinType})`);
+                        const currentPath = this.pinUsage.get(normalizedPin);
+                        if (!currentPath || currentPath.includes('line ')) {
+                            this.pinUsage.set(normalizedPin, path);
                         }
                     }
                 }
@@ -266,14 +287,15 @@
                         const pin = match[1] ? match[1].toUpperCase() : match[0].toUpperCase();
                         if (this.isValidPin(pin) && !this.shouldSkipPin(pin, line)) {
                             const normalizedPin = pin.toUpperCase();
-                            const fullPath = `${path} (${normalizedPin})`;
                             if (isCommented) {
                                 if (!this.commentedPins.has(normalizedPin)) {
-                                    this.commentedPins.set(normalizedPin, fullPath);
+                                    this.commentedPins.set(normalizedPin, `${path} (${normalizedPin})`);
                                 }
                             } else {
-                                if (!this.pinUsage.has(normalizedPin)) {
-                                    this.pinUsage.set(normalizedPin, fullPath);
+                                // Only add if we don't have a better structured path already
+                                const currentPath = this.pinUsage.get(normalizedPin);
+                                if (!currentPath) {
+                                    this.pinUsage.set(normalizedPin, `${path} (${normalizedPin})`);
                                 }
                             }
                         }
