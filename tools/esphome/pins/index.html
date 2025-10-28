@@ -197,63 +197,103 @@
 
             handlePinValue(value, path, pinType = 'pin') {
                 if (typeof value === 'string') {
-                    if (this.isValidPin(value)) {
-                        this.pinUsage.set(value, `${path} (${pinType})`);
+                    const normalizedPin = value.toUpperCase();
+                    if (this.isValidPin(normalizedPin)) {
+                        if (!this.pinUsage.has(normalizedPin)) {
+                            this.pinUsage.set(normalizedPin, path);
+                        }
                     }
                 } else if (typeof value === 'object' && value !== null) {
                     if (value.number && this.isValidPin(value.number)) {
-                        const pinInfo = `${value.number}${value.inverted ? ' (inverted)' : ''}${value.mode ? ` (${value.mode})` : ''}`;
-                        this.pinUsage.set(value.number, `${path} = ${pinInfo}`);
+                        const normalizedPin = value.number.toString().toUpperCase();
+                        const pinInfo = `${normalizedPin}${value.inverted ? ' (inverted)' : ''}${value.mode ? ` (${value.mode})` : ''}`;
+                        if (!this.pinUsage.has(normalizedPin)) {
+                            this.pinUsage.set(normalizedPin, `${path} = ${pinInfo}`);
+                        }
                     }
                     // Handle other pin object properties
                     Object.keys(value).forEach(key => {
-                        if (key === 'number' && this.isValidPin(value[key])) {
+                        if (key === 'number') {
                             // Already handled above
                         } else if (this.isValidPin(value[key])) {
-                            this.pinUsage.set(value[key], `${path}.${key} (${pinType})`);
+                            const normalizedPin = value[key].toString().toUpperCase();
+                            if (!this.pinUsage.has(normalizedPin)) {
+                                this.pinUsage.set(normalizedPin, `${path}.${key}`);
+                            }
                         }
                     });
                 } else if (typeof value === 'number') {
                     // Sometimes pins are just numbers
                     const pinStr = value.toString();
                     if (this.isValidPin(pinStr) || this.isValidPin(`GPIO${pinStr}`)) {
-                        this.pinUsage.set(pinStr, `${path} (${pinType})`);
+                        const normalizedPin = pinStr.toUpperCase();
+                        if (!this.pinUsage.has(normalizedPin)) {
+                            this.pinUsage.set(normalizedPin, path);
+                        }
                     }
                 }
             }
 
             findPinsInLine(line, path, isCommented) {
-                // More comprehensive pin detection patterns
+                // Skip lines that contain common false positives
+                const skipPatterns = [
+                    /board:\s*d1_mini/i,
+                    /address:\s*0x/i,
+                    /data:\s*0x/i,
+                    /version:/i,
+                    /then:/i,
+                    /friendly_name:/i,
+                    /name:/i
+                ];
+
+                if (skipPatterns.some(pattern => pattern.test(line))) {
+                    return;
+                }
+
+                // More precise pin detection patterns
                 const pinPatterns = [
-                    // Direct pin assignments
+                    // Direct pin assignments with colon
                     /(?:pin|clk_pin|mosi_pin|miso_pin|cs_pin|sda|scl|data_pin|enable_pin|dc_pin|reset_pin|busy_pin):\s*([A-Z0-9]+)/gi,
-                    // Pin with number
+                    // Pin with number property
                     /number:\s*([A-Z0-9]+)/gi,
-                    // Standalone GPIO/D/A pins
-                    /(GPIO\d+)/gi,
-                    /([DA]\d+)/gi,
-                    // Common ESP pins
-                    /(VCC|GND|RST|EN|TX|RX)/gi
+                    // Standalone pin references in pin context
+                    /pin:\s*([A-Z0-9]+)/gi
                 ];
 
                 pinPatterns.forEach(pattern => {
                     const matches = line.matchAll(pattern);
                     for (const match of matches) {
-                        const pin = match[1] || match[0];
-                        if (this.isValidPin(pin)) {
-                            const fullPath = `${path} (${pin})`;
+                        const pin = match[1] ? match[1].toUpperCase() : match[0].toUpperCase();
+                        if (this.isValidPin(pin) && !this.shouldSkipPin(pin, line)) {
+                            const normalizedPin = pin.toUpperCase();
+                            const fullPath = `${path}`;
                             if (isCommented) {
-                                if (!this.commentedPins.has(pin)) {
-                                    this.commentedPins.set(pin, fullPath);
+                                if (!this.commentedPins.has(normalizedPin)) {
+                                    this.commentedPins.set(normalizedPin, fullPath);
                                 }
                             } else {
-                                if (!this.pinUsage.has(pin)) {
-                                    this.pinUsage.set(pin, fullPath);
+                                if (!this.pinUsage.has(normalizedPin)) {
+                                    this.pinUsage.set(normalizedPin, fullPath);
                                 }
                             }
                         }
                     }
                 });
+            }
+
+            shouldSkipPin(pin, line) {
+                // Skip common false positives
+                const skipList = ['EN', 'ON', 'IN', 'UP', 'IF', 'OR', 'TO', 'BY', 'AT', 'AS', 'GO'];
+                if (skipList.includes(pin.toUpperCase())) {
+                    return true;
+                }
+
+                // Skip if it's part of a hex address or data
+                if (/0x[0-9A-F]*/.test(line.toUpperCase())) {
+                    return true;
+                }
+
+                return false;
             }
 
             isValidPin(pin) {
@@ -285,7 +325,20 @@
                 if (this.pinUsage.size === 0) {
                     report += "No active pins found.\n";
                 } else {
-                    const sortedActive = Array.from(this.pinUsage.entries()).sort();
+                    const sortedActive = Array.from(this.pinUsage.entries()).sort((a, b) => {
+                        // Custom sort: D pins first, then GPIO, then others
+                        const pinA = a[0], pinB = b[0];
+                        const getDOrder = (pin) => {
+                            if (pin.startsWith('D')) return 1;
+                            if (pin.startsWith('A')) return 2;
+                            if (pin.startsWith('GPIO')) return 3;
+                            return 4;
+                        };
+                        const orderA = getDOrder(pinA), orderB = getDOrder(pinB);
+                        if (orderA !== orderB) return orderA - orderB;
+                        return pinA.localeCompare(pinB);
+                    });
+
                     sortedActive.forEach(([pin, path]) => {
                         report += `${pin.padEnd(8)} → ${path}\n`;
                     });
@@ -299,7 +352,19 @@
                 if (this.commentedPins.size === 0) {
                     report += "No commented pins found.\n";
                 } else {
-                    const sortedCommented = Array.from(this.commentedPins.entries()).sort();
+                    const sortedCommented = Array.from(this.commentedPins.entries()).sort((a, b) => {
+                        const pinA = a[0], pinB = b[0];
+                        const getDOrder = (pin) => {
+                            if (pin.startsWith('D')) return 1;
+                            if (pin.startsWith('A')) return 2;
+                            if (pin.startsWith('GPIO')) return 3;
+                            return 4;
+                        };
+                        const orderA = getDOrder(pinA), orderB = getDOrder(pinB);
+                        if (orderA !== orderB) return orderA - orderB;
+                        return pinA.localeCompare(pinB);
+                    });
+
                     sortedCommented.forEach(([pin, path]) => {
                         report += `${pin.padEnd(8)} → ${path}\n`;
                     });
