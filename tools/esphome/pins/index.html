@@ -7,6 +7,12 @@
     <title>ESPHome Pin Analyzer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+
+    <!-- CodeMirror -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/lib/codemirror.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/theme/material-darker.css">
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/mode/yaml/yaml.min.js"></script>
     <style>
         .pin-used {
             color: #198754;
@@ -27,6 +33,57 @@
             font-size: 0.9em;
             line-height: 1.4;
         }
+
+        .CodeMirror {
+            height: 400px;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+        }
+
+        .csv-output {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.3;
+            white-space: pre;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            height: 400px;
+            overflow-y: auto;
+        }
+
+        .line-numbers {
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            padding: 0.75rem 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.3;
+            color: #6c757d;
+            user-select: none;
+            white-space: pre;
+            min-width: 50px;
+            flex-shrink: 0;
+        }
+
+        .csv-container {
+            display: flex;
+            height: 400px;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+        }
+
+        .csv-content {
+            flex: 1;
+            padding: 0.75rem;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.3;
+            white-space: pre;
+            background-color: #fff;
+        }
     </style>
 </head>
 
@@ -43,7 +100,7 @@
             <div class="col-12">
                 <div class="mb-3">
                     <label for="yamlInput" class="form-label">ESPHome YAML Configuration</label>
-                    <textarea class="form-control" id="yamlInput" rows="15" placeholder="Paste your ESPHome YAML configuration here..." style="font-family: 'Courier New', monospace; font-size: 0.9em;"></textarea>
+                    <div id="yamlInput"></div>
                 </div>
             </div>
         </div>
@@ -51,8 +108,11 @@
         <div class="row">
             <div class="col-12">
                 <div class="mb-3">
-                    <label for="analysisOutput" class="form-label">Pin Analysis Results</label>
-                    <textarea class="form-control analysis-result" id="analysisOutput" rows="20" readonly placeholder="Pin analysis will appear here..."></textarea>
+                    <label for="analysisOutput" class="form-label">Pin Analysis Results (CSV)</label>
+                    <div class="csv-container">
+                        <div class="line-numbers" id="lineNumbers"></div>
+                        <div class="csv-content" id="analysisOutput">Pin analysis will appear here...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -65,6 +125,7 @@
             constructor() {
                 this.pinUsage = new Map();
                 this.commentedPins = new Map();
+                this.lineNumberMap = new Map();
                 this.allKnownPins = [
                     // ESP8266 pins
                     'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10',
@@ -86,25 +147,22 @@
             analyzeYAML(yamlText) {
                 this.pinUsage.clear();
                 this.commentedPins.clear();
+                this.lineNumberMap.clear();
 
                 try {
                     // First, analyze commented pins from raw text
                     this.analyzeCommentedPins(yamlText);
 
-                    // Try to parse YAML with ESPHome tag handling first (preferred method)
-                    let yamlParsed = false;
+                    // Second, analyze raw text to capture line numbers for all pins
+                    this.analyzeRawText(yamlText);
+
+                    // Try to parse YAML with ESPHome tag handling (preferred method for structured paths)
                     try {
                         const cleanedYaml = this.preprocessESPHomeYAML(yamlText);
                         const yamlDoc = jsyaml.load(cleanedYaml);
                         this.traverseObject(yamlDoc, '', '');
-                        yamlParsed = true;
                     } catch (yamlError) {
-                        console.warn('YAML parsing failed, falling back to text-based analysis:', yamlError);
-                    }
-
-                    // Only use raw text analysis as fallback if YAML parsing failed or found no pins
-                    if (!yamlParsed || this.pinUsage.size === 0) {
-                        this.analyzeRawText(yamlText);
+                        console.warn('YAML parsing failed, using text-based analysis only:', yamlError);
                     }
 
                     return this.generateReport();
@@ -133,6 +191,7 @@
             }
 
             analyzeRawText(yamlText) {
+                this.lineNumberMap = new Map(); // Store pin -> line number mapping
                 const lines = yamlText.split('\n');
                 lines.forEach((line, index) => {
                     const trimmedLine = line.trim();
@@ -140,8 +199,62 @@
                     // Skip commented lines (already handled)
                     if (trimmedLine.startsWith('#')) return;
 
-                    // Look for pin assignments in active lines
-                    this.findPinsInLine(line, `line ${index + 1}`, false);
+                    // Look for pin assignments in active lines and store line numbers
+                    this.findPinsInLineWithNumber(line, `line ${index + 1}`, false, index + 1);
+                });
+            }
+
+            findPinsInLineWithNumber(line, path, isCommented, lineNumber) {
+                // Skip lines that contain common false positives
+                const skipPatterns = [
+                    /board:\s*d1_mini/i,
+                    /address:\s*0x/i,
+                    /data:\s*0x/i,
+                    /version:/i,
+                    /then:/i,
+                    /friendly_name:/i,
+                    /name:/i
+                ];
+
+                if (skipPatterns.some(pattern => pattern.test(line))) {
+                    return;
+                }
+
+                // More precise pin detection patterns
+                const pinPatterns = [
+                    // Direct pin assignments with colon
+                    /(?:pin|clk_pin|mosi_pin|miso_pin|cs_pin|sda|scl|data_pin|enable_pin|dc_pin|reset_pin|busy_pin):\s*([A-Z0-9]+)/gi,
+                    // Pin with number property
+                    /number:\s*([A-Z0-9]+)/gi,
+                    // Standalone pin references in pin context
+                    /pin:\s*([A-Z0-9]+)/gi
+                ];
+
+                pinPatterns.forEach(pattern => {
+                    const matches = line.matchAll(pattern);
+                    for (const match of matches) {
+                        const pin = match[1] ? match[1].toUpperCase() : match[0].toUpperCase();
+                        if (this.isValidPin(pin) && !this.shouldSkipPin(pin, line)) {
+                            const normalizedPin = pin.toUpperCase();
+
+                            // Store line number mapping for active pins
+                            if (!isCommented) {
+                                this.lineNumberMap.set(normalizedPin, lineNumber);
+                            }
+
+                            if (isCommented) {
+                                if (!this.commentedPins.has(normalizedPin)) {
+                                    this.commentedPins.set(normalizedPin, `${path} (${normalizedPin})`);
+                                }
+                            } else {
+                                // Only add if we don't have a better structured path already
+                                const currentPath = this.pinUsage.get(normalizedPin);
+                                if (!currentPath) {
+                                    this.pinUsage.set(normalizedPin, `${path} (${normalizedPin})`);
+                                }
+                            }
+                        }
+                    }
                 });
             }
 
@@ -339,60 +452,146 @@
             }
 
             generateReport() {
-                let report = "";
+                let csvLines = [];
 
-                // Active pins
-                report += `🟢 ${this.pinUsage.size} ACTIVE PINS:\n`;
-                report += "========================\n";
-                if (this.pinUsage.size === 0) {
-                    report += "No active pins found.\n";
+                // CSV Header
+                csvLines.push("Pin;Path;ID;Friendly Name;Modes;Line Number");
+
+                // Process active pins
+                const sortedActive = Array.from(this.pinUsage.entries()).sort((a, b) => {
+                    const pinA = a[0], pinB = b[0];
+                    const getDOrder = (pin) => {
+                        if (pin.startsWith('D')) return 1;
+                        if (pin.startsWith('A')) return 2;
+                        if (pin.startsWith('GPIO')) return 3;
+                        return 4;
+                    };
+                    const orderA = getDOrder(pinA), orderB = getDOrder(pinB);
+                    if (orderA !== orderB) return orderA - orderB;
+                    return pinA.localeCompare(pinB);
+                });
+
+                sortedActive.forEach(([pin, path]) => {
+                    const { componentPath, id, friendlyName, modes, lineNumber } = this.parsePathInfo(path, pin);
+                    csvLines.push(`${pin};${componentPath};${id};${friendlyName};${modes};${lineNumber}`);
+                });
+
+                // Process commented pins
+                const sortedCommented = Array.from(this.commentedPins.entries()).sort((a, b) => {
+                    const pinA = a[0], pinB = b[0];
+                    const getDOrder = (pin) => {
+                        if (pin.startsWith('D')) return 1;
+                        if (pin.startsWith('A')) return 2;
+                        if (pin.startsWith('GPIO')) return 3;
+                        return 4;
+                    };
+                    const orderA = getDOrder(pinA), orderB = getDOrder(pinB);
+                    if (orderA !== orderB) return orderA - orderB;
+                    return pinA.localeCompare(pinB);
+                });
+
+                sortedCommented.forEach(([pin, path]) => {
+                    const { componentPath, id, friendlyName, modes, lineNumber } = this.parsePathInfo(path, pin);
+                    csvLines.push(`#${pin};${componentPath};${id};${friendlyName};${modes};${lineNumber}`);
+                });
+
+                return csvLines.join('\n');
+            }
+
+            parsePathInfo(path, pin = null) {
+                let componentPath = "";
+                let id = "";
+                let friendlyName = "";
+                let modes = "";
+                let lineNumber = "";
+
+                // Handle different path formats
+                if (path.includes('line ') && path.includes('(commented)')) {
+                    // Commented pin format: "line 41 (commented) (D0)"
+                    const lineMatch = path.match(/line\s+(\d+)/);
+                    if (lineMatch) {
+                        lineNumber = lineMatch[1];
+                    }
+                    componentPath = "commented";
                 } else {
-                    const sortedActive = Array.from(this.pinUsage.entries()).sort((a, b) => {
-                        // Custom sort: D pins first, then GPIO, then others
-                        const pinA = a[0], pinB = b[0];
-                        const getDOrder = (pin) => {
-                            if (pin.startsWith('D')) return 1;
-                            if (pin.startsWith('A')) return 2;
-                            if (pin.startsWith('GPIO')) return 3;
-                            return 4;
-                        };
-                        const orderA = getDOrder(pinA), orderB = getDOrder(pinB);
-                        if (orderA !== orderB) return orderA - orderB;
-                        return pinA.localeCompare(pinB);
+                    // Active pin formats
+                    // Extract friendly name from parentheses (human readable names)
+                    const friendlyNameMatches = path.match(/\(([^)]+)\)/g);
+                    if (friendlyNameMatches) {
+                        friendlyNameMatches.forEach(match => {
+                            const content = match.replace(/[()]/g, '');
+                            // Check if it's a friendly name (has spaces, quotes, or common words)
+                            if ((content.includes(' ') || content.includes('"') ||
+                                content.includes('LED') || content.includes('Sensor') ||
+                                content.includes('Relais') || content.includes('Light')) &&
+                                !content.includes('inverted') && !content.includes('INPUT_PULLUP')) {
+                                friendlyName = `"${content.replace(/"/g, '')}"`;
+                            }
+                        });
+                    }
+
+                    // Extract modes (technical parameters)
+                    const modeMatches = path.match(/=\s*[A-Z0-9]+\s*\(([^)]+)\)/);
+                    if (modeMatches) {
+                        modes = modeMatches[1];
+                    } else {
+                        // Look for modes in other parentheses
+                        const allMatches = path.match(/\(([^)]+)\)/g);
+                        if (allMatches) {
+                            allMatches.forEach(match => {
+                                const content = match.replace(/[()]/g, '');
+                                if (content.includes('inverted') || content.includes('INPUT_PULLUP') ||
+                                    content.includes('OUTPUT') || content.includes('pin')) {
+                                    if (modes) modes += ', ';
+                                    modes += content;
+                                }
+                            });
+                        }
+                    }
+
+                    // Extract ID from path - look for component IDs
+                    const allParentheses = path.match(/\(([^)]+)\)/g) || [];
+                    allParentheses.forEach(match => {
+                        const content = match.replace(/[()]/g, '');
+
+                        // Check if it's a component ID (specific patterns)
+                        if ((content.includes('_') ||
+                            content.match(/^(led|sensor|relais|mcp|gpio|output|switch|binary_sensor)/i)) &&
+                            !content.includes(' ') &&
+                            !content.includes('"') &&
+                            !content.includes('inverted') &&
+                            !content.includes('INPUT_PULLUP') &&
+                            !content.includes('OUTPUT') &&
+                            !content.includes('LED') &&
+                            !content.includes('Sensor') &&
+                            !content.includes('Relais') &&
+                            !content.includes('Light') &&
+                            !content.includes('GPIO') &&
+                            !content.includes('Temperature') &&
+                            !content.includes('Humidity') &&
+                            !content.includes('Signal') &&
+                            content !== friendlyName.replace(/"/g, '')) {
+                            id = content;
+                        }
                     });
 
-                    sortedActive.forEach(([pin, path]) => {
-                        report += `${pin.padEnd(8)} → ${path}\n`;
-                    });
+                    // Clean up component path - extract base path before parentheses
+                    const basePathMatch = path.match(/^([^(=]+)/);
+                    if (basePathMatch) {
+                        componentPath = basePathMatch[1].trim();
+                    } else {
+                        componentPath = path.split('=')[0].trim();
+                    }
+
+                    // For active pins, get line number from our mapping
+                    if (pin && this.lineNumberMap && this.lineNumberMap.has(pin)) {
+                        lineNumber = this.lineNumberMap.get(pin).toString();
+                    } else {
+                        lineNumber = "";
+                    }
                 }
 
-                report += "\n";
-
-                // Commented pins
-                report += `⚪ ${this.commentedPins.size} COMMENTED/DISABLED PINS:\n`;
-                report += "=================================\n";
-                if (this.commentedPins.size === 0) {
-                    report += "No commented pins found.\n";
-                } else {
-                    const sortedCommented = Array.from(this.commentedPins.entries()).sort((a, b) => {
-                        const pinA = a[0], pinB = b[0];
-                        const getDOrder = (pin) => {
-                            if (pin.startsWith('D')) return 1;
-                            if (pin.startsWith('A')) return 2;
-                            if (pin.startsWith('GPIO')) return 3;
-                            return 4;
-                        };
-                        const orderA = getDOrder(pinA), orderB = getDOrder(pinB);
-                        if (orderA !== orderB) return orderA - orderB;
-                        return pinA.localeCompare(pinB);
-                    });
-
-                    sortedCommented.forEach(([pin, path]) => {
-                        report += `${pin.padEnd(8)} → ${path}\n`;
-                    });
-                }
-
-                return report;
+                return { componentPath, id, friendlyName, modes, lineNumber };
             }
         }
 
@@ -401,30 +600,49 @@
 
         // Set up event listeners
         document.addEventListener('DOMContentLoaded', function () {
-            const yamlInput = document.getElementById('yamlInput');
             const analysisOutput = document.getElementById('analysisOutput');
+            const lineNumbers = document.getElementById('lineNumbers');
+
+            // Initialize CodeMirror
+            const editor = CodeMirror(document.getElementById('yamlInput'), {
+                mode: 'yaml',
+                theme: 'default',
+                lineNumbers: true,
+                lineWrapping: true,
+                indentUnit: 2,
+                tabSize: 2,
+                placeholder: 'Paste your ESPHome YAML configuration here...',
+                viewportMargin: Infinity
+            });
+
+            function updateLineNumbers(csvContent) {
+                const lines = csvContent.split('\n');
+                const lineNumbersText = lines.map((_, index) => (index + 1).toString().padStart(3, ' ')).join('\n');
+                lineNumbers.textContent = lineNumbersText;
+            }
 
             function performAnalysis() {
-                const yamlContent = yamlInput.value.trim();
+                const yamlContent = editor.getValue().trim();
                 if (yamlContent) {
                     const analysis = analyzer.analyzeYAML(yamlContent);
-                    analysisOutput.value = analysis;
+                    analysisOutput.textContent = analysis;
+                    updateLineNumbers(analysis);
                 } else {
-                    analysisOutput.value = 'Please paste your ESPHome YAML configuration above.';
+                    const placeholder = 'Pin;Path;ID;Friendly Name;Modes;Line Number\nPaste your ESPHome YAML configuration above to analyze pin usage.';
+                    analysisOutput.textContent = placeholder;
+                    updateLineNumbers(placeholder);
                 }
             }
 
             // Analyze on input change (with debounce)
             let timeout;
-            yamlInput.addEventListener('input', function () {
+            editor.on('change', function () {
                 clearTimeout(timeout);
                 timeout = setTimeout(performAnalysis, 500);
             });
 
-            // Analyze on paste
-            yamlInput.addEventListener('paste', function () {
-                setTimeout(performAnalysis, 100);
-            });
+            // Initial setup
+            performAnalysis();
         });
     </script>
 </body>
