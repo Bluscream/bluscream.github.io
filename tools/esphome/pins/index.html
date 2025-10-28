@@ -200,7 +200,7 @@
                     const normalizedPin = value.toUpperCase();
                     if (this.isValidPin(normalizedPin)) {
                         if (!this.pinUsage.has(normalizedPin)) {
-                            this.pinUsage.set(normalizedPin, path);
+                            this.pinUsage.set(normalizedPin, `${path} (${pinType})`);
                         }
                     }
                 } else if (typeof value === 'object' && value !== null) {
@@ -218,7 +218,7 @@
                         } else if (this.isValidPin(value[key])) {
                             const normalizedPin = value[key].toString().toUpperCase();
                             if (!this.pinUsage.has(normalizedPin)) {
-                                this.pinUsage.set(normalizedPin, `${path}.${key}`);
+                                this.pinUsage.set(normalizedPin, `${path}.${key} (${pinType})`);
                             }
                         }
                     });
@@ -228,7 +228,7 @@
                     if (this.isValidPin(pinStr) || this.isValidPin(`GPIO${pinStr}`)) {
                         const normalizedPin = pinStr.toUpperCase();
                         if (!this.pinUsage.has(normalizedPin)) {
-                            this.pinUsage.set(normalizedPin, path);
+                            this.pinUsage.set(normalizedPin, `${path} (${pinType})`);
                         }
                     }
                 }
@@ -266,7 +266,7 @@
                         const pin = match[1] ? match[1].toUpperCase() : match[0].toUpperCase();
                         if (this.isValidPin(pin) && !this.shouldSkipPin(pin, line)) {
                             const normalizedPin = pin.toUpperCase();
-                            const fullPath = `${path}`;
+                            const fullPath = `${path} (${normalizedPin})`;
                             if (isCommented) {
                                 if (!this.commentedPins.has(normalizedPin)) {
                                     this.commentedPins.set(normalizedPin, fullPath);
