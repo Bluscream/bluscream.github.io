@@ -57,18 +57,6 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-12">
-                <div class="alert alert-info">
-                    <h6>Legend:</h6>
-                    <ul class="mb-0">
-                        <li><span class="pin-used">Green</span>: Active pin usage</li>
-                        <li><span class="pin-commented">Gray/Italic</span>: Commented out pin usage</li>
-                        <li><span class="pin-unused">Red</span>: Available/unused pins</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -79,14 +67,19 @@
                 this.commentedPins = new Map();
                 this.allKnownPins = [
                     // ESP8266 pins
-                    'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8',
+                    'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10',
                     'A0', 'VCC', 'GND', 'RST', 'EN', 'TX', 'RX',
-                    // GPIO pins
+                    // GPIO pins (ESP8266 mapping)
                     'GPIO0', 'GPIO1', 'GPIO2', 'GPIO3', 'GPIO4', 'GPIO5',
                     'GPIO12', 'GPIO13', 'GPIO14', 'GPIO15', 'GPIO16',
-                    // ESP32 pins (common ones)
-                    'GPIO18', 'GPIO19', 'GPIO21', 'GPIO22', 'GPIO23', 'GPIO25',
-                    'GPIO26', 'GPIO27', 'GPIO32', 'GPIO33', 'GPIO34', 'GPIO35'
+                    // ESP32 pins (comprehensive list)
+                    'GPIO6', 'GPIO7', 'GPIO8', 'GPIO9', 'GPIO10', 'GPIO11',
+                    'GPIO17', 'GPIO18', 'GPIO19', 'GPIO20', 'GPIO21', 'GPIO22', 'GPIO23',
+                    'GPIO24', 'GPIO25', 'GPIO26', 'GPIO27', 'GPIO28', 'GPIO29', 'GPIO30', 'GPIO31',
+                    'GPIO32', 'GPIO33', 'GPIO34', 'GPIO35', 'GPIO36', 'GPIO37', 'GPIO38', 'GPIO39',
+                    // Additional common pins
+                    'IO0', 'IO1', 'IO2', 'IO3', 'IO4', 'IO5', 'IO12', 'IO13', 'IO14', 'IO15', 'IO16',
+                    'MOSI', 'MISO', 'SCK', 'SDA', 'SCL', 'CLK'
                 ];
             }
 
@@ -98,14 +91,55 @@
                     // First, analyze commented pins from raw text
                     this.analyzeCommentedPins(yamlText);
 
-                    // Then parse the active YAML
-                    const yamlDoc = jsyaml.load(yamlText);
-                    this.traverseObject(yamlDoc, '');
+                    // Analyze pins from raw text (fallback method)
+                    this.analyzeRawText(yamlText);
+
+                    // Try to parse YAML with ESPHome tag handling
+                    try {
+                        const cleanedYaml = this.preprocessESPHomeYAML(yamlText);
+                        const yamlDoc = jsyaml.load(cleanedYaml);
+                        this.traverseObject(yamlDoc, '', '');
+                    } catch (yamlError) {
+                        // If YAML parsing fails, we still have the raw text analysis
+                        console.warn('YAML parsing failed, using text-based analysis only:', yamlError);
+                    }
 
                     return this.generateReport();
                 } catch (error) {
-                    return `Error parsing YAML: ${error.message}`;
+                    return `Error analyzing YAML: ${error.message}`;
                 }
+            }
+
+            preprocessESPHomeYAML(yamlText) {
+                // Replace ESPHome-specific tags with placeholder values
+                let cleaned = yamlText;
+
+                // Handle !secret tags
+                cleaned = cleaned.replace(/!secret\s+\w+/g, '"PLACEHOLDER_SECRET"');
+
+                // Handle !include tags
+                cleaned = cleaned.replace(/!include\s+[\w\/\.\-]+/g, '"PLACEHOLDER_INCLUDE"');
+
+                // Handle !extend tags
+                cleaned = cleaned.replace(/!extend\s+[\w\/\.\-]+/g, '"PLACEHOLDER_EXTEND"');
+
+                // Handle !lambda tags (more complex, just replace with placeholder)
+                cleaned = cleaned.replace(/!lambda\s*[\|\>]?[\s\S]*?(?=\n\S|\n$)/g, '"PLACEHOLDER_LAMBDA"');
+
+                return cleaned;
+            }
+
+            analyzeRawText(yamlText) {
+                const lines = yamlText.split('\n');
+                lines.forEach((line, index) => {
+                    const trimmedLine = line.trim();
+
+                    // Skip commented lines (already handled)
+                    if (trimmedLine.startsWith('#')) return;
+
+                    // Look for pin assignments in active lines
+                    this.findPinsInLine(line, `line ${index + 1}`, false);
+                });
             }
 
             analyzeCommentedPins(yamlText) {
@@ -120,13 +154,18 @@
                 });
             }
 
-            traverseObject(obj, path) {
+            traverseObject(obj, path, parentKey = '') {
                 if (obj === null || obj === undefined) return;
 
                 if (typeof obj === 'object') {
                     if (Array.isArray(obj)) {
                         obj.forEach((item, index) => {
-                            this.traverseObject(item, `${path}[${index}]`);
+                            // Try to find a name property for better context
+                            let itemName = '';
+                            if (item && typeof item === 'object' && item.name) {
+                                itemName = ` (${item.name})`;
+                            }
+                            this.traverseObject(item, `${path}[${index}]${itemName}`, parentKey);
                         });
                     } else {
                         Object.keys(obj).forEach(key => {
@@ -134,9 +173,9 @@
 
                             // Check if this key indicates a pin
                             if (this.isPinKey(key)) {
-                                this.handlePinValue(obj[key], newPath);
+                                this.handlePinValue(obj[key], newPath, key);
                             } else {
-                                this.traverseObject(obj[key], newPath);
+                                this.traverseObject(obj[key], newPath, key);
                             }
                         });
                     }
@@ -156,10 +195,10 @@
                 return pinKeys.includes(key.toLowerCase());
             }
 
-            handlePinValue(value, path) {
+            handlePinValue(value, path, pinType = 'pin') {
                 if (typeof value === 'string') {
                     if (this.isValidPin(value)) {
-                        this.pinUsage.set(value, path);
+                        this.pinUsage.set(value, `${path} (${pinType})`);
                     }
                 } else if (typeof value === 'object' && value !== null) {
                     if (value.number && this.isValidPin(value.number)) {
@@ -171,36 +210,46 @@
                         if (key === 'number' && this.isValidPin(value[key])) {
                             // Already handled above
                         } else if (this.isValidPin(value[key])) {
-                            this.pinUsage.set(value[key], `${path}.${key}`);
+                            this.pinUsage.set(value[key], `${path}.${key} (${pinType})`);
                         }
                     });
                 } else if (typeof value === 'number') {
                     // Sometimes pins are just numbers
                     const pinStr = value.toString();
                     if (this.isValidPin(pinStr) || this.isValidPin(`GPIO${pinStr}`)) {
-                        this.pinUsage.set(pinStr, path);
+                        this.pinUsage.set(pinStr, `${path} (${pinType})`);
                     }
                 }
             }
 
             findPinsInLine(line, path, isCommented) {
-                // Find pin patterns in text
+                // More comprehensive pin detection patterns
                 const pinPatterns = [
-                    /pin:\s*([A-Z0-9]+)/gi,
-                    /([A-Z]+\d+)/gi,
+                    // Direct pin assignments
+                    /(?:pin|clk_pin|mosi_pin|miso_pin|cs_pin|sda|scl|data_pin|enable_pin|dc_pin|reset_pin|busy_pin):\s*([A-Z0-9]+)/gi,
+                    // Pin with number
+                    /number:\s*([A-Z0-9]+)/gi,
+                    // Standalone GPIO/D/A pins
                     /(GPIO\d+)/gi,
-                    /([A-Z]\d+)/gi
+                    /([DA]\d+)/gi,
+                    // Common ESP pins
+                    /(VCC|GND|RST|EN|TX|RX)/gi
                 ];
 
                 pinPatterns.forEach(pattern => {
-                    let match;
-                    while ((match = pattern.exec(line)) !== null) {
+                    const matches = line.matchAll(pattern);
+                    for (const match of matches) {
                         const pin = match[1] || match[0];
                         if (this.isValidPin(pin)) {
+                            const fullPath = `${path} (${pin})`;
                             if (isCommented) {
-                                this.commentedPins.set(pin, path);
-                            } else if (!this.pinUsage.has(pin)) {
-                                this.pinUsage.set(pin, path);
+                                if (!this.commentedPins.has(pin)) {
+                                    this.commentedPins.set(pin, fullPath);
+                                }
+                            } else {
+                                if (!this.pinUsage.has(pin)) {
+                                    this.pinUsage.set(pin, fullPath);
+                                }
                             }
                         }
                     }
@@ -228,11 +277,11 @@
             }
 
             generateReport() {
-                let report = "=== ESPHome Pin Analysis Report ===\n\n";
+                let report = "";
 
                 // Active pins
-                report += "🟢 ACTIVE PINS:\n";
-                report += "================\n";
+                report += `🟢 ${this.pinUsage.size} ACTIVE PINS:\n`;
+                report += "========================\n";
                 if (this.pinUsage.size === 0) {
                     report += "No active pins found.\n";
                 } else {
@@ -245,8 +294,8 @@
                 report += "\n";
 
                 // Commented pins
-                report += "⚪ COMMENTED/DISABLED PINS:\n";
-                report += "===========================\n";
+                report += `⚪ ${this.commentedPins.size} COMMENTED/DISABLED PINS:\n`;
+                report += "=================================\n";
                 if (this.commentedPins.size === 0) {
                     report += "No commented pins found.\n";
                 } else {
@@ -255,32 +304,6 @@
                         report += `${pin.padEnd(8)} → ${path}\n`;
                     });
                 }
-
-                report += "\n";
-
-                // Available pins
-                report += "🔴 AVAILABLE/UNUSED PINS:\n";
-                report += "==========================\n";
-                const usedPins = new Set([...this.pinUsage.keys(), ...this.commentedPins.keys()]);
-                const availablePins = this.allKnownPins.filter(pin => !usedPins.has(pin));
-
-                if (availablePins.length === 0) {
-                    report += "All known pins are in use or commented.\n";
-                } else {
-                    availablePins.forEach(pin => {
-                        report += `${pin}\n`;
-                    });
-                }
-
-                report += "\n";
-
-                // Summary
-                report += "📊 SUMMARY:\n";
-                report += "============\n";
-                report += `Active pins:     ${this.pinUsage.size}\n`;
-                report += `Commented pins:  ${this.commentedPins.size}\n`;
-                report += `Available pins:  ${availablePins.length}\n`;
-                report += `Total known pins: ${this.allKnownPins.length}\n`;
 
                 return report;
             }
