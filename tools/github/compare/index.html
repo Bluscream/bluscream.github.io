@@ -70,7 +70,7 @@
             </div>
             <div class="card-body p-4">
                 <!-- Base Repository -->
-                <div class="mb-4">
+                <div class="mb-3">
                     <label for="baseUrl" class="form-label">
                         <i class="bi bi-arrow-left-circle"></i> Base Repository/Branch URL
                     </label>
@@ -78,6 +78,13 @@
                     <small class="example-link" onclick="fillExample('base')">
                         Example: https://github.com/original/repo/tree/main
                     </small>
+                </div>
+
+                <!-- Swap Button -->
+                <div class="text-center mb-3">
+                    <button class="btn btn-outline-secondary" onclick="swapUrls()" title="Swap base and head">
+                        <i class="bi bi-arrow-down-up"></i> Swap
+                    </button>
                 </div>
 
                 <!-- Head Repository -->
@@ -246,6 +253,22 @@
             } else {
                 document.getElementById('headUrl').value = 'https://github.com/Bluscream/discord-games/tree/main';
             }
+        }
+
+        function swapUrls() {
+            const baseInput = document.getElementById('baseUrl');
+            const headInput = document.getElementById('headUrl');
+
+            const temp = baseInput.value;
+            baseInput.value = headInput.value;
+            headInput.value = temp;
+
+            // Auto-generate if both fields have values
+            if (baseInput.value && headInput.value) {
+                generateCompareUrl();
+            }
+
+            showInfo('URLs swapped!', 'info');
         }
 
         // Auto-generate on input
