@@ -20,6 +20,9 @@ const splitHandle = document.querySelector('[data-role="split-handle"]');
 const inputPane = splitContainer?.querySelector('[data-pane="input"]');
 const outputPane = splitContainer?.querySelector('[data-pane="output"]');
 
+const SPLIT_STORAGE_KEY = "hass-layout/split-ratio";
+const MIN_PANE_WIDTH = 240;
+
 const resizeInput = enableAutoResize(yamlInputEditor, { minLines: 24, padding: 48 });
 const resizeOutput = enableAutoResize(yamlOutputEditor, { minLines: 24, padding: 48 });
 const resizeOverrides = enableAutoResize(overridesEditor, { minLines: 16, padding: 48 });
@@ -39,9 +42,6 @@ async function bootstrap() {
     });
     positionSlider.addEventListener("change", processYaml);
 }
-
-const SPLIT_STORAGE_KEY = "hass-layout/split-ratio";
-const MIN_PANE_WIDTH = 240;
 
 function initSplitHandle() {
     if (!splitContainer || !splitHandle || !inputPane || !outputPane) {
