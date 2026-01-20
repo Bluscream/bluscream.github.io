@@ -20,8 +20,8 @@ const splitHandle = document.querySelector('[data-role="split-handle"]');
 const inputPane = splitContainer?.querySelector('[data-pane="input"]');
 const outputPane = splitContainer?.querySelector('[data-pane="output"]');
 
-const SPLIT_STORAGE_KEY = "hass-layout/split-ratio";
 const MIN_PANE_WIDTH = 240;
+let splitRatio = 0.5;
 
 const resizeInput = enableAutoResize(yamlInputEditor, { minLines: 24, padding: 48 });
 const resizeOutput = enableAutoResize(yamlOutputEditor, { minLines: 24, padding: 48 });
@@ -48,9 +48,7 @@ function initSplitHandle() {
         return;
     }
 
-    const savedRatio = safeNumber(localStorage.getItem(SPLIT_STORAGE_KEY));
-    const ratio = Number.isFinite(savedRatio) ? savedRatio : 0.5;
-    applySplitRatio(ratio);
+    applySplitRatio(splitRatio);
 
     const onPointerMove = (event) => {
         if (!splitHandle.classList.contains("dragging")) return;
@@ -61,7 +59,8 @@ function initSplitHandle() {
         const raw = (event.clientX - rect.left) / rect.width;
         const minRatio = MIN_PANE_WIDTH / rect.width;
         const clamped = clamp(raw, minRatio, 1 - minRatio);
-        applySplitRatio(clamped);
+        splitRatio = clamped;
+        applySplitRatio(splitRatio);
     };
 
     const stopDragging = () => {
@@ -69,7 +68,6 @@ function initSplitHandle() {
         splitHandle.classList.remove("dragging");
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", stopDragging);
-        storeSplitRatio();
     };
 
     splitHandle.addEventListener("pointerdown", (event) => {
@@ -81,14 +79,14 @@ function initSplitHandle() {
     });
 
     window.addEventListener("resize", () => {
-        const ratio = safeNumber(localStorage.getItem(SPLIT_STORAGE_KEY)) ?? 0.5;
-        applySplitRatio(ratio);
+        applySplitRatio(splitRatio);
     });
 }
 
 function applySplitRatio(ratio) {
     if (!inputPane || !outputPane) return;
     const sanitised = clamp(ratio, 0.2, 0.8);
+    splitRatio = sanitised;
     inputPane.style.flex = `0 0 ${sanitised * 100}%`;
     outputPane.style.flex = `0 0 ${(1 - sanitised) * 100}%`;
     resizeInput();
@@ -96,23 +94,6 @@ function applySplitRatio(ratio) {
     splitHandle?.classList.toggle("dragging", splitHandle?.classList.contains("dragging") ?? false);
     inputPane.dataset.splitRatio = sanitised;
     outputPane.dataset.splitRatio = 1 - sanitised;
-    storeSplitRatio(sanitised);
-}
-
-function storeSplitRatio(ratio) {
-    if (!Number.isFinite(ratio)) {
-        ratio = safeNumber(localStorage.getItem(SPLIT_STORAGE_KEY)) ?? 0.5;
-    }
-    try {
-        localStorage.setItem(SPLIT_STORAGE_KEY, String(ratio));
-    } catch (_) {
-        /* ignore */
-    }
-}
-
-function safeNumber(value) {
-    const number = parseFloat(value);
-    return Number.isFinite(number) ? number : null;
 }
 
 function clamp(value, min, max) {
