@@ -32,21 +32,22 @@
                 <label for="position-slider">Relative position</label>
                 <p class="group-hint">Scale all <code>left/top</code> values between -100% and +100%.</p>
                 <div class="slider-row">
-                    <input id="position-slider" type="range" min="-100" max="100" value="100" step="1" />
-                    <output id="position-value">100%</output>
+                    <input id="position-slider" type="range" min="-100" max="100" value="0" step="1" />
+                    <output id="position-value">0%</output>
                 </div>
             </div>
         </section>
 
-        <section class="card editor-grid">
-            <div class="editor-pane">
+        <section class="card editor-split" data-role="editor-split">
+            <div class="editor-pane" data-pane="input">
                 <div class="editor-heading">
                     <h2>YAML Input</h2>
                     <p>Paste cards, picture-elements blocks, or entire dashboards.</p>
                 </div>
                 <div id="yaml-input" class="editor-surface" aria-label="YAML input editor"></div>
             </div>
-            <div class="editor-pane">
+            <div class="split-handle" data-role="split-handle" aria-label="Resize editors" role="separator" tabindex="0"></div>
+            <div class="editor-pane" data-pane="output">
                 <div class="editor-heading">
                     <h2>YAML Output</h2>
                     <p>Processed copy reflecting the overrides below.</p>

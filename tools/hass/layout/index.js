@@ -15,10 +15,15 @@ const yamlOutputEditor = createEditor("yaml-output", { mode: "ace/mode/yaml", re
 const overridesEditor = createEditor("overrides-editor", { mode: "ace/mode/json" });
 const positionSlider = document.getElementById("position-slider");
 const positionValue = document.getElementById("position-value");
+const splitContainer = document.querySelector('[data-role="editor-split"]');
+const splitHandle = document.querySelector('[data-role="split-handle"]');
+const inputPane = splitContainer?.querySelector('[data-pane="input"]');
+const outputPane = splitContainer?.querySelector('[data-pane="output"]');
 
 const resizeInput = enableAutoResize(yamlInputEditor, { minLines: 24, padding: 48 });
 const resizeOutput = enableAutoResize(yamlOutputEditor, { minLines: 24, padding: 48 });
 const resizeOverrides = enableAutoResize(overridesEditor, { minLines: 16, padding: 48 });
+initSplitHandle();
 
 bootstrap();
 
@@ -33,6 +38,85 @@ async function bootstrap() {
         positionValue.textContent = `${positionSlider.value}%`;
     });
     positionSlider.addEventListener("change", processYaml);
+}
+
+const SPLIT_STORAGE_KEY = "hass-layout/split-ratio";
+const MIN_PANE_WIDTH = 240;
+
+function initSplitHandle() {
+    if (!splitContainer || !splitHandle || !inputPane || !outputPane) {
+        return;
+    }
+
+    const savedRatio = safeNumber(localStorage.getItem(SPLIT_STORAGE_KEY));
+    const ratio = Number.isFinite(savedRatio) ? savedRatio : 0.5;
+    applySplitRatio(ratio);
+
+    const onPointerMove = (event) => {
+        if (!splitHandle.classList.contains("dragging")) return;
+        const rect = splitContainer.getBoundingClientRect();
+        if (rect.width <= MIN_PANE_WIDTH * 2) {
+            return;
+        }
+        const raw = (event.clientX - rect.left) / rect.width;
+        const minRatio = MIN_PANE_WIDTH / rect.width;
+        const clamped = clamp(raw, minRatio, 1 - minRatio);
+        applySplitRatio(clamped);
+    };
+
+    const stopDragging = () => {
+        if (!splitHandle.classList.contains("dragging")) return;
+        splitHandle.classList.remove("dragging");
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("pointerup", stopDragging);
+        storeSplitRatio();
+    };
+
+    splitHandle.addEventListener("pointerdown", (event) => {
+        if (window.matchMedia("(max-width: 720px)").matches) return;
+        event.preventDefault();
+        splitHandle.classList.add("dragging");
+        window.addEventListener("pointermove", onPointerMove);
+        window.addEventListener("pointerup", stopDragging, { once: false });
+    });
+
+    window.addEventListener("resize", () => {
+        const ratio = safeNumber(localStorage.getItem(SPLIT_STORAGE_KEY)) ?? 0.5;
+        applySplitRatio(ratio);
+    });
+}
+
+function applySplitRatio(ratio) {
+    if (!inputPane || !outputPane) return;
+    const sanitised = clamp(ratio, 0.2, 0.8);
+    inputPane.style.flex = `0 0 ${sanitised * 100}%`;
+    outputPane.style.flex = `0 0 ${(1 - sanitised) * 100}%`;
+    resizeInput();
+    resizeOutput();
+    splitHandle?.classList.toggle("dragging", splitHandle?.classList.contains("dragging") ?? false);
+    inputPane.dataset.splitRatio = sanitised;
+    outputPane.dataset.splitRatio = 1 - sanitised;
+    storeSplitRatio(sanitised);
+}
+
+function storeSplitRatio(ratio) {
+    if (!Number.isFinite(ratio)) {
+        ratio = safeNumber(localStorage.getItem(SPLIT_STORAGE_KEY)) ?? 0.5;
+    }
+    try {
+        localStorage.setItem(SPLIT_STORAGE_KEY, String(ratio));
+    } catch (_) {
+        /* ignore */
+    }
+}
+
+function safeNumber(value) {
+    const number = parseFloat(value);
+    return Number.isFinite(number) ? number : null;
+}
+
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
 }
 
 async function loadOverrides() {
