@@ -1,0 +1,53 @@
+[
+    {
+        "overrides": {
+            "style": { // rule applies to all except matched
+                "scale": "90%"
+            }
+        }
+    },
+    {
+        "filters": {
+            "type": "state-badge"
+        },
+        "overrides": {
+            "name": " ",
+            "style": {
+                "scale": "45%"
+            }
+        }
+    },
+    {
+        "filters": {
+            "type": "state-icon", // either direct match or /regex/
+            "entity": "/^light\\./" // either direct match or /regex/
+        },
+        "overrides": {
+            "style": {
+                "scale": "75%"
+            }
+        }
+    },
+    {
+        "filters": {
+            "type": "state-label",
+            "entity": "/.*_temp.*/"
+        },
+        "overrides": {
+            "style": {
+                "color": "lime"
+            }
+        }
+    },
+    {
+        "filters": {
+            "type": "state-label",
+            "entity": "/.*_humidity.*/"
+        },
+        "overrides": {
+            "style": {
+                "color": "cyan"
+            }
+        }
+    }
+]

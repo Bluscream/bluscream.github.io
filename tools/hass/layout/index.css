@@ -1,0 +1,160 @@
+:root {
+    color-scheme: dark;
+    --bg: #030712;
+    --bg-elevated: rgba(255, 255, 255, 0.04);
+    --border: rgba(255, 255, 255, 0.08);
+    --accent: #63f5c6;
+    --text: #f8fafc;
+    --muted: rgba(248, 250, 252, 0.8);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at top, rgba(99, 245, 198, 0.15), transparent 45%), var(--bg);
+    color: var(--text);
+    padding: 2.5rem;
+}
+
+.app-shell {
+    max-width: 1200px;
+    margin: 0 auto 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.eyebrow {
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin: 0 0 0.3rem;
+}
+
+.page-header h1 {
+    margin: 0 0 0.4rem;
+    font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.lede {
+    margin: 0;
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 40ch;
+}
+
+.status-chip {
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 1.2rem;
+    padding: 1.5rem;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.options-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    align-items: center;
+}
+
+.option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+input[type="range"] {
+    accent-color: var(--accent);
+}
+
+.editor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.editor-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.editor-heading h2 {
+    margin: 0;
+}
+
+.editor-heading p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.editor-surface {
+    height: 340px;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: rgba(3, 7, 18, 0.6);
+    overflow: hidden;
+}
+
+.editor-surface.overrides {
+    height: 260px;
+}
+
+.ace_editor {
+    font-family: "JetBrains Mono", "Space Grotesk", monospace;
+    font-size: 0.95rem;
+}
+
+.page-footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.page-footer code {
+    color: var(--accent);
+}
+
+@media (max-width: 720px) {
+    body {
+        padding: 1.5rem 1rem 3rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+    }
+
+    .editor-surface {
+        height: 260px;
+    }
+}
