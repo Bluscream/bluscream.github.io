@@ -14,6 +14,10 @@ const yamlInputEditor = createEditor("yaml-input", { mode: "ace/mode/yaml" });
 const yamlOutputEditor = createEditor("yaml-output", { mode: "ace/mode/yaml", readOnly: true });
 const overridesEditor = createEditor("overrides-editor", { mode: "ace/mode/json" });
 
+const resizeInput = enableAutoResize(yamlInputEditor, { minLines: 24, padding: 48 });
+const resizeOutput = enableAutoResize(yamlOutputEditor, { minLines: 24, padding: 48 });
+const resizeOverrides = enableAutoResize(overridesEditor, { minLines: 16, padding: 48 });
+
 bootstrap();
 
 async function bootstrap() {
@@ -30,14 +34,17 @@ async function loadOverrides() {
         const response = await fetch("./defaults.jsonc");
         const text = await response.text();
         overridesEditor.setValue(text.trim(), -1);
+        resizeOverrides();
     } catch (error) {
         console.error("Failed to load overrides", error);
         overridesEditor.setValue("[]", -1);
+        resizeOverrides();
         setStatus("Could not load defaults.jsonc", true);
     }
 }
 
 function processYaml() {
+    resizeInput();
     const rawInput = yamlInputEditor.getValue().trim();
 
     if (!rawInput) {
@@ -66,6 +73,7 @@ function processYaml() {
         const processed = applyOverrides(structuredClone(data), overrides);
         const yaml = YAML.dump(processed, { lineWidth: 120, noRefs: true, sortKeys: false });
         yamlOutputEditor.setValue(yaml, -1);
+        resizeOutput();
         setStatus(STATUS.success);
     } catch (error) {
         console.error("Processing error", error);
@@ -239,6 +247,23 @@ function createEditor(id, { mode, readOnly = false }) {
     });
     editor.session.setUseWrapMode(true);
     return editor;
+}
+
+function enableAutoResize(editor, { minLines = 12, padding = 32 } = {}) {
+    const performResize = () => {
+        const lineHeight = editor.renderer.lineHeight || 16;
+        const lines = Math.max(editor.session.getScreenLength(), minLines);
+        const height = lines * lineHeight + padding;
+        editor.container.style.height = `${height}px`;
+        editor.resize();
+    };
+
+    const scheduleResize = () => window.requestAnimationFrame(performResize);
+    editor.session.on("change", scheduleResize);
+    editor.session.on("changeFold", scheduleResize);
+    window.addEventListener("resize", scheduleResize);
+    scheduleResize();
+    return performResize;
 }
 
 function debounce(fn, delay = 200) {
