@@ -21,20 +21,14 @@
     <div class="app-shell">
         <header class="page-header">
             <div>
-                <p class="eyebrow">Home Assistant utility</p>
-                <h1>Picture Elements Overrides</h1>
-                <p class="lede">Paste any YAML snippet, tweak the rules, and preview the processed output instantly.</p>
+                <p class="eyebrow">HASS Picture Elements Overrides</p>
+                <!-- <p class="lede">Paste any YAML snippet, tweak the rules, and preview the processed output instantly.</p> -->
             </div>
             <div class="status-chip" data-role="status" aria-live="polite">Waiting for YAML input</div>
         </header>
 
-        <section class="card options-panel">
+        <section class="card options-panel is-hidden">
             <div class="option-group">
-                <label for="scale-slider">Scale</label>
-                <div class="slider-row">
-                    <input id="scale-slider" type="range" min="1" max="200" value="100" step="1" />
-                    <output id="scale-value" for="scale-slider">100%</output>
-                </div>
             </div>
         </section>
 
@@ -64,7 +58,7 @@
         </section>
 
         <footer class="page-footer">
-            <p>Need sample data? Try <code>.references/example_input.yml</code> from the repo.</p>
+            <p>Made with <span>❤️</span> by <a href="https://bluscream.github.io">Bluscream</a> for the <a href="https://home-assistant.io">HomeAssistant</a> community</p>
         </footer>
     </div>
 </body>

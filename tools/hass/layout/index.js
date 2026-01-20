@@ -9,8 +9,6 @@ const STATUS = {
 };
 
 const statusChip = document.querySelector('[data-role="status"]');
-const scaleSlider = document.getElementById("scale-slider");
-const scaleValue = document.getElementById("scale-value");
 
 const yamlInputEditor = createEditor("yaml-input", { mode: "ace/mode/yaml" });
 const yamlOutputEditor = createEditor("yaml-output", { mode: "ace/mode/yaml", readOnly: true });
@@ -25,10 +23,6 @@ async function bootstrap() {
 
     yamlInputEditor.session.on("change", debounce(processYaml, 250));
     overridesEditor.session.on("change", debounce(processYaml, 250));
-    scaleSlider.addEventListener("input", () => {
-        scaleValue.textContent = `${scaleSlider.value}%`;
-        processYaml();
-    });
 }
 
 async function loadOverrides() {
@@ -69,7 +63,7 @@ function processYaml() {
     }
 
     try {
-        const processed = applyOverrides(structuredClone(data), overrides, Number(scaleSlider.value) / 100);
+        const processed = applyOverrides(structuredClone(data), overrides);
         const yaml = YAML.dump(processed, { lineWidth: 120, noRefs: true, sortKeys: false });
         yamlOutputEditor.setValue(yaml, -1);
         setStatus(STATUS.success);
@@ -94,24 +88,31 @@ function getOverrides() {
     }
 }
 
-function applyOverrides(data, overrides, scaleFactor) {
+function applyOverrides(data, overrides, scaleFactor = 1) {
     if (!Array.isArray(overrides) || overrides.length === 0) {
         return applyScaleOnly(data, scaleFactor);
     }
 
     traverse(data, (element) => {
+        let matched = false;
         overrides.forEach((rule) => {
             if (!rule || typeof rule !== "object") return;
             if (!matchesFilters(element, rule.filters || {})) return;
+            matched = true;
             mergeRule(element, rule);
         });
-        applyScale(element, scaleFactor);
+        if (matched) {
+            applyScale(element, scaleFactor);
+        }
     });
 
     return data;
 }
 
-function applyScaleOnly(data, scaleFactor) {
+function applyScaleOnly(data, scaleFactor = 1) {
+    if (scaleFactor === 1 || Number.isNaN(scaleFactor) || scaleFactor <= 0) {
+        return data;
+    }
     traverse(data, (element) => applyScale(element, scaleFactor));
     return data;
 }
@@ -185,7 +186,7 @@ function mergeRule(element, rule) {
     });
 }
 
-function applyScale(element, scaleFactor) {
+function applyScale(element, scaleFactor = 1) {
     if (!element || typeof element !== "object") return;
     if (scaleFactor === 1 || Number.isNaN(scaleFactor) || scaleFactor <= 0) return;
 
