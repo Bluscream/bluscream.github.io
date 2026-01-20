@@ -80,14 +80,16 @@ body {
     align-items: center;
 }
 
-.options-panel.is-hidden {
-    display: none;
-}
-
 .option-group {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+}
+
+.group-hint {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
 }
 
 .slider-row {

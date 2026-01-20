@@ -13,6 +13,8 @@ const statusChip = document.querySelector('[data-role="status"]');
 const yamlInputEditor = createEditor("yaml-input", { mode: "ace/mode/yaml" });
 const yamlOutputEditor = createEditor("yaml-output", { mode: "ace/mode/yaml", readOnly: true });
 const overridesEditor = createEditor("overrides-editor", { mode: "ace/mode/json" });
+const positionSlider = document.getElementById("position-slider");
+const positionValue = document.getElementById("position-value");
 
 const resizeInput = enableAutoResize(yamlInputEditor, { minLines: 24, padding: 48 });
 const resizeOutput = enableAutoResize(yamlOutputEditor, { minLines: 24, padding: 48 });
@@ -27,6 +29,10 @@ async function bootstrap() {
 
     yamlInputEditor.session.on("change", debounce(processYaml, 250));
     overridesEditor.session.on("change", debounce(processYaml, 250));
+    positionSlider.addEventListener("input", () => {
+        positionValue.textContent = `${positionSlider.value}%`;
+    });
+    positionSlider.addEventListener("change", processYaml);
 }
 
 async function loadOverrides() {
@@ -70,7 +76,8 @@ function processYaml() {
     }
 
     try {
-        const processed = applyOverrides(structuredClone(data), overrides);
+        const shiftPercent = Number(positionSlider.value);
+        const processed = applyOverrides(structuredClone(data), overrides, shiftPercent);
         const yaml = YAML.dump(processed, { lineWidth: 120, noRefs: true, sortKeys: false });
         yamlOutputEditor.setValue(yaml, -1);
         resizeOutput();
@@ -96,9 +103,9 @@ function getOverrides() {
     }
 }
 
-function applyOverrides(data, overrides, scaleFactor = 1) {
+function applyOverrides(data, overrides, positionShiftPercent = 0) {
     if (!Array.isArray(overrides) || overrides.length === 0) {
-        return applyScaleOnly(data, scaleFactor);
+        return applyScaleOnly(data, 1, positionShiftPercent);
     }
 
     traverse(data, (element) => {
@@ -110,18 +117,19 @@ function applyOverrides(data, overrides, scaleFactor = 1) {
             mergeRule(element, rule);
         });
         if (matched) {
-            applyScale(element, scaleFactor);
+            applyScale(element, 1);
+            applyRelativeShift(element, positionShiftPercent);
         }
     });
 
     return data;
 }
 
-function applyScaleOnly(data, scaleFactor = 1) {
-    if (scaleFactor === 1 || Number.isNaN(scaleFactor) || scaleFactor <= 0) {
-        return data;
-    }
-    traverse(data, (element) => applyScale(element, scaleFactor));
+function applyScaleOnly(data, scaleFactor = 1, positionShiftPercent = 0) {
+    traverse(data, (element) => {
+        applyScale(element, scaleFactor);
+        applyRelativeShift(element, positionShiftPercent);
+    });
     return data;
 }
 
@@ -218,6 +226,20 @@ function deepMerge(target, source) {
 
 function isPlainObject(value) {
     return Object.prototype.toString.call(value) === "[object Object]";
+}
+
+function applyRelativeShift(element, percent = 0) {
+    if (!percent || Number.isNaN(percent)) return;
+    const style = (element.style = isPlainObject(element.style) ? element.style : {});
+    ["left", "top"].forEach((prop) => {
+        if (typeof style[prop] !== "string" || !style[prop].trim().endsWith("%")) {
+            return;
+        }
+        const current = parseFloat(style[prop]);
+        if (!Number.isFinite(current)) return;
+        const adjusted = current * (1 + percent / 100);
+        style[prop] = `${Math.round(adjusted * 1000) / 1000}%`;
+    });
 }
 
 function stripJsonComments(text) {

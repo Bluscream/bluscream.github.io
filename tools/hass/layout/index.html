@@ -27,8 +27,14 @@
             <div class="status-chip" data-role="status" aria-live="polite">Waiting for YAML input</div>
         </header>
 
-        <section class="card options-panel is-hidden">
+        <section class="card options-panel">
             <div class="option-group">
+                <label for="position-slider">Relative position</label>
+                <p class="group-hint">Scale all <code>left/top</code> values between -100% and +100%.</p>
+                <div class="slider-row">
+                    <input id="position-slider" type="range" min="-100" max="100" value="100" step="1" />
+                    <output id="position-value">100%</output>
+                </div>
             </div>
         </section>
 
