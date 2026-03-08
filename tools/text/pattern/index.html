@@ -21,6 +21,16 @@
       <input type="text" id="patternText" class="form-control" placeholder="e.g. - " value=" ">
     </div>
 
+    <div class="mb-3">
+      <label for="prefixText" class="form-label">Prefix</label>
+      <input type="text" id="prefixText" class="form-control" placeholder="e.g. &lt;">
+    </div>
+
+    <div class="mb-3">
+      <label for="suffixText" class="form-label">Suffix</label>
+      <input type="text" id="suffixText" class="form-control" placeholder="e.g. &gt;">
+    </div>
+
     <button id="goBtn" class="btn btn-primary mb-3">Go</button>
 
     <div class="mb-3">
@@ -31,13 +41,35 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    document.getElementById('goBtn').addEventListener('click', function () {
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      const val = params.get(name);
+      return val !== null ? decodeURIComponent(val) : '';
+    }
+
+    function runTransform() {
       const input = document.getElementById('inputText').value;
       const pattern = document.getElementById('patternText').value;
+      const prefix = document.getElementById('prefixText').value;
+      const suffix = document.getElementById('suffixText').value;
       const chars = input.split('');
-      const result = chars.join(pattern);
+      const result = prefix + chars.join(pattern) + suffix;
       document.getElementById('outputText').value = result;
-    });
+    }
+
+    document.getElementById('goBtn').addEventListener('click', runTransform);
+
+    (function initFromQuery() {
+      const input = getQueryParam('input');
+      const pattern = getQueryParam('pattern');
+      const prefix = getQueryParam('prefix');
+      const suffix = getQueryParam('suffix');
+      if (input) document.getElementById('inputText').value = input;
+      if (pattern) document.getElementById('patternText').value = pattern;
+      if (prefix) document.getElementById('prefixText').value = prefix;
+      if (suffix) document.getElementById('suffixText').value = suffix;
+      if (input) runTransform();
+    })();
   </script>
 </body>
 </html>
