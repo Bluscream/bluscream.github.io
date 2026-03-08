@@ -8,31 +8,40 @@
 </head>
 <body class="bg-light">
   <div class="container py-5">
-    <div class="mb-3">
-      <label for="inputText" class="form-label">Input</label>
-      <textarea id="inputText" class="form-control" rows="2" placeholder="e.g. Hello"></textarea>
+    <div class="mb-3 d-flex align-items-center gap-2">
+      <label for="inputText" class="form-label mb-0" style="min-width: 4rem;">Input</label>
+      <textarea id="inputText" class="form-control flex-grow-1" rows="2" placeholder="e.g. Hello"></textarea>
     </div>
 
-    <div class="mb-3">
-      <label for="patternText" class="form-label">Pattern</label>
-      <input type="text" id="patternText" class="form-control" placeholder="e.g. - " value=" ">
+    <div class="mb-3 d-flex align-items-center gap-2">
+      <label for="patternText" class="form-label mb-0" style="min-width: 4rem;">Pattern</label>
+      <div class="d-flex align-items-center gap-3 flex-grow-1 flex-nowrap">
+        <div class="d-flex align-items-center gap-2 flex-grow-1">
+          <input type="text" id="patternText" class="form-control form-control-sm flex-grow-1" placeholder="e.g. - " value=" " style="min-width: 4rem;">
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label for="prefixText" class="form-label mb-0">Prefix</label>
+          <input type="text" id="prefixText" class="form-control form-control-sm" placeholder="e.g. &lt;" style="width: 8rem;">
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label for="suffixText" class="form-label mb-0">Suffix</label>
+          <input type="text" id="suffixText" class="form-control form-control-sm" placeholder="e.g. &gt;" style="width: 8rem;">
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label for="applyMode" class="form-label mb-0">Apply to</label>
+          <select id="applyMode" class="form-select form-select-sm" style="width: auto;">
+            <option value="char">Char</option>
+            <option value="word">Word</option>
+            <option value="line">Line</option>
+          </select>
+        </div>
+        <button id="goBtn" class="btn btn-primary btn-sm">Go</button>
+      </div>
     </div>
 
-    <div class="mb-3">
-      <label for="prefixText" class="form-label">Prefix</label>
-      <input type="text" id="prefixText" class="form-control" placeholder="e.g. &lt;">
-    </div>
-
-    <div class="mb-3">
-      <label for="suffixText" class="form-label">Suffix</label>
-      <input type="text" id="suffixText" class="form-control" placeholder="e.g. &gt;">
-    </div>
-
-    <button id="goBtn" class="btn btn-primary mb-3">Go</button>
-
-    <div class="mb-3">
-      <label for="outputText" class="form-label">Output</label>
-      <textarea id="outputText" class="form-control" rows="4" placeholder="Result will appear here..."></textarea>
+    <div class="mb-3 d-flex align-items-center gap-2">
+      <label for="outputText" class="form-label mb-0" style="min-width: 4rem;">Output</label>
+      <textarea id="outputText" class="form-control flex-grow-1" rows="4" placeholder="Result will appear here..."></textarea>
     </div>
   </div>
 
@@ -49,8 +58,16 @@
       const pattern = document.getElementById('patternText').value;
       const prefix = document.getElementById('prefixText').value;
       const suffix = document.getElementById('suffixText').value;
-      const chars = input.split('');
-      const result = prefix + chars.join(pattern) + suffix;
+      const mode = document.getElementById('applyMode').value;
+      let parts;
+      if (mode === 'char') {
+        parts = input.split('');
+      } else if (mode === 'word') {
+        parts = input.split(/\s+/).filter(Boolean);
+      } else {
+        parts = input.split(/\r?\n/);
+      }
+      const result = prefix + parts.join(pattern) + suffix;
       document.getElementById('outputText').value = result;
     }
 
@@ -61,10 +78,12 @@
       const pattern = getQueryParam('pattern');
       const prefix = getQueryParam('prefix');
       const suffix = getQueryParam('suffix');
+      const mode = getQueryParam('mode');
       if (input) document.getElementById('inputText').value = input;
       if (pattern) document.getElementById('patternText').value = pattern;
       if (prefix) document.getElementById('prefixText').value = prefix;
       if (suffix) document.getElementById('suffixText').value = suffix;
+      if (['char', 'word', 'line'].includes(mode)) document.getElementById('applyMode').value = mode;
       if (input) runTransform();
     })();
   </script>
