@@ -32,6 +32,7 @@
           <select id="applyMode" class="form-select form-select-sm" style="width: auto;">
             <option value="char">Char</option>
             <option value="word">Word</option>
+            <option value="text">Text</option>
             <option value="line">Line</option>
           </select>
         </div>
@@ -64,6 +65,8 @@
         parts = input.split('');
       } else if (mode === 'word') {
         parts = input.split(/\s+/).filter(Boolean);
+      } else if (mode === 'text') {
+        parts = input.match(/\w+/g) ?? [];
       } else {
         parts = input.split(/\r?\n/);
       }
@@ -83,7 +86,7 @@
       if (pattern) document.getElementById('patternText').value = pattern;
       if (prefix) document.getElementById('prefixText').value = prefix;
       if (suffix) document.getElementById('suffixText').value = suffix;
-      if (['char', 'word', 'line'].includes(mode)) document.getElementById('applyMode').value = mode;
+      if (['char', 'word', 'text', 'line'].includes(mode)) document.getElementById('applyMode').value = mode;
       if (input) runTransform();
     })();
   </script>
