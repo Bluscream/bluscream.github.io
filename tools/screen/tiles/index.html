@@ -402,15 +402,22 @@
                 <div class="input-group">
                     <label>Layout Logic</label>
                     <div class="res-input-wrapper" style="font-size: 0.9rem; color: var(--text-muted)">
-                        <span>Horizontal (Side-by-Side)</span>
+                        <span>Intelligent Tiling (Columnar)</span>
                     </div>
                     <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
-                        Tiles are placed left-to-right, maintaining their ratios while sharing the same height.
+                        Tiles are grouped into columns. Drag a tile onto another to swap or reorder. 
+                        To create a <strong>new column</strong>, drag a tile to the far right.
                     </p>
-                    <button class="reset-btn" onclick="resetLayout()">
-                        <i data-lucide="refresh-ccw" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i>
-                        Reset to Default Layout
-                    </button>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="reset-btn" onclick="addColumn()" style="margin: 0; flex: 1;">
+                            <i data-lucide="plus-square" style="width: 14px; height: 14px; vertical-align: middle;"></i>
+                            New Column
+                        </button>
+                        <button class="reset-btn" onclick="resetLayout()" style="margin: 0; flex: 1;">
+                            <i data-lucide="refresh-ccw" style="width: 14px; height: 14px; vertical-align: middle;"></i>
+                            Reset
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -446,25 +453,27 @@
     </div>
 
     <script>
-        // State
+        // State: Array of columns, each containing tile objects
         let screenW = 3440;
         let screenH = 1440;
-        let tiles = [
-            { ratio: "18:9", w: 0, h: 0, x: 0, y: 0, id: Date.now() },
-            { ratio: "4:3", w: 0, h: 0, x: 0, y: 0, id: Date.now() + 1 },
-            { ratio: "4:3", w: 0, h: 0, x: 0, y: 0, id: Date.now() + 2 }
+        let columns = [
+            [
+                { ratio: "4:3", id: 1 },
+                { ratio: "4:3", id: 2 }
+            ],
+            [
+                { ratio: "16:9", id: 3 }
+            ]
         ];
-        let activeTile = null;
-        let resizeTile = null;
-        let dragOffset = { x: 0, y: 0 };
-        let initialResizeSize = { w: 0, h: 0, x: 0, y: 0 };
+        
+        let draggedTile = null;
+        let draggedFrom = null;
 
         // DOM Elements
         const screenWInput = document.getElementById('screenW');
         const screenHInput = document.getElementById('screenH');
         const newRatioInput = document.getElementById('newRatio');
         const addRatioBtn = document.getElementById('addRatioBtn');
-        const ratiosList = document.getElementById('ratiosList');
         const screenCanvas = document.getElementById('screenCanvas');
         const monitorOuter = document.getElementById('monitorOuter');
         const resultsBody = document.getElementById('resultsBody');
@@ -473,69 +482,44 @@
         lucide.createIcons();
 
         function init() {
-            renderRatioTags();
-            calculateInitialLayout();
-            render();
+            calculateAndRender();
 
-            // Listeners
-            screenWInput.addEventListener('input', updateScreenSize);
-            screenHInput.addEventListener('input', updateScreenSize);
+            screenWInput.addEventListener('input', () => {
+                screenW = parseInt(screenWInput.value) || 0;
+                calculateAndRender();
+            });
+            screenHInput.addEventListener('input', () => {
+                screenH = parseInt(screenHInput.value) || 0;
+                calculateAndRender();
+            });
             
             addRatioBtn.addEventListener('click', () => {
                 const val = newRatioInput.value.trim();
-                if (val && (val.includes(':') || !isNaN(val))) {
-                    tiles.push({
-                        ratio: val,
-                        w: 0, h: 0, x: 0, y: 0,
-                        id: Date.now()
-                    });
+                if (val) {
+                    // Add to the last column by default
+                    if (columns.length === 0) columns.push([]);
+                    columns[0].push({ ratio: val, id: Date.now() });
                     newRatioInput.value = "";
-                    renderRatioTags();
-                    calculateInitialLayout();
-                    render();
+                    calculateAndRender();
                 }
             });
 
             newRatioInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') addRatioBtn.click();
             });
-
-            // Global mouse events for dragging/resizing
-            window.addEventListener('mousemove', onMouseMove);
-            window.addEventListener('mouseup', onMouseUp);
         }
 
-        function updateScreenSize() {
-            screenW = parseInt(screenWInput.value) || 0;
-            screenH = parseInt(screenHInput.value) || 0;
-            calculateInitialLayout();
-            render();
-        }
-
-        function renderRatioTags() {
-            ratiosList.innerHTML = "";
-            tiles.forEach((tile, index) => {
-                const tag = document.createElement('div');
-                tag.className = 'ratio-tag';
-                tag.innerHTML = `
-                    <span>${tile.ratio}</span>
-                    <i data-lucide="x" class="remove-tag" onclick="removeTile(${index})"></i>
-                `;
-                ratiosList.appendChild(tag);
-            });
-            lucide.createIcons();
-        }
-
-        window.removeTile = (index) => {
-            tiles.splice(index, 1);
-            renderRatioTags();
-            calculateInitialLayout();
-            render();
+        window.addColumn = () => {
+            columns.push([{ ratio: "16:9", id: Date.now() }]);
+            calculateAndRender();
         };
 
         window.resetLayout = () => {
-            calculateInitialLayout();
-            render();
+            columns = [
+                [{ ratio: "4:3", id: 1 }, { ratio: "4:3", id: 2 }],
+                [{ ratio: "16:9", id: 3 }]
+            ];
+            calculateAndRender();
         };
 
         function parseRatio(str) {
@@ -543,158 +527,226 @@
                 const parts = str.split(':');
                 const w = parseFloat(parts[0]);
                 const h = parseFloat(parts[1]);
-                if (h === 0) return 1;
-                return w / h;
+                return h === 0 ? 1 : w / h;
             }
             return parseFloat(str) || 1;
         }
 
-        function calculateInitialLayout() {
-            if (!screenW || !screenH || tiles.length === 0) return;
+        function calculateAndRender() {
+            if (!screenW || !screenH || columns.length === 0) {
+                renderEmpty();
+                return;
+            }
 
-            const ratioValues = tiles.map(t => parseRatio(t.ratio));
-            const sumRatios = ratioValues.reduce((a, b) => a + b, 0);
+            // Calculation Logic for Columnar Tiling:
+            // Every tile i in column j has width Wj.
+            // Height of tile i is Hi = Wj / Ri.
+            // Column Height Hj = Sum(Hi) = Wj * Sum(1/Ri).
+            // All columns share the same height H.
+            // H = Wj * Sum(1/Ri)  =>  Wj = H / Sum(1/Ri).
+            // Total Width = Sum(Wj) = H * Sum_j( 1 / Sum_{i in Cj}(1/Ri) ).
+            // We want H to be as large as possible such that H <= screenH AND Total Width <= screenW.
 
-            let finalH = Math.min(screenH, screenW / sumRatios);
-            let finalWTotal = finalH * sumRatios;
+            let columnFactors = columns.map(col => {
+                if (col.length === 0) return 0;
+                // Sum(1/Ri)
+                return col.reduce((sum, tile) => sum + (1 / parseRatio(tile.ratio)), 0);
+            }).filter(f => f > 0);
+
+            if (columnFactors.length === 0) {
+                renderEmpty();
+                return;
+            }
+
+            // Total Width Factor = Sum(1 / factor_j)
+            const totalWidthFactor = columnFactors.reduce((sum, f) => sum + (1 / f), 0);
+
+            // Calculate optimal H
+            let finalH = Math.min(screenH, screenW / totalWidthFactor);
+            let finalWTotal = finalH * totalWidthFactor;
             
             let startX = (screenW - finalWTotal) / 2;
             let startY = (screenH - finalH) / 2;
 
-            let currentX = startX;
-
-            tiles.forEach((tile, i) => {
-                const rValue = ratioValues[i];
-                tile.w = Math.round(finalH * rValue);
-                tile.h = Math.round(finalH);
-                tile.x = Math.round(currentX);
-                tile.y = Math.round(startY);
-                currentX += tile.w;
-            });
-        }
-
-        function onMouseDown(e, tile, isResize = false) {
-            if (isResize) {
-                resizeTile = tile;
-                initialResizeSize = { w: tile.w, h: tile.h, mouseX: e.clientX, mouseY: e.clientY };
-            } else {
-                activeTile = tile;
-                const rect = e.currentTarget.getBoundingClientRect();
-                dragOffset.x = e.clientX - rect.left;
-                dragOffset.y = e.clientY - rect.top;
-            }
-            e.stopPropagation();
-        }
-
-        function onMouseMove(e) {
-            const canvasRect = screenCanvas.getBoundingClientRect();
-            const scaleX = screenW / canvasRect.width;
-            const scaleY = screenH / canvasRect.height;
-
-            if (activeTile) {
-                let mouseX = e.clientX - canvasRect.left - dragOffset.x;
-                let mouseY = e.clientY - canvasRect.top - dragOffset.y;
-
-                let newX = Math.round(mouseX * scaleX);
-                let newY = Math.round(mouseY * scaleY);
-
-                // Snapping
-                const snapThreshold = 30;
-                if (Math.abs(newX) < snapThreshold) newX = 0;
-                if (Math.abs(newY) < snapThreshold) newY = 0;
-                if (Math.abs(newX + activeTile.w - screenW) < snapThreshold) newX = screenW - activeTile.w;
-                if (Math.abs(newY + activeTile.h - screenH) < snapThreshold) newY = screenH - activeTile.h;
-
-                tiles.forEach(other => {
-                    if (other === activeTile) return;
-                    if (Math.abs(newX - (other.x + other.w)) < snapThreshold) newX = other.x + other.w;
-                    if (Math.abs((newX + activeTile.w) - other.x) < snapThreshold) newX = other.x - activeTile.w;
-                    if (Math.abs(newY - (other.y + other.h)) < snapThreshold) newY = other.y + other.h;
-                    if (Math.abs((newY + activeTile.h) - other.y) < snapThreshold) newY = other.y - activeTile.h;
-                    if (Math.abs(newX - other.x) < snapThreshold) newX = other.x;
-                    if (Math.abs(newY - other.y) < snapThreshold) newY = other.y;
-                });
-
-                activeTile.x = newX;
-                activeTile.y = newY;
-                render();
-            } else if (resizeTile) {
-                const dx = (e.clientX - initialResizeSize.mouseX) * scaleX;
-                const r = parseRatio(resizeTile.ratio);
-                
-                let newW = Math.max(100, initialResizeSize.w + dx);
-                let newH = Math.round(newW / r);
-
-                // Snap resize to screen edges
-                const snapThreshold = 30;
-                if (Math.abs(resizeTile.x + newW - screenW) < snapThreshold) {
-                    newW = screenW - resizeTile.x;
-                    newH = Math.round(newW / r);
-                }
-                if (Math.abs(resizeTile.y + newH - screenH) < snapThreshold) {
-                    newH = screenH - resizeTile.y;
-                    newW = Math.round(newH * r);
-                }
-
-                resizeTile.w = newW;
-                resizeTile.h = newH;
-                render();
-            }
-        }
-
-        function onMouseUp() {
-            activeTile = null;
-            resizeTile = null;
-        }
-
-        function render() {
-            if (!screenW || !screenH || tiles.length === 0) {
-                screenCanvas.innerHTML = '<div class="empty-state">Add ratios to start</div>';
-                resultsBody.innerHTML = '<tr><td colspan="4" class="empty-state">No data available</td></tr>';
-                return;
-            }
-
-            const monitorAspect = screenW / screenH;
-            monitorOuter.style.aspectRatio = monitorAspect;
-
             screenCanvas.innerHTML = "";
             resultsBody.innerHTML = "";
 
-            tiles.forEach((tile, i) => {
-                const el = document.createElement('div');
-                el.className = 'tile-rect';
-                el.style.width = `${(tile.w / screenW) * 100}%`;
-                el.style.height = `${(tile.h / screenH) * 100}%`;
-                el.style.left = `${(tile.x / screenW) * 100}%`;
-                el.style.top = `${(tile.y / screenH) * 100}%`;
-                el.style.cursor = 'grab';
-                if (activeTile === tile) el.style.cursor = 'grabbing';
-                
-                el.innerHTML = `
-                    <span>${tile.ratio}</span>
-                    <div class="res-label">${tile.w}×${tile.h} px</div>
-                    <div class="resize-handle"></div>
-                `;
-                
-                el.onmousedown = (e) => onMouseDown(e, tile);
-                const handle = el.querySelector('.resize-handle');
-                handle.onmousedown = (e) => onMouseDown(e, tile, true);
-                
-                screenCanvas.appendChild(el);
+            let currentX = startX;
+            let monitorAspect = screenW / screenH;
+            monitorOuter.style.aspectRatio = monitorAspect;
 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>#${i + 1}</td>
-                    <td><strong>${tile.ratio}</strong></td>
-                    <td><span class="dim-pill">${tile.w}</span> × <span class="dim-pill">${tile.h}</span> px</td>
-                    <td><span class="coord-pill">${tile.x}</span>, <span class="coord-pill">${tile.y}</span></td>
-                `;
-                resultsBody.appendChild(row);
+            columns.forEach((col, colIdx) => {
+                if (col.length === 0) return;
+
+                const factor = columnFactors.shift(); // Get factor for this specific col
+                const colW = Math.round(finalH / factor);
+                let currentY = startY;
+
+                col.forEach((tile, tileIdx) => {
+                    const tileH = Math.round(colW / parseRatio(tile.ratio));
+                    const tileX = Math.round(currentX);
+                    const tileY = Math.round(currentY);
+
+                    createTileElement(tile, colW, tileH, tileX, tileY, colIdx, tileIdx);
+                    createResultRow(tile, colW, tileH, tileX, tileY);
+
+                    currentY += tileH;
+                });
+                currentX += colW;
             });
+
+            // Add a "New Column" drop zone at the end
+            const dropZone = document.createElement('div');
+            dropZone.className = 'new-col-zone';
+            dropZone.innerHTML = '<span>+ New Column</span>';
+            dropZone.ondragover = (e) => e.preventDefault();
+            dropZone.ondrop = (e) => {
+                e.preventDefault();
+                moveTile(draggedFrom.colIdx, draggedFrom.tileIdx, columns.length, 0);
+            };
+            screenCanvas.appendChild(dropZone);
+        }
+
+        function createTileElement(tile, w, h, x, y, colIdx, tileIdx) {
+            const el = document.createElement('div');
+            el.className = 'tile-rect';
+            el.draggable = true;
+            el.style.width = `${(w / screenW) * 100}%`;
+            el.style.height = `${(h / screenH) * 100}%`;
+            el.style.left = `${(x / screenW) * 100}%`;
+            el.style.top = `${(y / screenH) * 100}%`;
+            
+            el.innerHTML = `
+                <span>${tile.ratio}</span>
+                <div class="res-label">${w}×${h} px</div>
+                <div class="remove-btn" onclick="removeTile(${colIdx}, ${tileIdx})">×</div>
+            `;
+
+            el.ondragstart = (e) => {
+                draggedTile = tile;
+                draggedFrom = { colIdx, tileIdx };
+                el.style.opacity = '0.4';
+            };
+            el.ondragend = () => {
+                el.style.opacity = '1';
+                draggedTile = null;
+            };
+
+            // Drop zones inside/around tiles
+            el.ondragover = (e) => e.preventDefault();
+            el.ondrop = (e) => {
+                e.preventDefault();
+                moveTile(draggedFrom.colIdx, draggedFrom.tileIdx, colIdx, tileIdx);
+            };
+
+            screenCanvas.appendChild(el);
+        }
+
+        function createDropZone(colIdx, tileIdx, isNewCol = false) {
+            // Invisible drop zones for more natural dragging could be added here
+            // For now, dropping on a tile puts it in that position
+        }
+
+        function moveTile(fromCol, fromIdx, toCol, toIdx) {
+            const tile = columns[fromCol].splice(fromIdx, 1)[0];
+            
+            // If dragging to a new column
+            if (toCol === columns.length) {
+                columns.push([tile]);
+            } else {
+                columns[toCol].splice(toIdx, 0, tile);
+            }
+
+            // Cleanup empty columns
+            columns = columns.filter(col => col.length > 0);
+            calculateAndRender();
+        }
+
+        window.removeTile = (colIdx, tileIdx) => {
+            columns[colIdx].splice(tileIdx, 1);
+            columns = columns.filter(col => col.length > 0);
+            calculateAndRender();
+        };
+
+        function createResultRow(tile, w, h, x, y) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>#${tile.id}</td>
+                <td><strong>${tile.ratio}</strong></td>
+                <td><span class="dim-pill">${w}</span> × <span class="dim-pill">${h}</span> px</td>
+                <td><span class="coord-pill">${x}</span>, <span class="coord-pill">${y}</span></td>
+            `;
+            resultsBody.appendChild(row);
+        }
+
+        function renderEmpty() {
+            screenCanvas.innerHTML = '<div class="empty-state">Drag ratios here or use the input to start.</div>';
+            resultsBody.innerHTML = '<tr><td colspan="4" class="empty-state">No tiles defined.</td></tr>';
         }
 
         init();
     </script>
+    <style>
+        /* Extra styles for the new engine */
+        .tile-rect {
+            cursor: move;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .tile-rect:hover {
+            border-color: #fff;
+            background: rgba(99, 102, 241, 0.2);
+            z-index: 10;
+        }
+        .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 18px;
+            height: 18px;
+            background: rgba(255, 0, 0, 0.2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .tile-rect:hover .remove-btn {
+            opacity: 1;
+        }
+        .remove-btn:hover {
+            background: #ef4444;
+        }
+
+        .new-col-zone {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 1px dashed var(--glass-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            writing-mode: vertical-rl;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s;
+        }
+
+        .new-col-zone:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: white;
+            width: 60px;
+        }
+    </style>
+
 
 
 </body>
