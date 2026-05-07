@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precision Screen Tiler | Aspect Ratio Calculator</title>
+    <meta name="description" content="Calculate pixel-perfect window tiling layouts for any screen resolution and aspect ratio combination.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #0a0a0c;
+            --bg-card: rgba(23, 23, 26, 0.7);
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.05) 0%, transparent 40%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            padding: 2rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #fff, #a1a1aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Controls Section */
+        .controls {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .res-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .res-input-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            width: 100%;
+            outline: none;
+        }
+
+        .divider {
+            color: var(--text-muted);
+            font-weight: 800;
+        }
+
+        /* Ratio Tags */
+        .ratios-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            min-height: 44px;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 1px dashed var(--glass-border);
+        }
+
+        .ratio-tag {
+            background: var(--accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            animation: scaleIn 0.2s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .remove-tag {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .remove-tag:hover {
+            opacity: 1;
+        }
+
+        .add-ratio-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .add-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.05);
+            background: #4f46e5;
+        }
+
+        /* Preview Section */
+        .display-area {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .monitor-preview {
+            background: #000;
+            border-radius: 20px;
+            padding: 12px;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 2px #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .monitor-preview::after {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 15px;
+            background: #1a1a1e;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .screen-canvas {
+            width: 100%;
+            height: 100%;
+            background: #050505;
+            position: relative;
+            border-radius: 4px;
+            transition: aspect-ratio 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tile-rect {
+            position: absolute;
+            border: 2px solid var(--accent);
+            background: rgba(99, 102, 241, 0.1);
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 0.75rem;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 6px;
+        }
+
+        .tile-rect span {
+            font-weight: 700;
+            opacity: 0.9;
+        }
+
+        .tile-rect .res-label {
+            font-size: 0.65rem;
+            opacity: 0.6;
+        }
+
+        /* Results Table */
+        .results-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .results-table th {
+            text-align: left;
+            padding: 0.75rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            font-weight: 500;
+        }
+
+        .results-table td {
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .coord-pill {
+            background: var(--glass-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #6ee7b7;
+        }
+
+        .dim-pill {
+            background: var(--glass-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #fbbf24;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Precision Tiler</h1>
+            <p>Divide your workspace with mathematical accuracy.</p>
+        </header>
+
+        <main class="calculator-grid">
+            <section class="controls">
+                <!-- Screen Resolution -->
+                <div class="input-group">
+                    <label>Monitor Resolution</label>
+                    <div class="res-input-wrapper">
+                        <input type="number" id="screenW" value="3440" placeholder="Width">
+                        <span class="divider">×</span>
+                        <input type="number" id="screenH" value="1440" placeholder="Height">
+                    </div>
+                </div>
+
+                <!-- Aspect Ratios -->
+                <div class="input-group">
+                    <label>Target Ratios (Add to list)</label>
+                    <div class="add-ratio-row">
+                        <div class="res-input-wrapper">
+                            <input type="text" id="newRatio" placeholder="e.g. 18:9 or 21:9" value="16:9">
+                        </div>
+                        <button class="add-btn" id="addRatioBtn">
+                            <i data-lucide="plus"></i>
+                        </button>
+                    </div>
+                    <div class="ratios-container" id="ratiosList">
+                        <!-- Tags injected here -->
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Layout Logic</label>
+                    <div class="res-input-wrapper" style="font-size: 0.9rem; color: var(--text-muted)">
+                        <span>Horizontal (Side-by-Side)</span>
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
+                        Tiles are placed left-to-right, maintaining their ratios while sharing the same height.
+                    </p>
+                </div>
+            </section>
+
+            <section class="display-area">
+                <!-- Monitor Visualizer -->
+                <div class="monitor-preview" id="monitorOuter">
+                    <div class="screen-canvas" id="screenCanvas">
+                        <!-- Tiles injected here -->
+                    </div>
+                </div>
+
+                <!-- Results List -->
+                <div class="results-card">
+                    <label style="display: block; margin-bottom: 1rem;">Calculated Dimensions</label>
+                    <div id="resultsTableContainer">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Tile</th>
+                                    <th>Ratio</th>
+                                    <th>Size (W×H)</th>
+                                    <th>Position (X,Y)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsBody">
+                                <!-- Rows injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // State
+        let screenW = 3440;
+        let screenH = 1440;
+        let ratios = ["18:9", "4:3", "4:3"];
+
+        // DOM Elements
+        const screenWInput = document.getElementById('screenW');
+        const screenHInput = document.getElementById('screenH');
+        const newRatioInput = document.getElementById('newRatio');
+        const addRatioBtn = document.getElementById('addRatioBtn');
+        const ratiosList = document.getElementById('ratiosList');
+        const screenCanvas = document.getElementById('screenCanvas');
+        const monitorOuter = document.getElementById('monitorOuter');
+        const resultsBody = document.getElementById('resultsBody');
+
+        // Init Lucide
+        lucide.createIcons();
+
+        function init() {
+            renderRatios();
+            calculate();
+
+            // Listeners
+            screenWInput.addEventListener('input', updateRes);
+            screenHInput.addEventListener('input', updateRes);
+            
+            addRatioBtn.addEventListener('click', () => {
+                const val = newRatioInput.value.trim();
+                if (val && (val.includes(':') || !isNaN(val))) {
+                    ratios.push(val);
+                    newRatioInput.value = "";
+                    renderRatios();
+                    calculate();
+                }
+            });
+
+            newRatioInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addRatioBtn.click();
+            });
+        }
+
+        function updateRes() {
+            screenW = parseInt(screenWInput.value) || 0;
+            screenH = parseInt(screenHInput.value) || 0;
+            calculate();
+        }
+
+        function renderRatios() {
+            ratiosList.innerHTML = "";
+            ratios.forEach((ratio, index) => {
+                const tag = document.createElement('div');
+                tag.className = 'ratio-tag';
+                tag.innerHTML = `
+                    <span>${ratio}</span>
+                    <i data-lucide="x" class="remove-tag" onclick="removeRatio(${index})"></i>
+                `;
+                ratiosList.appendChild(tag);
+            });
+            lucide.createIcons();
+        }
+
+        window.removeRatio = (index) => {
+            ratios.splice(index, 1);
+            renderRatios();
+            calculate();
+        };
+
+        function parseRatio(str) {
+            if (str.includes(':')) {
+                const parts = str.split(':');
+                const w = parseFloat(parts[0]);
+                const h = parseFloat(parts[1]);
+                if (h === 0) return 1;
+                return w / h;
+            }
+            return parseFloat(str) || 1;
+        }
+
+        function calculate() {
+            if (!screenW || !screenH || ratios.length === 0) {
+                screenCanvas.innerHTML = '<div class="empty-state">Add ratios to start</div>';
+                resultsBody.innerHTML = '<tr><td colspan="4" class="empty-state">No data available</td></tr>';
+                return;
+            }
+
+            // Update monitor preview aspect ratio
+            const monitorAspect = screenW / screenH;
+            monitorOuter.style.aspectRatio = monitorAspect;
+
+            // Horizontal Calculation
+            const ratioValues = ratios.map(r => parseRatio(r));
+            const sumRatios = ratioValues.reduce((a, b) => a + b, 0);
+
+            let finalH = Math.min(screenH, screenW / sumRatios);
+            let finalWTotal = finalH * sumRatios;
+            
+            let startX = (screenW - finalWTotal) / 2;
+            let startY = (screenH - finalH) / 2;
+
+            screenCanvas.innerHTML = "";
+            resultsBody.innerHTML = "";
+
+            let currentX = startX;
+
+            ratioValues.forEach((rValue, i) => {
+                const w = Math.round(finalH * rValue);
+                const h = Math.round(finalH);
+                const x = Math.round(currentX);
+                const y = Math.round(startY);
+
+                const tile = document.createElement('div');
+                tile.className = 'tile-rect';
+                tile.style.width = `${(w / screenW) * 100}%`;
+                tile.style.height = `${(h / screenH) * 100}%`;
+                tile.style.left = `${(x / screenW) * 100}%`;
+                tile.style.top = `${(y / screenH) * 100}%`;
+                
+                tile.innerHTML = `
+                    <span>${ratios[i]}</span>
+                    <div class="res-label">${w}×${h}</div>
+                `;
+                screenCanvas.appendChild(tile);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>#${i + 1}</td>
+                    <td><strong>${ratios[i]}</strong></td>
+                    <td><span class="dim-pill">${w}</span> × <span class="dim-pill">${h}</span> px</td>
+                    <td><span class="coord-pill">${x}</span>, <span class="coord-pill">${y}</span></td>
+                `;
+                resultsBody.appendChild(row);
+
+                currentX += w;
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
