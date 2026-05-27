@@ -1168,7 +1168,8 @@ class DrillFlowApp {
         scaleX: this.state.scaleX,
         scaleY: this.state.scaleY,
         elements: this.state.elements,
-        selectedElementId: this.state.selectedElementId
+        selectedElementId: this.state.selectedElementId,
+        theme: document.body.classList.contains('dark-theme') ? 'dark' : 'light'
       };
       
       const json = JSON.stringify(cleanState);
@@ -1201,6 +1202,16 @@ class DrillFlowApp {
       if (parsed.scaleY !== undefined) this.state.scaleY = parsed.scaleY;
       if (parsed.elements) this.state.elements = parsed.elements;
       if (parsed.selectedElementId !== undefined) this.state.selectedElementId = parsed.selectedElementId;
+      
+      if (parsed.theme) {
+        if (parsed.theme === 'light') {
+          document.body.classList.remove('dark-theme');
+          document.body.classList.add('light-theme');
+        } else {
+          document.body.classList.remove('light-theme');
+          document.body.classList.add('dark-theme');
+        }
+      }
     } catch (e) {
       console.warn('Could not parse configuration from URL parameter. Reverting to default values.', e);
     }
