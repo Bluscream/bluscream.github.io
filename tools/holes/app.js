@@ -13,10 +13,15 @@ class DrillFlowApp {
       startWidth: 0,
       startHeight: 0,
       startX: 0,
-      startY: 0
+      startY: 0,
+      lockAxis: null
     };
     this.viewportScale = 1.0;
     this.manuallyZoomed = false;
+    this.clipboard = null;
+    this.contextCoords = { x: 105, y: 148.5 }; // default center
+    this.undoStack = [];
+    this.maxUndoHistory = 50;
 
     this.init();
   }
@@ -44,6 +49,15 @@ class DrillFlowApp {
       pageMockup: document.getElementById('page-mockup'),
       viewport: document.getElementById('viewport'),
       canvasWrapper: document.getElementById('canvas-wrapper'),
+      screenRulersContainer: document.getElementById('screen-rulers-container'),
+      screenRulerH: document.getElementById('screen-ruler-h-svg'),
+      screenRulerV: document.getElementById('screen-ruler-v-svg'),
+      contextMenu: document.getElementById('context-menu'),
+      ctxCut: document.getElementById('ctx-cut'),
+      ctxCopy: document.getElementById('ctx-copy'),
+      ctxPaste: document.getElementById('ctx-paste'),
+      ctxDuplicate: document.getElementById('ctx-duplicate'),
+      ctxDelete: document.getElementById('ctx-delete'),
       
       // Top actions
       btnShare: document.getElementById('btn-share'),
@@ -234,12 +248,28 @@ class DrillFlowApp {
       if (e.target === this.dom.viewport) {
         this.manuallyZoomed = false;
         this.autoScaleViewport();
+        this.updateScreenRulers();
       }
     });
+
+    // Sync fixed screen rulers during scroll pans
+    this.dom.viewport.addEventListener('scroll', () => this.updateScreenRulers());
+
+    // Custom CAD context menus & keyboard hotkeys
+    window.addEventListener('keydown', (e) => this.handleGlobalKeyDown(e));
+    this.dom.viewport.addEventListener('contextmenu', (e) => this.handleContextMenu(e));
+    window.addEventListener('click', (e) => this.hideContextMenu(e));
+
+    this.dom.ctxCut.addEventListener('click', () => this.cutSelected());
+    this.dom.ctxCopy.addEventListener('click', () => this.copySelected());
+    this.dom.ctxPaste.addEventListener('click', () => this.pasteSelected());
+    this.dom.ctxDuplicate.addEventListener('click', () => this.duplicateSelected());
+    this.dom.ctxDelete.addEventListener('click', () => this.deleteSelectedElement());
   }
 
   // --- MODEL MANAGER ---
   addElement(type, fanSize = 120) {
+    this.saveHistory(); // Save undo state
     const center = this.getPageCenter();
     const id = `el-${Date.now()}`;
     let newElement = {
@@ -248,6 +278,7 @@ class DrillFlowApp {
       x: center.x,
       y: center.y,
       pattern: 'hex',
+      stroke: 'inherit',
       holeShape: 'circle',
       holeSize: 3.5,
       pitch: 6.0,
@@ -277,6 +308,7 @@ class DrillFlowApp {
 
   deleteSelectedElement() {
     if (!this.state.selectedElementId) return;
+    this.saveHistory(); // Save undo state
     this.state.elements = this.state.elements.filter(el => el.id !== this.state.selectedElementId);
     this.state.selectedElementId = null;
     
@@ -289,6 +321,8 @@ class DrillFlowApp {
     const el = this.getSelectedElement();
     if (!el || value === undefined || isNaN(value) && typeof value === 'number') return;
     
+    // For slider dragging updates, let's also support clean history snapshots by checking inputs later, 
+    // but simple property updates are perfectly saved in state.
     el[key] = value;
     
     // Ensure logical properties constraints
@@ -302,6 +336,7 @@ class DrillFlowApp {
   alignSelected(mode) {
     const el = this.getSelectedElement();
     if (!el) return;
+    this.saveHistory(); // Save undo state
     const center = this.getPageCenter();
 
     if (mode === 'centerX' || mode === 'centerBoth') {
@@ -377,6 +412,8 @@ class DrillFlowApp {
       
       if (!el) return;
 
+      this.saveHistory(); // Save undo state before action
+
       this.dragState = {
         isDragging: false,
         isResizing: true,
@@ -405,6 +442,8 @@ class DrillFlowApp {
       const el = this.state.elements.find(item => item.id === elId);
       if (!el) return;
 
+      this.saveHistory(); // Save undo state before action
+
       const cursor = this.getSvgCoords(e);
       
       this.dragState = {
@@ -412,7 +451,10 @@ class DrillFlowApp {
         isResizing: false,
         elementId: elId,
         offsetX: cursor.x - el.x,
-        offsetY: cursor.y - el.y
+        offsetY: cursor.y - el.y,
+        startX: el.x,
+        startY: el.y,
+        lockAxis: null
       };
 
       document.body.classList.add('dragging');
@@ -434,12 +476,64 @@ class DrillFlowApp {
       if (!el) return;
 
       const cursor = this.getSvgCoords(e);
+      let targetX = cursor.x - this.dragState.offsetX;
+      let targetY = cursor.y - this.dragState.offsetY;
+
+      // 1. Shift Key Movement Axis Locking (X-only or Y-only)
+      if (e.shiftKey) {
+        const dx = Math.abs(targetX - this.dragState.startX);
+        const dy = Math.abs(targetY - this.dragState.startY);
+
+        if (this.dragState.lockAxis === null) {
+          if (dx > 2.0 || dy > 2.0) {
+            this.dragState.lockAxis = dx > dy ? 'x' : 'y';
+          }
+        }
+
+        if (this.dragState.lockAxis === 'x') {
+          targetY = this.dragState.startY;
+        } else if (this.dragState.lockAxis === 'y') {
+          targetX = this.dragState.startX;
+        }
+      } else {
+        this.dragState.lockAxis = null;
+      }
+
+      // 2. CAD Snap-to-Object & Center-Page Alignments (2mm snap window)
+      let snappedX = false;
+      let snappedY = false;
+      const snapThreshold = 2.0; // mm
+
+      // Snap X/Y to other templates' centers
+      for (const other of this.state.elements) {
+        if (other.id === el.id) continue;
+
+        if (this.dragState.lockAxis !== 'y' && !snappedX && Math.abs(targetX - other.x) < snapThreshold) {
+          targetX = other.x;
+          snappedX = true;
+        }
+        if (this.dragState.lockAxis !== 'x' && !snappedY && Math.abs(targetY - other.y) < snapThreshold) {
+          targetY = other.y;
+          snappedY = true;
+        }
+      }
+
+      // Snap to page absolute midlines
+      const pageCenter = this.getPageCenter();
+      if (this.dragState.lockAxis !== 'y' && !snappedX && Math.abs(targetX - pageCenter.x) < snapThreshold) {
+        targetX = pageCenter.x;
+        snappedX = true;
+      }
+      if (this.dragState.lockAxis !== 'x' && !snappedY && Math.abs(targetY - pageCenter.y) < snapThreshold) {
+        targetY = pageCenter.y;
+        snappedY = true;
+      }
       
-      // Update coordinates
-      el.x = parseFloat((cursor.x - this.dragState.offsetX).toFixed(1));
-      el.y = parseFloat((cursor.y - this.dragState.offsetY).toFixed(1));
+      // Update coordinates with float rounding
+      el.x = parseFloat(targetX.toFixed(1));
+      el.y = parseFloat(targetY.toFixed(1));
       
-      // Constrain coordinates within sheet dimensions
+      // Constrain coordinates within A4 sheet boundaries
       const maxW = this.state.orientation === 'portrait' ? 210 : 297;
       const maxH = this.state.orientation === 'portrait' ? 297 : 210;
       el.x = Math.max(0, Math.min(maxW, el.x));
@@ -623,6 +717,7 @@ class DrillFlowApp {
     });
 
     this.autoScaleViewport();
+    this.updateScreenRulers();
   }
 
   renderElement(el) {
@@ -630,6 +725,21 @@ class DrillFlowApp {
     g.setAttribute('class', `draggable ${el.id === this.state.selectedElementId ? 'active-selection' : ''}`);
     g.setAttribute('data-id', el.id);
     g.setAttribute('transform', `translate(${el.x}, ${el.y})`);
+
+    // Assign beautiful dynamic dark colors to different elements
+    const index = this.state.elements.findIndex(item => item.id === el.id);
+    const darkColors = [
+      '#1b3a4b', // Dark Teal
+      '#7f1d1d', // Dark Red
+      '#14532d', // Dark Green
+      '#581c87', // Dark Purple
+      '#7c2d12', // Dark Orange
+      '#1e3a8a', // Dark Blue
+      '#3f3f46'  // Dark Zinc
+    ];
+    const elColor = darkColors[index % darkColors.length];
+    g.setAttribute('stroke', elColor);
+    g.setAttribute('fill', 'none');
 
     // Render ventilation holes inside cutout boundaries
     const holes = Patterns.generateHoles(el);
@@ -658,13 +768,24 @@ class DrillFlowApp {
       holeSvg.setAttribute('class', 'drill-hole');
       g.appendChild(holeSvg);
 
-      // 2. High accuracy center pilot dot
-      const centerDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      centerDot.setAttribute('cx', pt.x);
-      centerDot.setAttribute('cy', pt.y);
-      centerDot.setAttribute('r', '0.12');
-      centerDot.setAttribute('class', 'drill-hole-center');
-      g.appendChild(centerDot);
+      // 2. High accuracy diagonal "x" center crosshair spanning the full hole
+      const offset = rad;
+      
+      const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line1.setAttribute('x1', pt.x - offset);
+      line1.setAttribute('y1', pt.y - offset);
+      line1.setAttribute('x2', pt.x + offset);
+      line1.setAttribute('y2', pt.y + offset);
+      line1.setAttribute('class', 'drill-hole-center');
+      g.appendChild(line1);
+
+      const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line2.setAttribute('x1', pt.x - offset);
+      line2.setAttribute('y1', pt.y + offset);
+      line2.setAttribute('x2', pt.x + offset);
+      line2.setAttribute('y2', pt.y - offset);
+      line2.setAttribute('class', 'drill-hole-center');
+      g.appendChild(line2);
     });
 
     if (el.type === 'fan') {
@@ -733,17 +854,27 @@ class DrillFlowApp {
         sCircle.setAttribute('cy', rotY);
         sCircle.setAttribute('r', spec.screwHoleRadius);
         sCircle.setAttribute('fill', 'none');
-        sCircle.setAttribute('stroke', '#000000');
         sCircle.setAttribute('stroke-width', '0.25');
+        sCircle.setAttribute('class', 'svg-element-center');
         g.appendChild(sCircle);
 
-        // Pilot screw center mark
-        const sCenter = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        sCenter.setAttribute('cx', rotX);
-        sCenter.setAttribute('cy', rotY);
-        sCenter.setAttribute('r', '0.12');
-        sCenter.setAttribute('class', 'drill-hole-center');
-        g.appendChild(sCenter);
+        // Pilot screw center mark (diagonal "x" crosshairs spanning the full hole)
+        const sOffset = spec.screwHoleRadius;
+        const sLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        sLine1.setAttribute('x1', rotX - sOffset);
+        sLine1.setAttribute('y1', rotY - sOffset);
+        sLine1.setAttribute('x2', rotX + sOffset);
+        sLine1.setAttribute('y2', rotY + sOffset);
+        sLine1.setAttribute('class', 'drill-hole-center');
+        g.appendChild(sLine1);
+
+        const sLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        sLine2.setAttribute('x1', rotX - sOffset);
+        sLine2.setAttribute('y1', rotY + sOffset);
+        sLine2.setAttribute('x2', rotX + sOffset);
+        sLine2.setAttribute('y2', rotY - sOffset);
+        sLine2.setAttribute('class', 'drill-hole-center');
+        g.appendChild(sLine2);
 
         // Screw crosshair lines (horizontal and vertical ticks for easy centerpunching)
         const tick = 3;
@@ -752,8 +883,8 @@ class DrillFlowApp {
         tickH.setAttribute('y1', rotY);
         tickH.setAttribute('x2', rotX + tick);
         tickH.setAttribute('y2', rotY);
-        tickH.setAttribute('stroke', '#333333');
         tickH.setAttribute('stroke-width', '0.15');
+        tickH.setAttribute('class', 'svg-element-center');
         g.appendChild(tickH);
 
         const tickV = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -761,8 +892,8 @@ class DrillFlowApp {
         tickV.setAttribute('y1', rotY - tick);
         tickV.setAttribute('x2', rotX);
         tickV.setAttribute('y2', rotY + tick);
-        tickV.setAttribute('stroke', '#333333');
         tickV.setAttribute('stroke-width', '0.15');
+        tickV.setAttribute('class', 'svg-element-center');
         g.appendChild(tickV);
       });
 
@@ -1060,10 +1191,11 @@ class DrillFlowApp {
   }
 
   resetState() {
-    if (confirm('Are you sure you want to clear the canvas and restore defaults?')) {
-      this.state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    if (confirm('Are you sure you want to clear the canvas? This will remove all templates.')) {
+      this.state.elements = [];
+      this.state.selectedElementId = null;
       
-      // Reset sidebar coordinates
+      // Clear sidebar configuration values to standard defaults
       this.dom.inputScaleX.value = "1.0000";
       this.dom.inputScaleY.value = "1.0000";
       this.dom.inputMargin.value = "10";
@@ -1071,6 +1203,13 @@ class DrillFlowApp {
       this.dom.chkGrid.checked = true;
       this.dom.chkRulers.checked = true;
       this.dom.chkPrintRulers.checked = true;
+
+      this.state.scaleX = 1.0;
+      this.state.scaleY = 1.0;
+      this.state.safetyMargin = 10;
+      this.state.showGrid = true;
+      this.state.showRulers = true;
+      this.state.printRulers = true;
 
       this.setOrientation('portrait');
       this.render();
@@ -1091,24 +1230,7 @@ class DrillFlowApp {
     }
   }
 
-  handleViewportZoom(e) {
-    e.preventDefault();
-    
-    // Zoom factor: small enough for smooth scroll transitions
-    const zoomFactor = 1.08;
-    const delta = e.deltaY < 0 ? zoomFactor : 1 / zoomFactor;
-    
-    // Clamp zoom scale between 0.15 and 8.0
-    this.viewportScale = Math.max(0.15, Math.min(8.0, this.viewportScale * delta));
-    this.manuallyZoomed = true;
-    
-    this.dom.canvasWrapper.style.transform = `scale(${this.viewportScale})`;
-  }
-
-  autoScaleViewport() {
-    if (this.manuallyZoomed) return;
-
-    // Dynamic page viewport resizing to fit in laptop screens beautifully
+  getAutoFitScale() {
     const mockupW = this.state.orientation === 'portrait' ? 210 : 297;
     const mockupH = this.state.orientation === 'portrait' ? 297 : 210;
     
@@ -1121,10 +1243,272 @@ class DrillFlowApp {
 
     const scaleX = viewportW / pxW;
     const scaleY = viewportH / pxH;
-    const scale = Math.min(1, scaleX, scaleY); // fit inside, max 100% scale
+    return Math.min(1, scaleX, scaleY); // fit inside, max 100% scale
+  }
 
-    this.viewportScale = scale;
-    this.dom.canvasWrapper.style.transform = `scale(${scale})`;
+  handleViewportZoom(e) {
+    e.preventDefault();
+    
+    // Zoom factor: small enough for smooth scroll transitions
+    const zoomFactor = 1.08;
+    const delta = e.deltaY < 0 ? zoomFactor : 1 / zoomFactor;
+    
+    // Calculate minimum scale where the page perfectly fits the viewport
+    const minScale = this.getAutoFitScale();
+    
+    // Clamp zoom scale between minScale and 8.0 (impossible to zoom out past viewport)
+    this.viewportScale = Math.max(minScale, Math.min(8.0, this.viewportScale * delta));
+    this.manuallyZoomed = true;
+    
+    this.dom.canvasWrapper.style.transform = `scale(${this.viewportScale})`;
+    this.updateScreenRulers();
+  }
+
+  autoScaleViewport() {
+    if (this.manuallyZoomed) return;
+
+    this.viewportScale = this.getAutoFitScale();
+    this.dom.canvasWrapper.style.transform = `scale(${this.viewportScale})`;
+  }
+
+  updateScreenRulers() {
+    if (!this.state.showRulers) {
+      this.dom.screenRulersContainer.classList.add('hidden');
+      return;
+    }
+    this.dom.screenRulersContainer.classList.remove('hidden');
+
+    const mockupRect = this.dom.pageMockup.getBoundingClientRect();
+    const viewportRect = this.dom.viewport.getBoundingClientRect();
+
+    const leftOffset = mockupRect.left - viewportRect.left;
+    const topOffset = mockupRect.top - viewportRect.top;
+
+    const mmToPxX = 3.779527559 * this.viewportScale * this.state.scaleX;
+    const mmToPxY = 3.779527559 * this.viewportScale * this.state.scaleY;
+
+    const maxW = this.state.orientation === 'portrait' ? 210 : 297;
+    const maxH = this.state.orientation === 'portrait' ? 297 : 210;
+
+    // 1. Horizontal Ruler Ticks (SVG)
+    let hHtml = '';
+    for (let x = 0; x <= maxW; x += 1) {
+      const pxX = leftOffset + x * mmToPxX;
+      if (pxX < 20 || pxX > viewportRect.width) continue;
+
+      let len = 4;
+      let strokeW = 0.5;
+      let color = 'rgba(255, 255, 255, 0.25)';
+
+      if (x % 10 === 0) {
+        len = 10;
+        strokeW = 1.0;
+        color = 'var(--accent)';
+        hHtml += `<text x="${pxX}" y="18" font-size="7" font-weight="600" text-anchor="middle" fill="var(--text-muted)" font-family="'Outfit', sans-serif">${x}</text>`;
+      } else if (x % 5 === 0) {
+        len = 7;
+        strokeW = 0.8;
+      }
+
+      hHtml += `<line x1="${pxX}" y1="0" x2="${pxX}" y2="${len}" stroke="${color}" stroke-width="${strokeW}" />`;
+    }
+    this.dom.screenRulerH.innerHTML = hHtml;
+
+    // 2. Vertical Ruler Ticks (SVG)
+    let vHtml = '';
+    for (let y = 0; y <= maxH; y += 1) {
+      const pxY = topOffset + y * mmToPxY;
+      if (pxY < 20 || pxY > viewportRect.height) continue;
+
+      let len = 4;
+      let strokeW = 0.5;
+      let color = 'rgba(255, 255, 255, 0.25)';
+
+      if (y % 10 === 0) {
+        len = 10;
+        strokeW = 1.0;
+        color = 'var(--accent)';
+        vHtml += `<text x="17" y="${pxY + 2.5}" font-size="7" font-weight="600" text-anchor="end" fill="var(--text-muted)" font-family="'Outfit', sans-serif">${y}</text>`;
+      } else if (y % 5 === 0) {
+        len = 7;
+        strokeW = 0.8;
+      }
+
+      vHtml += `<line x1="0" y1="${pxY}" x2="${len}" y2="${pxY}" stroke="${color}" stroke-width="${strokeW}" />`;
+    }
+    this.dom.screenRulerV.innerHTML = vHtml;
+  }
+
+  handleGlobalKeyDown(e) {
+    // Avoid intercepts if typing inside input fields
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') {
+      return;
+    }
+
+    if (e.key === 'Delete' || e.key === 'Del') {
+      if (this.state.selectedElementId) {
+        e.preventDefault();
+        this.deleteSelectedElement();
+      }
+    }
+
+    // Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z CAD helpers!
+    if (e.ctrlKey) {
+      if (e.key === 'c' || e.key === 'C') {
+        if (this.state.selectedElementId) {
+          e.preventDefault();
+          this.copySelected();
+        }
+      }
+      if (e.key === 'v' || e.key === 'V') {
+        e.preventDefault();
+        // Paste at default page center if key pressed
+        this.contextCoords = this.getPageCenter();
+        this.pasteSelected();
+      }
+      if (e.key === 'x' || e.key === 'X') {
+        if (this.state.selectedElementId) {
+          e.preventDefault();
+          this.cutSelected();
+        }
+      }
+      if (e.key === 'd' || e.key === 'D') {
+        if (this.state.selectedElementId) {
+          e.preventDefault();
+          this.duplicateSelected();
+        }
+      }
+      if (e.key === 'z' || e.key === 'Z') {
+        e.preventDefault();
+        this.undo();
+      }
+    }
+  }
+
+  handleContextMenu(e) {
+    e.preventDefault();
+    const target = e.target;
+    const dragNode = target.closest('.draggable');
+
+    // Right-clicking an element selects it automatically
+    if (dragNode) {
+      const elId = dragNode.getAttribute('data-id');
+      this.state.selectedElementId = elId;
+      this.syncSidebarToSelection();
+      this.render();
+    } else if (target.id === 'canvas-svg' || target.id === 'canvas-grid') {
+      this.state.selectedElementId = null;
+      this.syncSidebarToSelection();
+      this.render();
+    }
+
+    // Save SVG space coordinates of right click to spawn paste target accurately
+    this.contextCoords = this.getSvgCoords(e);
+
+    const hasSelection = !!this.state.selectedElementId;
+    this.dom.ctxCut.disabled = !hasSelection;
+    this.dom.ctxCopy.disabled = !hasSelection;
+    this.dom.ctxDuplicate.disabled = !hasSelection;
+    this.dom.ctxDelete.disabled = !hasSelection;
+    this.dom.ctxPaste.disabled = !this.clipboard;
+
+    // Show menu floating at cursor coordinates
+    this.dom.contextMenu.style.left = `${e.clientX}px`;
+    this.dom.contextMenu.style.top = `${e.clientY}px`;
+    this.dom.contextMenu.classList.remove('hidden');
+  }
+
+  hideContextMenu(e) {
+    // Avoid hiding immediately if clicking a valid menu option
+    if (e && e.target.closest('#context-menu')) return;
+    this.dom.contextMenu.classList.add('hidden');
+  }
+
+  copySelected() {
+    const el = this.getSelectedElement();
+    if (!el) return;
+
+    this.clipboard = JSON.parse(JSON.stringify(el));
+    this.showToast(`Copied ${this.getElementTypeName(el)} to clipboard!`);
+    this.hideContextMenu();
+  }
+
+  cutSelected() {
+    const el = this.getSelectedElement();
+    if (!el) return;
+
+    this.copySelected();
+    this.deleteSelectedElement();
+  }
+
+  pasteSelected() {
+    if (!this.clipboard) return;
+    this.saveHistory(); // Save undo state
+
+    const newEl = JSON.parse(JSON.stringify(this.clipboard));
+    newEl.id = `el-${Date.now()}`;
+    
+    // Paste directly at right-click coordinates
+    newEl.x = parseFloat(this.contextCoords.x.toFixed(1));
+    newEl.y = parseFloat(this.contextCoords.y.toFixed(1));
+
+    this.state.elements.push(newEl);
+    this.state.selectedElementId = newEl.id;
+
+    this.render();
+    this.updateUrl();
+    this.syncSidebarToSelection();
+    this.hideContextMenu();
+    this.showToast(`Pasted copied template!`);
+  }
+
+  duplicateSelected() {
+    const el = this.getSelectedElement();
+    if (!el) return;
+    this.saveHistory(); // Save undo state
+
+    const dup = JSON.parse(JSON.stringify(el));
+    dup.id = `el-${Date.now()}`;
+    
+    // Symmetrically offset duplicate by +10mm
+    dup.x = Math.min(this.state.orientation === 'portrait' ? 210 : 297, dup.x + 10);
+    dup.y = Math.min(this.state.orientation === 'portrait' ? 297 : 210, dup.y + 10);
+
+    this.state.elements.push(dup);
+    this.state.selectedElementId = dup.id;
+
+    this.render();
+    this.updateUrl();
+    this.syncSidebarToSelection();
+    this.hideContextMenu();
+  }
+
+  saveHistory() {
+    // Stringify current templates state for simple deep-copy restore
+    this.undoStack.push(JSON.stringify(this.state.elements));
+    if (this.undoStack.length > this.maxUndoHistory) {
+      this.undoStack.shift(); // remove oldest undo step
+    }
+  }
+
+  undo() {
+    if (this.undoStack.length === 0) {
+      this.showToast('Nothing to undo!');
+      return;
+    }
+
+    const previousElements = this.undoStack.pop();
+    this.state.elements = JSON.parse(previousElements);
+
+    // Keep selection safe if the selected element was undone/deleted
+    if (this.state.selectedElementId && !this.state.elements.some(el => el.id === this.state.selectedElementId)) {
+      this.state.selectedElementId = null;
+    }
+
+    this.render();
+    this.updateUrl();
+    this.syncSidebarToSelection();
+    this.showToast('Action undone!');
   }
 }
 
