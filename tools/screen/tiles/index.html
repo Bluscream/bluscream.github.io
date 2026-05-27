@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precision Screen Tiler | Aspect Ratio Calculator</title>
+    <meta name="description" content="Calculate pixel-perfect window tiling layouts for any screen resolution and aspect ratio combination.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #0a0a0c;
+            --bg-card: rgba(23, 23, 26, 0.7);
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.05) 0%, transparent 40%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            padding: 2rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #fff, #a1a1aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Controls Section */
+        .controls {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .res-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .res-input-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            width: 100%;
+            outline: none;
+        }
+
+        .divider {
+            color: var(--text-muted);
+            font-weight: 800;
+        }
+
+        /* Ratio Tags */
+        .ratios-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            min-height: 44px;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 1px dashed var(--glass-border);
+        }
+
+        .ratio-tag {
+            background: var(--accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            animation: scaleIn 0.2s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .remove-tag {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .remove-tag:hover {
+            opacity: 1;
+        }
+
+        .add-ratio-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .add-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.05);
+            background: #4f46e5;
+        }
+
+        /* Preview Section */
+        .display-area {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .monitor-preview {
+            background: #000;
+            border-radius: 20px;
+            padding: 12px;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 2px #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .monitor-preview::after {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 15px;
+            background: #1a1a1e;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .screen-canvas {
+            width: 100%;
+            height: 100%;
+            background: #050505;
+            position: relative;
+            border-radius: 4px;
+            transition: aspect-ratio 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tile-rect {
+            position: absolute;
+            border: 2px solid var(--accent);
+            background: rgba(99, 102, 241, 0.1);
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 0.75rem;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 6px;
+        }
+
+        .tile-rect span {
+            font-weight: 700;
+            opacity: 0.9;
+        }
+
+        .tile-rect .res-label {
+            font-size: 0.65rem;
+            opacity: 0.6;
+        }
+
+        .resize-handle {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 16px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: nwse-resize;
+            border-top-left-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .resize-handle:hover {
+            background: var(--accent);
+        }
+
+        /* Reset Button */
+        .reset-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .reset-btn:hover {
+            background: var(--glass-bg);
+            color: white;
+            border-color: var(--text-muted);
+        }
+
+        /* Results Table */
+        .results-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .results-table th {
+            text-align: left;
+            padding: 0.75rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            font-weight: 500;
+        }
+
+        .results-table td {
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .coord-pill {
+            background: var(--glass-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #6ee7b7;
+        }
+
+        .dim-pill {
+            background: var(--glass-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #fbbf24;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Precision Tiler</h1>
+            <p>Divide your workspace with mathematical accuracy.</p>
+        </header>
+
+        <main class="calculator-grid">
+            <section class="controls">
+                <!-- Screen Resolution -->
+                <div class="input-group">
+                    <label>Monitor Resolution</label>
+                    <div class="res-input-wrapper">
+                        <input type="number" id="screenW" value="3440" placeholder="Width">
+                        <span class="divider">×</span>
+                        <input type="number" id="screenH" value="1440" placeholder="Height">
+                    </div>
+                </div>
+
+                <!-- Aspect Ratios -->
+                <div class="input-group">
+                    <label>Target Ratios (Add to list)</label>
+                    <div class="add-ratio-row">
+                        <div class="res-input-wrapper">
+                            <input type="text" id="newRatio" placeholder="e.g. 18:9 or 21:9" value="16:9">
+                        </div>
+                        <button class="add-btn" id="addRatioBtn">
+                            <i data-lucide="plus"></i>
+                        </button>
+                    </div>
+                    <div class="ratios-container" id="ratiosList">
+                        <!-- Tags injected here -->
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Layout Logic</label>
+                    <div class="res-input-wrapper" style="font-size: 0.9rem; color: var(--text-muted)">
+                        <span>Intelligent Tiling (Columnar)</span>
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
+                        Tiles are grouped into columns. Drag a tile onto another to swap or reorder. 
+                        To create a <strong>new column</strong>, drag a tile to the far right.
+                    </p>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="reset-btn" onclick="addColumn()" style="margin: 0; flex: 1;">
+                            <i data-lucide="plus-square" style="width: 14px; height: 14px; vertical-align: middle;"></i>
+                            New Column
+                        </button>
+                        <button class="reset-btn" onclick="resetLayout()" style="margin: 0; flex: 1;">
+                            <i data-lucide="refresh-ccw" style="width: 14px; height: 14px; vertical-align: middle;"></i>
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="display-area">
+                <!-- Monitor Visualizer -->
+                <div class="monitor-preview" id="monitorOuter">
+                    <div class="screen-canvas" id="screenCanvas">
+                        <!-- Tiles injected here -->
+                    </div>
+                </div>
+
+                <!-- Results List -->
+                <div class="results-card">
+                    <label style="display: block; margin-bottom: 1rem;">Calculated Dimensions</label>
+                    <div id="resultsTableContainer">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Tile</th>
+                                    <th>Ratio</th>
+                                    <th>Size (W×H)</th>
+                                    <th>Position (X,Y)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsBody">
+                                <!-- Rows injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // State: Array of columns, each containing tile objects
+        let screenW = 3440;
+        let screenH = 1440;
+        let columns = [
+            [
+                { ratio: "4:3", id: 1 },
+                { ratio: "4:3", id: 2 }
+            ],
+            [
+                { ratio: "16:9", id: 3 }
+            ]
+        ];
+        
+        let draggedTile = null;
+        let draggedFrom = null;
+
+        // DOM Elements
+        const screenWInput = document.getElementById('screenW');
+        const screenHInput = document.getElementById('screenH');
+        const newRatioInput = document.getElementById('newRatio');
+        const addRatioBtn = document.getElementById('addRatioBtn');
+        const screenCanvas = document.getElementById('screenCanvas');
+        const monitorOuter = document.getElementById('monitorOuter');
+        const resultsBody = document.getElementById('resultsBody');
+
+        // Init Lucide
+        lucide.createIcons();
+
+        function init() {
+            calculateAndRender();
+
+            screenWInput.addEventListener('input', () => {
+                screenW = parseInt(screenWInput.value) || 0;
+                calculateAndRender();
+            });
+            screenHInput.addEventListener('input', () => {
+                screenH = parseInt(screenHInput.value) || 0;
+                calculateAndRender();
+            });
+            
+            addRatioBtn.addEventListener('click', () => {
+                const val = newRatioInput.value.trim();
+                if (val) {
+                    // Add to the last column by default
+                    if (columns.length === 0) columns.push([]);
+                    columns[0].push({ ratio: val, id: Date.now() });
+                    newRatioInput.value = "";
+                    calculateAndRender();
+                }
+            });
+
+            newRatioInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addRatioBtn.click();
+            });
+        }
+
+        window.addColumn = () => {
+            columns.push([{ ratio: "16:9", id: Date.now() }]);
+            calculateAndRender();
+        };
+
+        window.resetLayout = () => {
+            columns = [
+                [{ ratio: "4:3", id: 1 }, { ratio: "4:3", id: 2 }],
+                [{ ratio: "16:9", id: 3 }]
+            ];
+            calculateAndRender();
+        };
+
+        function parseRatio(str) {
+            if (str.includes(':')) {
+                const parts = str.split(':');
+                const w = parseFloat(parts[0]);
+                const h = parseFloat(parts[1]);
+                return h === 0 ? 1 : w / h;
+            }
+            return parseFloat(str) || 1;
+        }
+
+        function calculateAndRender() {
+            if (!screenW || !screenH || columns.length === 0) {
+                renderEmpty();
+                return;
+            }
+
+            // Calculation Logic for Columnar Tiling:
+            // Every tile i in column j has width Wj.
+            // Height of tile i is Hi = Wj / Ri.
+            // Column Height Hj = Sum(Hi) = Wj * Sum(1/Ri).
+            // All columns share the same height H.
+            // H = Wj * Sum(1/Ri)  =>  Wj = H / Sum(1/Ri).
+            // Total Width = Sum(Wj) = H * Sum_j( 1 / Sum_{i in Cj}(1/Ri) ).
+            // We want H to be as large as possible such that H <= screenH AND Total Width <= screenW.
+
+            let columnFactors = columns.map(col => {
+                if (col.length === 0) return 0;
+                // Sum(1/Ri)
+                return col.reduce((sum, tile) => sum + (1 / parseRatio(tile.ratio)), 0);
+            }).filter(f => f > 0);
+
+            if (columnFactors.length === 0) {
+                renderEmpty();
+                return;
+            }
+
+            // Total Width Factor = Sum(1 / factor_j)
+            const totalWidthFactor = columnFactors.reduce((sum, f) => sum + (1 / f), 0);
+
+            // Calculate optimal H
+            let finalH = Math.min(screenH, screenW / totalWidthFactor);
+            let finalWTotal = finalH * totalWidthFactor;
+            
+            let startX = (screenW - finalWTotal) / 2;
+            let startY = (screenH - finalH) / 2;
+
+            screenCanvas.innerHTML = "";
+            resultsBody.innerHTML = "";
+
+            let currentX = startX;
+            let monitorAspect = screenW / screenH;
+            monitorOuter.style.aspectRatio = monitorAspect;
+
+            columns.forEach((col, colIdx) => {
+                if (col.length === 0) return;
+
+                const factor = columnFactors.shift(); // Get factor for this specific col
+                const colW = Math.round(finalH / factor);
+                let currentY = startY;
+
+                col.forEach((tile, tileIdx) => {
+                    const tileH = Math.round(colW / parseRatio(tile.ratio));
+                    const tileX = Math.round(currentX);
+                    const tileY = Math.round(currentY);
+
+                    createTileElement(tile, colW, tileH, tileX, tileY, colIdx, tileIdx);
+                    createResultRow(tile, colW, tileH, tileX, tileY);
+
+                    currentY += tileH;
+                });
+                currentX += colW;
+            });
+
+            // Add a "New Column" drop zone at the end
+            const dropZone = document.createElement('div');
+            dropZone.className = 'new-col-zone';
+            dropZone.innerHTML = '<span>+ New Column</span>';
+            dropZone.ondragover = (e) => e.preventDefault();
+            dropZone.ondrop = (e) => {
+                e.preventDefault();
+                moveTile(draggedFrom.colIdx, draggedFrom.tileIdx, columns.length, 0);
+            };
+            screenCanvas.appendChild(dropZone);
+        }
+
+        function createTileElement(tile, w, h, x, y, colIdx, tileIdx) {
+            const el = document.createElement('div');
+            el.className = 'tile-rect';
+            el.draggable = true;
+            el.style.width = `${(w / screenW) * 100}%`;
+            el.style.height = `${(h / screenH) * 100}%`;
+            el.style.left = `${(x / screenW) * 100}%`;
+            el.style.top = `${(y / screenH) * 100}%`;
+            
+            el.innerHTML = `
+                <span>${tile.ratio}</span>
+                <div class="res-label">${w}×${h} px</div>
+                <div class="remove-btn" onclick="removeTile(${colIdx}, ${tileIdx})">×</div>
+            `;
+
+            el.ondragstart = (e) => {
+                draggedTile = tile;
+                draggedFrom = { colIdx, tileIdx };
+                el.style.opacity = '0.4';
+            };
+            el.ondragend = () => {
+                el.style.opacity = '1';
+                draggedTile = null;
+            };
+
+            // Drop zones inside/around tiles
+            el.ondragover = (e) => e.preventDefault();
+            el.ondrop = (e) => {
+                e.preventDefault();
+                moveTile(draggedFrom.colIdx, draggedFrom.tileIdx, colIdx, tileIdx);
+            };
+
+            screenCanvas.appendChild(el);
+        }
+
+        function createDropZone(colIdx, tileIdx, isNewCol = false) {
+            // Invisible drop zones for more natural dragging could be added here
+            // For now, dropping on a tile puts it in that position
+        }
+
+        function moveTile(fromCol, fromIdx, toCol, toIdx) {
+            const tile = columns[fromCol].splice(fromIdx, 1)[0];
+            
+            // If dragging to a new column
+            if (toCol === columns.length) {
+                columns.push([tile]);
+            } else {
+                columns[toCol].splice(toIdx, 0, tile);
+            }
+
+            // Cleanup empty columns
+            columns = columns.filter(col => col.length > 0);
+            calculateAndRender();
+        }
+
+        window.removeTile = (colIdx, tileIdx) => {
+            columns[colIdx].splice(tileIdx, 1);
+            columns = columns.filter(col => col.length > 0);
+            calculateAndRender();
+        };
+
+        function createResultRow(tile, w, h, x, y) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>#${tile.id}</td>
+                <td><strong>${tile.ratio}</strong></td>
+                <td><span class="dim-pill">${w}</span> × <span class="dim-pill">${h}</span> px</td>
+                <td><span class="coord-pill">${x}</span>, <span class="coord-pill">${y}</span></td>
+            `;
+            resultsBody.appendChild(row);
+        }
+
+        function renderEmpty() {
+            screenCanvas.innerHTML = '<div class="empty-state">Drag ratios here or use the input to start.</div>';
+            resultsBody.innerHTML = '<tr><td colspan="4" class="empty-state">No tiles defined.</td></tr>';
+        }
+
+        init();
+    </script>
+    <style>
+        /* Extra styles for the new engine */
+        .tile-rect {
+            cursor: move;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .tile-rect:hover {
+            border-color: #fff;
+            background: rgba(99, 102, 241, 0.2);
+            z-index: 10;
+        }
+        .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 18px;
+            height: 18px;
+            background: rgba(255, 0, 0, 0.2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .tile-rect:hover .remove-btn {
+            opacity: 1;
+        }
+        .remove-btn:hover {
+            background: #ef4444;
+        }
+
+        .new-col-zone {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 1px dashed var(--glass-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            writing-mode: vertical-rl;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s;
+        }
+
+        .new-col-zone:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: white;
+            width: 60px;
+        }
+    </style>
+
+
+
+</body>
+</html>
