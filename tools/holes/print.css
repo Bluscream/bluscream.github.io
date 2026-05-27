@@ -1,0 +1,110 @@
+/* HIGH-PRECISION DRILLFLOW PRINT LAYOUTS */
+
+@page {
+  size: A4;
+  margin: 0 !important;
+}
+
+html, body {
+  width: 210mm !important;
+  height: 297mm !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  overflow: visible !important;
+}
+
+body {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Hide all editing components, panels and backgrounds */
+.app-header, 
+.app-sidebar, 
+.toast,
+.non-printable {
+  display: none !important;
+}
+
+.app-body {
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+.canvas-viewport {
+  width: 210mm !important;
+  height: 297mm !important;
+  background: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  display: block !important;
+}
+
+.canvas-scale-wrapper {
+  padding: 0 !important;
+  transform: none !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.a4-page-mockup {
+  width: 210mm !important;
+  height: 297mm !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  background-color: #ffffff !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Handle landscape printing alignment by rotating the container */
+.landscape-mode {
+  width: 297mm !important;
+  height: 210mm !important;
+  transform: rotate(-90deg) translate(-297mm, 0) !important;
+  transform-origin: 0 0 !important;
+}
+
+#canvas-svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* High contrast ink-friendly adjustments for vector outlines and drill paths */
+.drill-hole {
+  fill: none !important;
+  stroke: #000000 !important;
+  stroke-width: 0.15mm !important;
+}
+
+.drill-hole-center {
+  stroke: #000000 !important;
+  stroke-width: 0.08mm !important;
+}
+
+.svg-element-outline {
+  stroke: #666666 !important;
+  stroke-width: 0.12mm !important;
+  stroke-dasharray: 1mm, 1mm !important;
+}
+
+.svg-element-center {
+  stroke: #000000 !important;
+  stroke-width: 0.1mm !important;
+}
+
+/* Clean ruler ticks when printed */
+.ruler-tick {
+  stroke: #333333 !important;
+}
+.ruler-text {
+  fill: #000000 !important;
+  font-family: 'Outfit', sans-serif !important;
+}

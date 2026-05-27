@@ -1,0 +1,146 @@
+/* DRILLFLOW CANVAS & GRAPHICS ENVIRONMENT */
+
+/* --- VIEWPORT WORKSPACE --- */
+.canvas-viewport {
+  flex: 1;
+  height: 100%;
+  background-color: var(--bg-grid-cad);
+  background-image: radial-gradient(var(--grid-color-major) 1px, transparent 0);
+  background-size: 20px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  position: relative;
+  padding: 40px;
+}
+
+/* Scale Wrapper ensures we can resize A4 layout cleanly on small screens */
+.canvas-scale-wrapper {
+  transform-origin: center center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* The physical paper representation */
+.a4-page-mockup {
+  background-color: var(--a4-bg);
+  border: 1px solid var(--a4-border);
+  box-shadow: var(--a4-shadow);
+  border-radius: 2px;
+  position: relative;
+  transition: width 0.3s ease, height 0.3s ease;
+  user-select: none;
+}
+
+/* Page size mappings */
+.portrait-mode {
+  width: 210mm;
+  height: 297mm;
+}
+.landscape-mode {
+  width: 297mm;
+  height: 210mm;
+}
+
+/* Main SVG container */
+#canvas-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* SVG interactive nodes */
+.draggable {
+  cursor: grab;
+  pointer-events: bounding-box;
+}
+.dragging {
+  cursor: grabbing !important;
+}
+
+.svg-element-outline {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 0.35;
+  stroke-dasharray: 2, 2;
+  transition: stroke 0.2s;
+}
+.svg-element-center {
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 0.2;
+}
+
+/* Active element styling */
+.active-selection .svg-element-outline {
+  stroke: var(--accent);
+  stroke-width: 0.5;
+  stroke-dasharray: none;
+}
+
+/* Interactive bounding box overlay for resize */
+.selection-box {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 0.3;
+  stroke-dasharray: 1.5, 1.5;
+}
+
+.resize-handle {
+  fill: var(--white);
+  stroke: var(--accent);
+  stroke-width: 0.5;
+  cursor: nwse-resize;
+}
+.resize-handle-w {
+  cursor: ew-resize;
+}
+.resize-handle-h {
+  cursor: ns-resize;
+}
+
+/* Visual elements */
+.drill-hole {
+  fill: rgba(0, 0, 0, 0.9);
+  stroke: var(--text-muted);
+  stroke-width: 0.15;
+  transition: all 0.2s;
+}
+
+.drill-hole:hover {
+  fill: var(--accent-light);
+  stroke: var(--accent);
+}
+
+.drill-hole-center {
+  stroke: #ff4757;
+  stroke-width: 0.1;
+}
+
+/* --- RULER WORKSPACE STYLE (SCREEN ONLY) --- */
+.screen-rulers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+.ruler-corner {
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  width: 15px;
+  height: 15px;
+  background-color: var(--bg-sidebar);
+  border: 1px solid var(--border-color);
+  font-size: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}

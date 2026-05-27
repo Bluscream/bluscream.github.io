@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DrillFlow - Powerful Ventilation & Fan Template Generator</title>
+  <meta name="description" content="Design and print scale-accurate custom ventilation grids and PC fan drill templates. Dynamic millimeters rulers, multiple layouts, and instant URL state sharing.">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="canvas.css">
+  <link rel="stylesheet" href="print.css" media="print">
+</head>
+<body class="dark-theme">
+  <!-- Top App Navigation -->
+  <header class="app-header">
+    <div class="header-logo">
+      <svg class="logo-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+      </svg>
+      <h1>DrillFlow <span class="badge">v1.0</span></h1>
+    </div>
+    
+    <div class="header-actions">
+      <button id="btn-share" class="btn btn-secondary" title="Copy configuration URL to clipboard">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+        <span>Share Link</span>
+      </button>
+      <button id="btn-reset" class="btn btn-danger-outline" title="Clear canvas and reset settings">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        <span>Reset</span>
+      </button>
+      <button id="btn-theme" class="btn btn-secondary btn-icon-only" title="Toggle color theme">
+        <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+      <button id="btn-print" class="btn btn-primary" title="Print to A4 paper / save as PDF">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <span>Print Template</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Application Wrapper -->
+  <main class="app-body">
+    <!-- Sidebar Control Panel -->
+    <aside class="app-sidebar">
+      <div class="sidebar-scroll">
+        
+        <!-- SECTION 1: ADD ELEMENTS -->
+        <section class="control-group">
+          <h2><span class="step-num">1</span> Add Templates</h2>
+          <div class="element-adder-grid">
+            <button id="add-vent-rect" class="btn btn-adder">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="2,2"></rect>
+                <circle cx="9" cy="9" r="1" fill="currentColor"></circle>
+                <circle cx="15" cy="9" r="1" fill="currentColor"></circle>
+                <circle cx="9" cy="15" r="1" fill="currentColor"></circle>
+                <circle cx="15" cy="15" r="1" fill="currentColor"></circle>
+              </svg>
+              <span>Vent Grid</span>
+            </button>
+            <button id="add-vent-circle" class="btn btn-adder">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="9" stroke-dasharray="2,2"></circle>
+                <circle cx="12" cy="12" r="1" fill="currentColor"></circle>
+                <circle cx="8" cy="12" r="1" fill="currentColor"></circle>
+                <circle cx="16" cy="12" r="1" fill="currentColor"></circle>
+                <circle cx="12" cy="8" r="1" fill="currentColor"></circle>
+                <circle cx="12" cy="16" r="1" fill="currentColor"></circle>
+              </svg>
+              <span>Vent Circle</span>
+            </button>
+          </div>
+
+          <div class="fan-selector-wrapper">
+            <label class="section-label">Computer Fan Template</label>
+            <div class="fan-btn-grid">
+              <button class="btn btn-fan" data-fan-size="40">40mm</button>
+              <button class="btn btn-fan" data-fan-size="60">60mm</button>
+              <button class="btn btn-fan" data-fan-size="80">80mm</button>
+              <button class="btn btn-fan" data-fan-size="92">92mm</button>
+              <button class="btn btn-fan" data-fan-size="120">120mm</button>
+              <button class="btn btn-fan" data-fan-size="140">140mm</button>
+              <button class="btn btn-fan" data-fan-size="200">200mm</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: CANVAS SETTINGS -->
+        <section class="control-group">
+          <h2><span class="step-num">2</span> Page Settings</h2>
+          
+          <div class="form-row">
+            <label>Orientation</label>
+            <div class="segmented-control">
+              <button id="orient-portrait" class="active">Portrait (A4)</button>
+              <button id="orient-landscape">Landscape (A4)</button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="label-with-val">
+              <label for="input-margin">Safety Margin</label>
+              <span class="unit-val"><span id="val-margin">10</span>mm</span>
+            </div>
+            <input type="range" id="input-margin" min="0" max="30" step="1" value="10">
+          </div>
+
+          <div class="grid-toggles">
+            <label class="checkbox-container">
+              <input type="checkbox" id="chk-grid" checked>
+              <span class="checkmark"></span>
+              Show Grid Guides
+            </label>
+            <label class="checkbox-container">
+              <input type="checkbox" id="chk-rulers" checked>
+              <span class="checkmark"></span>
+              Show Rulers
+            </label>
+            <label class="checkbox-container">
+              <input type="checkbox" id="chk-print-rulers" checked>
+              <span class="checkmark"></span>
+              Print Rulers (Aids Verification)
+            </label>
+          </div>
+        </section>
+
+        <!-- SECTION 3: EDIT ACTIVE ELEMENT PROPERTIES -->
+        <section class="control-group selected-element-panel" id="panel-element-props">
+          <h2><span class="step-num">3</span> Element Settings</h2>
+          <div id="no-selection-msg" class="panel-info">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>Select an element on the canvas to configure it.</span>
+          </div>
+
+          <div id="selection-controls" class="hidden">
+            <div class="element-header">
+              <span id="selected-type-badge" class="badge badge-accent">Fan Template</span>
+              <button id="btn-delete-element" class="btn btn-icon-danger" title="Remove selected element">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Coordinate Controls -->
+            <div class="form-grid-2x2">
+              <div class="form-row-small">
+                <label for="input-pos-x">X Pos (mm)</label>
+                <input type="number" id="input-pos-x" min="0" max="300" step="0.5">
+              </div>
+              <div class="form-row-small">
+                <label for="input-pos-y">Y Pos (mm)</label>
+                <input type="number" id="input-pos-y" min="0" max="300" step="0.5">
+              </div>
+              <div class="form-row-small">
+                <label for="input-dim-w" id="lbl-dim-w">Width (mm)</label>
+                <input type="number" id="input-dim-w" min="5" max="300" step="1">
+              </div>
+              <div class="form-row-small">
+                <label for="input-dim-h" id="lbl-dim-h">Height (mm)</label>
+                <input type="number" id="input-dim-h" min="5" max="300" step="1">
+              </div>
+            </div>
+
+            <!-- Alignment controls -->
+            <div class="alignment-buttons">
+              <button id="btn-align-cx" class="btn btn-secondary-outline btn-sm">Center X</button>
+              <button id="btn-align-cy" class="btn btn-secondary-outline btn-sm">Center Y</button>
+              <button id="btn-align-both" class="btn btn-secondary-outline btn-sm">Center Page</button>
+            </div>
+
+            <!-- Fan specific controls -->
+            <div id="fan-only-controls" class="hidden">
+              <div class="form-row">
+                <div class="label-with-val">
+                  <label for="input-fan-rotation">Rotation</label>
+                  <span class="unit-val"><span id="val-fan-rotation">0</span>°</span>
+                </div>
+                <input type="range" id="input-fan-rotation" min="0" max="360" step="1" value="0">
+              </div>
+
+              <div class="form-row">
+                <label class="checkbox-container">
+                  <input type="checkbox" id="chk-fan-grill" checked>
+                  <span class="checkmark"></span>
+                  Generate Grill Holes
+                </label>
+              </div>
+            </div>
+
+            <!-- Vent pattern settings (shown for zones or fans with grill active) -->
+            <div id="grill-settings" class="grill-properties-section">
+              <h3 class="section-divider">Grill Grid Styling</h3>
+
+              <div class="form-row">
+                <label for="select-grill-pattern">Pattern Arrangement</label>
+                <select id="select-grill-pattern">
+                  <option value="straight">Straight Grid (Square)</option>
+                  <option value="hex">Staggered (Hexagonal / Optimal)</option>
+                  <option value="concentric">Concentric Circles (Circular)</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label for="select-hole-shape">Hole Shape</label>
+                <select id="select-hole-shape">
+                  <option value="circle">Circular Hole</option>
+                  <option value="hexagon">Hexagonal Hole</option>
+                  <option value="square">Square Hole</option>
+                </select>
+              </div>
+
+              <div class="form-grid-2x2">
+                <div class="form-row-small">
+                  <div class="label-with-val">
+                    <label for="input-hole-size">Hole Ø (mm)</label>
+                  </div>
+                  <input type="number" id="input-hole-size" min="0.5" max="30" step="0.1" value="3.5">
+                </div>
+                <div class="form-row-small">
+                  <div class="label-with-val">
+                    <label for="input-hole-pitch">Pitch (mm)</label>
+                  </div>
+                  <input type="number" id="input-hole-pitch" min="1.0" max="50" step="0.1" value="6.0">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="label-with-val">
+                  <label for="input-grill-rotation">Grid Rotation</label>
+                  <span class="unit-val"><span id="val-grill-rotation">0</span>°</span>
+                </div>
+                <input type="range" id="input-grill-rotation" min="0" max="90" step="1" value="0">
+              </div>
+
+              <div class="form-row" id="row-grill-margin">
+                <div class="label-with-val">
+                  <label for="input-grill-margin">Grill Margin</label>
+                  <span class="unit-val"><span id="val-grill-margin">2</span>mm</span>
+                </div>
+                <input type="range" id="input-grill-margin" min="0" max="25" step="0.5" value="2">
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- SECTION 4: CALIBRATION & INSTRUCTIONS -->
+        <section class="control-group">
+          <h2><span class="step-num">4</span> Printer Calibration</h2>
+          <p class="section-desc">Printers can slightly stretch prints. Use these controls to ensure absolute millimeter correctness.</p>
+          
+          <div class="form-grid-2x2">
+            <div class="form-row-small">
+              <label for="input-scale-x">Scale X Factor</label>
+              <input type="number" id="input-scale-x" min="0.9000" max="1.1000" step="0.0005" value="1.0000">
+            </div>
+            <div class="form-row-small">
+              <label for="input-scale-y">Scale Y Factor</label>
+              <input type="number" id="input-scale-y" min="0.9000" max="1.1000" step="0.0005" value="1.0000">
+            </div>
+          </div>
+          
+          <div class="calibration-box-info">
+            <p><strong>Calibration steps:</strong></p>
+            <ol>
+              <li>Print the template with rulers enabled.</li>
+              <li>Measure the vertical & horizontal rulers with a real physical ruler.</li>
+              <li>If the printed Y-ruler shows 99mm instead of 100mm, divide actual by measured ($100 / 99 \approx 1.0101$) and set the Scale Factor.</li>
+            </ol>
+          </div>
+        </section>
+
+      </div>
+    </aside>
+
+    <!-- Interactive Canvas Playground -->
+    <div class="canvas-viewport" id="viewport">
+      <div class="canvas-scale-wrapper" id="canvas-wrapper">
+        
+        <!-- A4 Page representation -->
+        <div class="a4-page-mockup" id="page-mockup">
+          
+          <!-- Rulers (drawn outside the printing canvas for display, and toggleable inside for printing) -->
+          <div class="screen-rulers" id="screen-rulers-container">
+            <div class="ruler-corner">mm</div>
+            <div class="ruler-horizontal" id="screen-ruler-h"></div>
+            <div class="ruler-vertical" id="screen-ruler-v"></div>
+          </div>
+
+          <!-- Main SVG Canvas -->
+          <svg id="canvas-svg" viewBox="0 0 210 297" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
+            <!-- Defined gradients, patterns, and clips -->
+            <defs>
+              <!-- Grid pattern for guide lines -->
+              <pattern id="grid-pattern-10" width="10" height="10" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="10" y2="0" stroke="var(--grid-color-subtle)" stroke-width="0.1" />
+                <line x1="0" y1="0" x2="0" y2="10" stroke="var(--grid-color-subtle)" stroke-width="0.1" />
+              </pattern>
+              <pattern id="grid-pattern-50" width="50" height="50" patternUnits="userSpaceOnUse">
+                <rect width="50" height="50" fill="url(#grid-pattern-10)" />
+                <line x1="0" y1="0" x2="50" y2="0" stroke="var(--grid-color-major)" stroke-width="0.25" />
+                <line x1="0" y1="0" x2="0" y2="50" stroke="var(--grid-color-major)" stroke-width="0.25" />
+              </pattern>
+            </defs>
+
+            <!-- Printable Background Grid Guide -->
+            <rect id="canvas-grid" width="100%" height="100%" fill="url(#grid-pattern-50)" class="non-printable" />
+
+            <!-- Safety Margin Guideline -->
+            <rect id="safety-margin-rect" x="10" y="10" width="190" height="277" fill="none" stroke="#ff4757" stroke-width="0.3" stroke-dasharray="1.5,1.5" class="non-printable" />
+
+            <!-- Calibration Verification box (50x50mm) in bottom-right corner -->
+            <g id="calibration-box" class="non-printable" transform="translate(150, 237)">
+              <rect x="0" y="0" width="50" height="50" fill="none" stroke="#2ed573" stroke-width="0.3" stroke-dasharray="1,1" />
+              <line x1="0" y1="0" x2="50" y2="50" stroke="#2ed573" stroke-width="0.15" stroke-dasharray="0.5,1" />
+              <text x="25" y="22" font-family="Outfit, sans-serif" font-size="3" fill="#2ed573" text-anchor="middle" font-weight="500">Calibration Box</text>
+              <text x="25" y="27" font-family="Outfit, sans-serif" font-size="2.5" fill="#2ed573" text-anchor="middle">50mm x 50mm</text>
+              <text x="25" y="32" font-family="Outfit, sans-serif" font-size="2" fill="#2ed573" text-anchor="middle">(Measure print to verify)</text>
+            </g>
+
+            <!-- Elements group (Ventilation zones, Fans) -->
+            <g id="svg-elements-group"></g>
+
+            <!-- Printable Rulers (Toggled on or off dynamically for printing) -->
+            <g id="printable-rulers-group"></g>
+
+            <!-- Active selection highlights & scale handles -->
+            <g id="svg-selection-overlay" class="non-printable"></g>
+          </svg>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Share URL Toast notification -->
+  <div id="toast-message" class="toast hidden">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <span id="toast-text">Configuration copied to URL and clipboard!</span>
+  </div>
+
+  <script src="constants.js"></script>
+  <script src="patterns.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
