@@ -58,8 +58,17 @@ class DrillFlowApp {
       ctxPaste: document.getElementById('ctx-paste'),
       ctxDuplicate: document.getElementById('ctx-duplicate'),
       ctxDelete: document.getElementById('ctx-delete'),
+      ctxTransformExpand: document.getElementById('ctx-transform-expand'),
+      ctxTransformBtn: document.getElementById('ctx-transform-btn'),
+      ctxFitPage: document.getElementById('ctx-fit-page'),
+      ctxFillPage: document.getElementById('ctx-fill-page'),
+      ctxSnapLeft: document.getElementById('ctx-snap-left'),
+      ctxSnapRight: document.getElementById('ctx-snap-right'),
+      ctxSnapTop: document.getElementById('ctx-snap-top'),
+      ctxSnapBottom: document.getElementById('ctx-snap-bottom'),
       
       // Top actions
+      btnSave: document.getElementById('btn-save'),
       btnShare: document.getElementById('btn-share'),
       btnReset: document.getElementById('btn-reset'),
       btnTheme: document.getElementById('btn-theme'),
@@ -90,6 +99,8 @@ class DrillFlowApp {
       inputDimH: document.getElementById('input-dim-h'),
       lblDimW: document.getElementById('lbl-dim-w'),
       lblDimH: document.getElementById('lbl-dim-h'),
+      inputOpacity: document.getElementById('input-opacity'),
+      valOpacity: document.getElementById('val-opacity'),
 
       // Alignments
       btnAlignCX: document.getElementById('btn-align-cx'),
@@ -185,6 +196,10 @@ class DrillFlowApp {
     });
 
     // Header buttons
+    this.dom.btnSave.addEventListener('click', () => {
+      this.updateUrl(true);
+      this.showToast('Template configuration saved to browser URL!');
+    });
     this.dom.btnShare.addEventListener('click', () => this.copyShareUrl());
     this.dom.btnReset.addEventListener('click', () => this.resetState());
     this.dom.btnTheme.addEventListener('click', () => this.toggleTheme());
@@ -265,6 +280,22 @@ class DrillFlowApp {
     this.dom.ctxPaste.addEventListener('click', () => this.pasteSelected());
     this.dom.ctxDuplicate.addEventListener('click', () => this.duplicateSelected());
     this.dom.ctxDelete.addEventListener('click', () => this.deleteSelectedElement());
+
+    // OBS transform actions
+    this.dom.ctxFitPage.addEventListener('click', () => this.transformSelected('fit'));
+    this.dom.ctxFillPage.addEventListener('click', () => this.transformSelected('fill'));
+    this.dom.ctxSnapLeft.addEventListener('click', () => this.transformSelected('snapLeft'));
+    this.dom.ctxSnapRight.addEventListener('click', () => this.transformSelected('snapRight'));
+    this.dom.ctxSnapTop.addEventListener('click', () => this.transformSelected('snapTop'));
+    this.dom.ctxSnapBottom.addEventListener('click', () => this.transformSelected('snapBottom'));
+
+    // Opacity input listeners
+    this.dom.inputOpacity.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      this.dom.valOpacity.textContent = val;
+      this.updateSelectedElement('opacity', val / 100);
+    });
+    this.dom.inputOpacity.addEventListener('mousedown', () => this.saveHistory());
   }
 
   // --- MODEL MANAGER ---
@@ -664,6 +695,11 @@ class DrillFlowApp {
 
     this.dom.inputGrillMargin.value = el.grillMargin;
     this.dom.valGrillMargin.textContent = el.grillMargin;
+
+    // Sync Opacity slider values
+    const opacityVal = el.opacity !== undefined ? Math.round(el.opacity * 100) : 100;
+    this.dom.inputOpacity.value = opacityVal;
+    this.dom.valOpacity.textContent = opacityVal;
   }
 
   getElementTypeName(el) {
@@ -725,6 +761,7 @@ class DrillFlowApp {
     g.setAttribute('class', `draggable ${el.id === this.state.selectedElementId ? 'active-selection' : ''}`);
     g.setAttribute('data-id', el.id);
     g.setAttribute('transform', `translate(${el.x}, ${el.y})`);
+    g.setAttribute('opacity', el.opacity !== undefined ? el.opacity : 1.0);
 
     // Assign beautiful dynamic dark colors to different elements
     const index = this.state.elements.findIndex(item => item.id === el.id);
@@ -1119,7 +1156,8 @@ class DrillFlowApp {
   }
 
   // --- PERSISTENCE: URL BASE64 SYNCHRONIZER ---
-  updateUrl() {
+  updateUrl(force = false) {
+    if (!force) return;
     try {
       const cleanState = {
         orientation: this.state.orientation,
@@ -1169,7 +1207,7 @@ class DrillFlowApp {
   }
 
   copyShareUrl() {
-    this.updateUrl(); // ensure completely up-to-date
+    this.updateUrl(true); // ensure completely up-to-date
     const url = window.location.href;
 
     navigator.clipboard.writeText(url).then(() => {
@@ -1412,6 +1450,21 @@ class DrillFlowApp {
     this.dom.ctxDelete.disabled = !hasSelection;
     this.dom.ctxPaste.disabled = !this.clipboard;
 
+    // Enable/disable OBS transform options
+    this.dom.ctxTransformBtn.disabled = !hasSelection;
+    this.dom.ctxFitPage.disabled = !hasSelection;
+    this.dom.ctxFillPage.disabled = !hasSelection;
+    this.dom.ctxSnapLeft.disabled = !hasSelection;
+    this.dom.ctxSnapRight.disabled = !hasSelection;
+    this.dom.ctxSnapTop.disabled = !hasSelection;
+    this.dom.ctxSnapBottom.disabled = !hasSelection;
+
+    if (hasSelection) {
+      this.dom.ctxTransformExpand.classList.remove('disabled');
+    } else {
+      this.dom.ctxTransformExpand.classList.add('disabled');
+    }
+
     // Show menu floating at cursor coordinates
     this.dom.contextMenu.style.left = `${e.clientX}px`;
     this.dom.contextMenu.style.top = `${e.clientY}px`;
@@ -1509,6 +1562,82 @@ class DrillFlowApp {
     this.updateUrl();
     this.syncSidebarToSelection();
     this.showToast('Action undone!');
+  }
+
+  transformSelected(action) {
+    const el = this.getSelectedElement();
+    if (!el) return;
+
+    this.saveHistory(); // Save undo state
+
+    const wMax = this.state.orientation === 'portrait' ? 210 : 297;
+    const hMax = this.state.orientation === 'portrait' ? 297 : 210;
+    const margin = this.state.safetyMargin;
+    const pageCenter = this.getPageCenter();
+
+    // Calculate bounding box dimensions
+    let elW = 0;
+    let elH = 0;
+    if (el.type === 'fan') {
+      const spec = FAN_TEMPLATES[el.fanSize];
+      elW = spec.size;
+      elH = spec.size;
+    } else {
+      elW = el.width;
+      elH = el.height;
+    }
+
+    const safeW = wMax - 2 * margin;
+    const safeH = hMax - 2 * margin;
+
+    if (action === 'fit') {
+      el.x = pageCenter.x;
+      el.y = pageCenter.y;
+      if (el.type !== 'fan') {
+        const ar = elW / elH;
+        if (safeW / safeH > ar) {
+          el.height = safeH;
+          el.width = safeH * ar;
+        } else {
+          el.width = safeW;
+          el.height = safeW / ar;
+        }
+        if (el.type === 'vent-circle') {
+          el.width = Math.min(safeW, safeH);
+          el.height = el.width;
+        }
+        // Round to 1 decimal place
+        el.width = parseFloat(el.width.toFixed(1));
+        el.height = parseFloat(el.height.toFixed(1));
+      }
+    } else if (action === 'fill') {
+      el.x = pageCenter.x;
+      el.y = pageCenter.y;
+      if (el.type !== 'fan') {
+        if (el.type === 'vent-circle') {
+          el.width = Math.min(safeW, safeH);
+          el.height = el.width;
+        } else {
+          el.width = safeW;
+          el.height = safeH;
+        }
+        el.width = parseFloat(el.width.toFixed(1));
+        el.height = parseFloat(el.height.toFixed(1));
+      }
+    } else if (action === 'snapLeft') {
+      el.x = parseFloat((margin + elW / 2).toFixed(1));
+    } else if (action === 'snapRight') {
+      el.x = parseFloat((wMax - margin - elW / 2).toFixed(1));
+    } else if (action === 'snapTop') {
+      el.y = parseFloat((margin + elH / 2).toFixed(1));
+    } else if (action === 'snapBottom') {
+      el.y = parseFloat((hMax - margin - elH / 2).toFixed(1));
+    }
+
+    this.render();
+    this.updateUrl();
+    this.syncSidebarToSelection();
+    this.hideContextMenu();
   }
 }
 

@@ -24,6 +24,14 @@
     </div>
     
     <div class="header-actions">
+      <button id="btn-save" class="btn btn-secondary" title="Save configuration to URL">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        <span>Save</span>
+      </button>
       <button id="btn-share" class="btn btn-secondary" title="Copy configuration URL to clipboard">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
@@ -196,6 +204,15 @@
               <button id="btn-align-cx" class="btn btn-secondary-outline btn-sm">Center X</button>
               <button id="btn-align-cy" class="btn btn-secondary-outline btn-sm">Center Y</button>
               <button id="btn-align-both" class="btn btn-secondary-outline btn-sm">Center Page</button>
+            </div>
+
+            <!-- Opacity Control -->
+            <div class="form-row" style="margin-top: 10px;">
+              <div class="label-with-val">
+                <label for="input-opacity">Element Opacity</label>
+                <span class="unit-val"><span id="val-opacity">100</span>%</span>
+              </div>
+              <input type="range" id="input-opacity" min="10" max="100" step="5" value="100">
             </div>
 
             <!-- Fan specific controls -->
@@ -410,6 +427,25 @@
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><rect x="2" y="2" width="13" height="13" rx="2" ry="2"></rect></svg>
       <span>Duplicate</span>
     </button>
+    <div class="menu-separator"></div>
+
+    <!-- OBS Transform Submenu -->
+    <div class="menu-item-with-submenu" id="ctx-transform-expand">
+      <button class="menu-item" id="ctx-transform-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+        <span>Transform</span>
+        <span class="submenu-arrow">▶</span>
+      </button>
+      <div class="submenu">
+        <button class="menu-item" id="ctx-fit-page">Fit to Page</button>
+        <button class="menu-item" id="ctx-fill-page">Fill Page</button>
+        <div class="menu-separator"></div>
+        <button class="menu-item" id="ctx-snap-left">Snap Left</button>
+        <button class="menu-item" id="ctx-snap-right">Snap Right</button>
+        <button class="menu-item" id="ctx-snap-top">Snap Top</button>
+        <button class="menu-item" id="ctx-snap-bottom">Snap Bottom</button>
+      </div>
+    </div>
     <div class="menu-separator"></div>
     <button class="menu-item item-danger" id="ctx-delete">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
