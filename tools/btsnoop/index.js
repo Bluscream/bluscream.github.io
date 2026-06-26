@@ -119,11 +119,25 @@ function extractMACAddresses(data) {
     // Helper to check if a sequence looks like a MAC address
     function isLikelyMAC(offset) {
         if (offset + 5 >= data.length) return false;
-        // MAC addresses are typically not all 00, FF, or the same byte
         const bytes = data.slice(offset, offset + 6);
+        
+        // MAC addresses are typically not all 00, FF, or the same byte
         const first = bytes[0];
         if (bytes.every(b => b === first)) return false; // All same bytes
         if (bytes.every(b => b === 0x00 || b === 0xFF)) return false; // All 00 or FF
+        
+        // Additional validation: Check if bytes look like valid MAC patterns
+        // First byte's second nibble should be 0, 2, 4, 6, 8, A, C, E (unicast/multicast)
+        const firstByte = bytes[0];
+        const secondNibble = firstByte & 0x0F;
+        const validSecondNibbles = [0x0, 0x2, 0x4, 0x6, 0x8, 0xA, 0xC, 0xE];
+        if (!validSecondNibbles.includes(secondNibble)) return false;
+        
+        // Check for common invalid patterns
+        // Avoid sequences that look like protocol headers or counters
+        if (bytes[0] === 0xFE && bytes[1] === 0xFE) return false; // Common in Bluetooth
+        if (bytes[0] === 0xFF && bytes[1] === 0xFF) return false;
+        
         return true;
     }
 
@@ -220,23 +234,8 @@ function extractMACAddresses(data) {
         }
     }
 
-    // ACL data packets (0x02) - check payload for MAC-like patterns
-    if (type === 0x02 && data.length >= 4) {
-        // Scan through payload for MAC-like patterns
-        for (let i = 4; i < data.length - 5; i++) {
-            if (isLikelyMAC(i)) {
-                // Try both normal and reversed byte order
-                const mac = formatMAC(i);
-                const macRev = formatMACReversed(i);
-                if (!macs.includes(mac)) {
-                    macs.push(mac);
-                }
-                if (!macs.includes(macRev)) {
-                    macs.push(macRev);
-                }
-            }
-        }
-    }
+    // ACL data packets (0x02) - MAC addresses are typically in connection handles, not in payload
+    // Skip ACL data scanning to avoid false positives from protocol data
 
     return [...new Set(macs)]; // Remove duplicates
 }
