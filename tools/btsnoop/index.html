@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTSnoop HCI Log Parser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .packet-row:hover { background-color: #f3f4f6; }
+        .hex-display { font-family: 'Courier New', monospace; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">BTSnoop HCI Log Parser</h1>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+                <input type="file" id="fileInput" accept=".log" class="hidden">
+                <label for="fileInput" class="cursor-pointer">
+                    <div class="text-gray-600 mb-2">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <p class="text-lg font-medium text-gray-700">Click to upload btsnoop_hci.log file</p>
+                    <p class="text-sm text-gray-500 mt-1">or drag and drop</p>
+                </label>
+            </div>
+        </div>
+
+        <div id="fileInfo" class="hidden bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">File Information</h2>
+            <div id="fileDetails" class="grid grid-cols-2 gap-4 text-sm"></div>
+        </div>
+
+        <div id="filters" class="hidden bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Filters</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Packet Type</label>
+                    <select id="packetTypeFilter" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="all">All</option>
+                        <option value="command">Command (0x01)</option>
+                        <option value="event">Event (0x04)</option>
+                        <option value="acl">ACL Data (0x02)</option>
+                        <option value="sco">SCO Data (0x03)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Direction</label>
+                    <select id="directionFilter" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="all">All</option>
+                        <option value="sent">Sent (Host to Controller)</option>
+                        <option value="received">Received (Controller to Host)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                    <input type="text" id="searchFilter" placeholder="Search in hex data..." class="w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+            </div>
+            <div class="mt-4 flex gap-2">
+                <button id="applyFilters" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">Apply Filters</button>
+                <button id="resetFilters" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors">Reset</button>
+            </div>
+        </div>
+
+        <div id="packetTable" class="hidden bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Packets</h2>
+                <p id="packetCount" class="text-sm text-gray-500 mt-1"></p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Direction</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Length</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Summary</th>
+                        </tr>
+                    </thead>
+                    <tbody id="packetBody" class="bg-white divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+            <div id="pagination" class="p-4 border-t border-gray-200 flex justify-between items-center"></div>
+        </div>
+
+        <div id="packetDetail" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden m-4">
+                <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800">Packet Detail</h2>
+                    <button id="closeDetail" class="text-gray-400 hover:text-gray-600">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                    <div id="detailContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let packets = [];
+        let filteredPackets = [];
+        let currentPage = 1;
+        const pageSize = 50;
+
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const filters = document.getElementById('filters');
+        const packetTable = document.getElementById('packetTable');
+        const packetBody = document.getElementById('packetBody');
+        const packetDetail = document.getElementById('packetDetail');
+        const detailContent = document.getElementById('detailContent');
+
+        fileInput.addEventListener('change', handleFile);
+        document.getElementById('applyFilters').addEventListener('click', applyFilters);
+        document.getElementById('resetFilters').addEventListener('click', resetFilters);
+        document.getElementById('closeDetail').addEventListener('click', () => packetDetail.classList.add('hidden'));
+
+        function handleFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                parseBTSnoop(data, file);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function parseBTSnoop(data, file) {
+            try {
+                // Parse header
+                const identification = String.fromCharCode(...data.slice(0, 8));
+                if (identification !== 'btsnoop\0') {
+                    throw new Error('Invalid BTSnoop file format');
+                }
+
+                const version = dataViewToUint16(data, 8);
+                const dataLinkType = dataViewToUint32(data, 12);
+
+                // Display file info
+                document.getElementById('fileDetails').innerHTML = `
+                    <div><strong>Filename:</strong> ${file.name}</div>
+                    <div><strong>Size:</strong> ${formatBytes(file.size)}</div>
+                    <div><strong>Identification:</strong> ${identification}</div>
+                    <div><strong>Version:</strong> ${version}</div>
+                    <div><strong>Data Link Type:</strong> ${dataLinkType}</div>
+                `;
+                fileInfo.classList.remove('hidden');
+
+                // Parse packets
+                packets = [];
+                let offset = 16;
+
+                while (offset < data.length) {
+                    const originalLength = dataViewToUint32(data, offset);
+                    const includedLength = dataViewToUint32(data, offset + 4);
+                    const flags = dataViewToUint32(data, offset + 8);
+                    const cumulativeDrops = dataViewToUint32(data, offset + 12);
+                    const timestamp = dataViewToUint64(data, offset + 16);
+                    
+                    const packetData = data.slice(offset + 24, offset + 24 + includedLength);
+                    
+                    const packet = {
+                        index: packets.length + 1,
+                        originalLength,
+                        includedLength,
+                        flags,
+                        cumulativeDrops,
+                        timestamp,
+                        data: packetData,
+                        direction: (flags & 0x01) ? 'sent' : 'received',
+                        type: getPacketType(packetData)
+                    };
+
+                    packets.push(packet);
+                    offset += 24 + includedLength;
+                }
+
+                filteredPackets = [...packets];
+                filters.classList.remove('hidden');
+                packetTable.classList.remove('hidden');
+                displayPackets();
+
+            } catch (error) {
+                alert('Error parsing file: ' + error.message);
+            }
+        }
+
+        function getPacketType(data) {
+            if (data.length === 0) return 'unknown';
+            const type = data[0];
+            switch (type) {
+                case 0x01: return 'command';
+                case 0x02: return 'acl';
+                case 0x03: return 'sco';
+                case 0x04: return 'event';
+                default: return 'unknown (0x' + type.toString(16) + ')';
+            }
+        }
+
+        function getPacketSummary(packet) {
+            const data = packet.data;
+            if (data.length === 0) return 'Empty';
+
+            const type = data[0];
+            let summary = '';
+
+            switch (type) {
+                case 0x01: // Command
+                    if (data.length >= 3) {
+                        const ogf = (data[1] >> 2) & 0x3F;
+                        const ocf = ((data[1] & 0x03) << 8) | data[2];
+                        summary = `OGF: 0x${ogf.toString(16).padStart(2, '0')}, OCF: 0x${ocf.toString(16).padStart(4, '0')}`;
+                    }
+                    break;
+                case 0x04: // Event
+                    if (data.length >= 2) {
+                        summary = `Event Code: 0x${data[1].toString(16).padStart(2, '0')}`;
+                    }
+                    break;
+                case 0x02: // ACL
+                    if (data.length >= 4) {
+                        const handle = data[1] | ((data[2] & 0x0F) << 8);
+                        const pb = (data[2] >> 4) & 0x03;
+                        const bc = (data[2] >> 6) & 0x03;
+                        summary = `Handle: ${handle}, PB: ${pb}, BC: ${bc}`;
+                    }
+                    break;
+                case 0x03: // SCO
+                    if (data.length >= 3) {
+                        const handle = data[1] & 0x0FFF;
+                        summary = `Handle: ${handle}`;
+                    }
+                    break;
+                default:
+                    summary = `Type: 0x${type.toString(16)}`;
+            }
+
+            return summary;
+        }
+
+        function displayPackets() {
+            const start = (currentPage - 1) * pageSize;
+            const end = Math.min(start + pageSize, filteredPackets.length);
+            const pagePackets = filteredPackets.slice(start, end);
+
+            document.getElementById('packetCount').textContent = `Showing ${start + 1}-${end} of ${filteredPackets.length} packets`;
+
+            packetBody.innerHTML = pagePackets.map((packet, i) => `
+                <tr class="packet-row cursor-pointer" onclick="showPacketDetail(${start + i})">
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${packet.index}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${formatTimestamp(packet.timestamp)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(packet.type)}">${packet.type}</span>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${packet.direction}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${packet.includedLength}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${getPacketSummary(packet)}</td>
+                </tr>
+            `).join('');
+
+            updatePagination();
+        }
+
+        function getTypeColor(type) {
+            const colors = {
+                'command': 'bg-blue-100 text-blue-800',
+                'event': 'bg-green-100 text-green-800',
+                'acl': 'bg-purple-100 text-purple-800',
+                'sco': 'bg-yellow-100 text-yellow-800',
+                'unknown': 'bg-gray-100 text-gray-800'
+            };
+            return colors[type] || colors['unknown'];
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredPackets.length / pageSize);
+            const pagination = document.getElementById('pagination');
+            
+            let html = `
+                <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
+                    class="px-3 py-1 rounded border ${currentPage === 1 ? 'text-gray-400' : 'text-blue-500 hover:bg-blue-50'}">Previous</button>
+                <span class="text-sm text-gray-600">Page ${currentPage} of ${totalPages}</span>
+                <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
+                    class="px-3 py-1 rounded border ${currentPage === totalPages ? 'text-gray-400' : 'text-blue-500 hover:bg-blue-50'}">Next</button>
+            `;
+            
+            pagination.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            const totalPages = Math.ceil(filteredPackets.length / pageSize);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            displayPackets();
+        }
+
+        function showPacketDetail(index) {
+            const packet = filteredPackets[index];
+            const hexData = Array.from(packet.data).map(b => b.toString(16).padStart(2, '0')).join(' ');
+            
+            detailContent.innerHTML = `
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div><strong>Index:</strong> ${packet.index}</div>
+                    <div><strong>Timestamp:</strong> ${formatTimestamp(packet.timestamp)}</div>
+                    <div><strong>Type:</strong> ${packet.type}</div>
+                    <div><strong>Direction:</strong> ${packet.direction}</div>
+                    <div><strong>Original Length:</strong> ${packet.originalLength}</div>
+                    <div><strong>Included Length:</strong> ${packet.includedLength}</div>
+                    <div><strong>Flags:</strong> 0x${packet.flags.toString(16).padStart(8, '0')}</div>
+                    <div><strong>Cumulative Drops:</strong> ${packet.cumulativeDrops}</div>
+                </div>
+                <div class="mb-4">
+                    <h3 class="font-semibold text-gray-800 mb-2">Summary</h3>
+                    <p class="text-gray-600">${getPacketSummary(packet)}</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Raw Data (Hex)</h3>
+                    <div class="bg-gray-50 rounded-md p-4 overflow-x-auto">
+                        <pre class="hex-display text-sm">${formatHexDump(packet.data)}</pre>
+                    </div>
+                </div>
+            `;
+            
+            packetDetail.classList.remove('hidden');
+        }
+
+        function formatHexDump(data) {
+            let result = '';
+            for (let i = 0; i < data.length; i += 16) {
+                const offset = i.toString(16).padStart(8, '0');
+                const hex = Array.from(data.slice(i, i + 16))
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join(' ');
+                const ascii = Array.from(data.slice(i, i + 16))
+                    .map(b => (b >= 32 && b < 127) ? String.fromCharCode(b) : '.')
+                    .join('');
+                result += `${offset}  ${hex.padEnd(47)}  |${ascii}|\n`;
+            }
+            return result;
+        }
+
+        function applyFilters() {
+            const typeFilter = document.getElementById('packetTypeFilter').value;
+            const directionFilter = document.getElementById('directionFilter').value;
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+
+            filteredPackets = packets.filter(packet => {
+                if (typeFilter !== 'all' && packet.type !== typeFilter) return false;
+                if (directionFilter !== 'all' && packet.direction !== directionFilter) return false;
+                if (searchFilter) {
+                    const hexStr = Array.from(packet.data).map(b => b.toString(16).padStart(2, '0')).join(' ');
+                    if (!hexStr.includes(searchFilter)) return false;
+                }
+                return true;
+            });
+
+            currentPage = 1;
+            displayPackets();
+        }
+
+        function resetFilters() {
+            document.getElementById('packetTypeFilter').value = 'all';
+            document.getElementById('directionFilter').value = 'all';
+            document.getElementById('searchFilter').value = '';
+            filteredPackets = [...packets];
+            currentPage = 1;
+            displayPackets();
+        }
+
+        function dataViewToUint16(data, offset) {
+            return (data[offset] << 8) | data[offset + 1];
+        }
+
+        function dataViewToUint32(data, offset) {
+            return (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
+        }
+
+        function dataViewToUint64(data, offset) {
+            const high = dataViewToUint32(data, offset);
+            const low = dataViewToUint32(data, offset + 4);
+            return (BigInt(high) << 32n) | BigInt(low);
+        }
+
+        function formatTimestamp(timestamp) {
+            // BTSnoop timestamp is in microseconds since Jan 1, 0 AD
+            const microseconds = Number(timestamp);
+            const seconds = microseconds / 1000000;
+            const date = new Date((seconds - 62135596800) * 1000); // Adjust for Unix epoch
+            return date.toISOString().replace('T', ' ').substr(0, 19);
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Drag and drop support
+        const dropZone = document.querySelector('.border-dashed');
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-blue-500', 'bg-blue-50');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                fileInput.files = e.dataTransfer.files;
+                handleFile({ target: { files: [file] } });
+            }
+        });
+    </script>
+</body>
+</html>
