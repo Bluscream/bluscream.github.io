@@ -22,16 +22,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
-        dropZone.classList.add('drag-over');
+        dropZone.classList.add('border-blue-500', 'bg-blue-50');
     });
 
     dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('drag-over');
+        dropZone.classList.remove('border-blue-500', 'bg-blue-50');
     });
 
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
-        dropZone.classList.remove('drag-over');
+        dropZone.classList.remove('border-blue-500', 'bg-blue-50');
         const file = e.dataTransfer.files[0];
         if (file) {
             fileInput.files = e.dataTransfer.files;
@@ -303,15 +303,15 @@ function displayPackets() {
 
     packetBody.innerHTML = pagePackets.map((packet, i) => `
         <tr class="packet-row cursor-pointer" onclick="showPacketDetail(${start + i})">
-            <td class="whitespace-nowrap">${packet.index}</td>
-            <td class="whitespace-nowrap text-gray-500">${formatTimestamp(packet.timestamp)}</td>
-            <td class="whitespace-nowrap">
-                <span class="badge ${getTypeColor(packet.type)}">${packet.type}</span>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${packet.index}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${formatTimestamp(packet.timestamp)}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                <span class="px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(packet.type)}">${packet.type}</span>
             </td>
-            <td class="whitespace-nowrap text-gray-500">${packet.direction}</td>
-            <td class="whitespace-nowrap text-gray-500">${packet.includedLength}</td>
-            <td class="whitespace-nowrap">${packet.macAddresses.length > 0 ? packet.macAddresses.join(', ') : '-'}</td>
-            <td class="whitespace-nowrap">${getPacketSummary(packet)}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${packet.direction}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${packet.includedLength}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${packet.macAddresses.length > 0 ? packet.macAddresses.join(', ') : '-'}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${getPacketSummary(packet)}</td>
         </tr>
     `).join('');
 
@@ -320,11 +320,11 @@ function displayPackets() {
 
 function getTypeColor(type) {
     const colors = {
-        'command': 'badge-command',
-        'event': 'badge-event',
-        'acl': 'badge-acl',
-        'sco': 'badge-sco',
-        'unknown': 'badge-unknown'
+        'command': 'bg-blue-100 text-blue-800',
+        'event': 'bg-green-100 text-green-800',
+        'acl': 'bg-purple-100 text-purple-800',
+        'sco': 'bg-yellow-100 text-yellow-800',
+        'unknown': 'bg-gray-100 text-gray-800'
     };
     return colors[type] || colors['unknown'];
 }
