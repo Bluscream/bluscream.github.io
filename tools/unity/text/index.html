@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unity / VRChat Styled Text Editor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Unity / VRChat Styled Text Editor</h1>
+    <p class="sub">Live editor for <a href="http://digitalnativestudios.com/textmeshpro/docs/rich-text/" target="_blank" rel="noopener">TextMeshPro rich text</a> — the same tags VRChat avatar 3.0 menus use — with a real-time preview.</p>
+  </header>
+
+  <div class="toolbar" id="toolbar">
+    <button type="button" data-tag="b" title="Bold">B</button>
+    <button type="button" data-tag="i" title="Italic"><em>I</em></button>
+    <button type="button" data-tag="u" title="Underline"><span style="text-decoration:underline">U</span></button>
+    <button type="button" data-tag="s" title="Strikethrough"><span style="text-decoration:line-through">S</span></button>
+    <span class="spacer"></span>
+    <button type="button" data-tag="size" title="Font size">Size</button>
+    <button type="button" data-tag="color" title="Color">Color</button>
+    <button type="button" data-tag="alpha" title="Alpha / opacity">Alpha</button>
+    <button type="button" data-tag="mark" title="Highlight (mark)">Mark</button>
+    <span class="spacer"></span>
+    <button type="button" data-tag="uppercase" title="UPPERCASE">AA</button>
+    <button type="button" data-tag="lowercase" title="lowercase">aa</button>
+    <button type="button" data-tag="smallcaps" title="Small caps">Aᴀ</button>
+    <button type="button" data-tag="sup" title="Superscript">x²</button>
+    <button type="button" data-tag="sub" title="Subscript">x₂</button>
+    <span class="spacer"></span>
+    <button type="button" data-tag="align-left" title="Align left">⯇</button>
+    <button type="button" data-tag="align-center" title="Align center">≡</button>
+    <button type="button" data-tag="align-right" title="Align right">⯈</button>
+    <button type="button" data-tag="cspace" title="Character spacing">Cspace</button>
+    <button type="button" data-tag="noparse" title="Do not parse tags inside">Noparse</button>
+    <button type="button" data-tag="newline" title="Insert newline (\n)">↵ Newline</button>
+  </div>
+
+  <div class="toolbar toolbar-inputs">
+    <label class="picker"><span>Color</span><input type="color" id="colorPicker" value="#ff8800" /></label>
+    <label class="picker"><span>Size</span><input type="number" id="sizePicker" value="120" min="1" max="600" /><select id="sizeUnit"><option value="%">%</option><option value="px">px</option><option value="em">em</option></select></label>
+    <label class="picker"><span>Alpha</span><input type="number" id="alphaPicker" value="128" min="0" max="255" /></label>
+    <label class="picker"><span>Cspace</span><input type="number" id="cspacePicker" value="0.2" step="0.1" /><span>em</span></label>
+    <span class="spacer"></span>
+    <button type="button" id="clearBtn" class="ghost" title="Clear">Clear</button>
+    <button type="button" id="copyBtn" class="ghost" title="Copy markup">Copy</button>
+  </div>
+
+  <main>
+    <section class="pane">
+      <div class="pane-head">Markup</div>
+      <textarea id="editor" spellcheck="false" placeholder="Type here. Select text and click a formatting button."></textarea>
+    </section>
+    <section class="pane">
+      <div class="pane-head">
+        Preview
+        <label class="bg-toggle"><input type="checkbox" id="bgToggle" checked /> dark bg</label>
+      </div>
+      <div id="preview" class="preview dark"></div>
+    </section>
+  </main>
+
+  <div class="notes">
+    <strong>Newlines &amp; VRChat notes:</strong>
+    TextMeshPro has <em>no</em> <code>&lt;br&gt;</code> tag and <em>no</em> <code>&lt;hr&gt;</code> — line breaks are real <code>\n</code> newline characters (the <span class="k">↵ Newline</span> button inserts one).
+    In <strong>VRChat avatar menus</strong> the rich-text tags above work, but VRChat's input sanitization currently <strong>strips the newline character</strong> from menu control names, so multi-line menu labels don't render in-game (open feature request). <code>&lt;hr&gt;</code> never works — fake a divider with a row of <code>─</code> characters.
+  </div>
+
+  <footer>
+    <span id="status">Ready</span>
+    <span class="hint">TMP tags: b i u s size color alpha mark sub sup align cspace uppercase lowercase smallcaps noparse</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
