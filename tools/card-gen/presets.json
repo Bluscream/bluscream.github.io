@@ -388,6 +388,52 @@
       }
     },
     {
+      "id": "staff-id",
+      "name": "Staff ID card (fictional issuer)",
+      "description": "Generic service ID: photo left, issuer header, name fields, validity and card number.",
+      "width": 1012,
+      "height": 638,
+      "radius": 36,
+      "font": "Inter",
+      "fonts": ["Inter:wght@400;600;700;800", "Caveat:wght@500"],
+      "sides": {
+        "front": {
+          "background": { "type": "gradient", "angle": 115, "stops": [ { "pos": 0, "color": "#f4efe6" }, { "pos": 0.55, "color": "#fbf8f2" }, { "pos": 1, "color": "#dfe9f3" } ] },
+          "layers": [
+            { "id": "watermark", "type": "text", "label": "Watermark", "text": "FB", "x": 760, "y": 520, "size": 420, "weight": 800, "color": "#d8e2ec", "align": "center", "opacity": 0.5, "letterSpacing": -20 },
+            { "id": "issuerLine", "type": "text", "label": "Issuer line", "text": "Femboy Express Betriebsgesellschaft", "x": 40, "y": 62, "size": 32, "weight": 800, "color": "#1d2a3a" },
+            { "id": "photoFrame", "type": "rect", "label": "Photo frame", "x": 40, "y": 100, "w": 260, "h": 330, "fill": "#2b2b2b", "stroke": "#ffffff", "strokeWidth": 4, "radius": 6 },
+            { "id": "photo", "type": "image", "label": "Photo", "x": 44, "y": 104, "w": 252, "h": 322, "fit": "cover", "radius": 4, "visible": false },
+            { "id": "department", "type": "text", "label": "Department", "text": "Kuschelaufsicht", "x": 340, "y": 150, "size": 36, "weight": 800, "color": "#1d2a3a" },
+            { "id": "docType", "type": "text", "label": "Document type", "text": "Dienstausweis", "x": 340, "y": 230, "size": 30, "weight": 600, "color": "#1d2a3a" },
+            { "id": "validUntil", "type": "text", "label": "Valid until", "text": "gültig bis: 10.01.2031", "x": 340, "y": 282, "size": 24, "weight": 400, "color": "#1d2a3a" },
+            { "id": "nameLabel", "type": "text", "label": "Name label", "text": "Name", "x": 340, "y": 340, "size": 16, "weight": 600, "color": "#5b6775" },
+            { "id": "name", "type": "text", "label": "Name", "text": "Musterfrau", "x": 340, "y": 376, "size": 30, "weight": 700, "color": "#1d2a3a" },
+            { "id": "givenNameLabel", "type": "text", "label": "Given name label", "text": "Vorname", "x": 340, "y": 420, "size": 16, "weight": 600, "color": "#5b6775" },
+            { "id": "givenName", "type": "text", "label": "Given name", "text": "Erika", "x": 340, "y": 456, "size": 30, "weight": 700, "color": "#1d2a3a" },
+            { "id": "numberLabel", "type": "text", "label": "Number label", "text": "Nr.", "x": 40, "y": 580, "size": 22, "weight": 600, "color": "#1d2a3a" },
+            { "id": "number", "type": "text", "label": "Card number", "text": "FB 0640 2117", "x": 90, "y": 580, "size": 28, "weight": 700, "color": "#1d2a3a", "letterSpacing": 2 },
+            { "id": "stripe", "type": "rect", "label": "Colour stripe", "x": 0, "y": 606, "w": 1012, "h": 32, "fill": "#d260a5" }
+          ]
+        },
+        "back": {
+          "background": { "type": "color", "color": "#fbf8f2" },
+          "layers": [
+            { "id": "magstripe", "type": "rect", "label": "Magnetic stripe", "x": 0, "y": 50, "w": 1012, "h": 90, "fill": "#111111" },
+            { "id": "notice", "type": "text", "label": "Notice", "text": "Dieser Ausweis bleibt Eigentum der ausstellenden Stelle und ist auf Verlangen vorzuzeigen.\nBei Verlust bitte umgehend melden. Fundsachen bitte an die untenstehende Anschrift senden.", "x": 40, "y": 200, "size": 19, "weight": 500, "lineHeight": 1.4, "color": "#1d2a3a" },
+            { "id": "sigLabel", "type": "text", "label": "Signature label", "text": "Unterschrift Inhaber/-in", "x": 40, "y": 300, "size": 15, "weight": 600, "color": "#5b6775" },
+            { "id": "sigBox", "type": "rect", "label": "Signature field", "x": 40, "y": 310, "w": 480, "h": 90, "fill": "#ffffff", "stroke": "#c9d1da", "strokeWidth": 2, "radius": 4 },
+            { "id": "signature", "type": "text", "label": "Signature", "text": "Erika Musterfrau", "x": 60, "y": 372, "size": 44, "weight": 500, "font": "Caveat", "color": "#1b2a6b", "rotate": -2 },
+            { "id": "issuerLabel", "type": "text", "label": "Issuer label", "text": "Ausstellende Stelle", "x": 560, "y": 300, "size": 15, "weight": 600, "color": "#5b6775" },
+            { "id": "issuer", "type": "text", "label": "Issuer address", "text": "Femboy Express Betriebsgesellschaft\nKuschelallee 1\n12345 Flauschhausen", "x": 560, "y": 334, "size": 19, "weight": 600, "lineHeight": 1.4, "color": "#1d2a3a" },
+            { "id": "barcodeBox", "type": "rect", "label": "Barcode placeholder", "x": 40, "y": 470, "w": 380, "h": 80, "fill": "#ffffff", "stroke": "#c9d1da", "strokeWidth": 2, "radius": 4 },
+            { "id": "barcode", "type": "text", "label": "Barcode (placeholder)", "text": "▌▐▌▌▐▐▌▐▌▌▌▐▌▐▐▌▌▐▌▐▌▌▐▐▌▐▌▐▌▌▐▌▐▐▌▌▐▌▐", "x": 230, "y": 512, "size": 44, "weight": 400, "color": "#111111", "align": "center", "baseline": "middle", "letterSpacing": -2, "maxWidth": 360 },
+            { "id": "stripeBack", "type": "rect", "label": "Colour stripe", "x": 0, "y": 606, "w": 1012, "h": 32, "fill": "#57cef8" }
+          ]
+        }
+      }
+    },
+    {
       "id": "blank",
       "name": "Blank ID card",
       "description": "Generic ID-1 card with a handful of text lines to start from.",
