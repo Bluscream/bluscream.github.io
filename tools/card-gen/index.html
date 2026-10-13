@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Card Generator</title>
+  <meta name="description" content="Client-side ID card / BahnCard style generator: pick a layout preset, set a background, fill in the texts, download front and back as PNG, share by link.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="brand"><i class="fa-solid fa-id-card"></i> Card Generator</div>
+    <div class="header-actions">
+      <button id="btnShare" class="btn" title="Copy a link that restores this exact card"><i class="fa-solid fa-link"></i> Copy share link</button>
+      <button id="btnReset" class="btn btn-ghost" title="Discard all changes for this preset"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <aside class="sidebar">
+      <section class="panel">
+        <h2><i class="fa-solid fa-layer-group"></i> Layout preset</h2>
+        <select id="presetSelect" class="input"></select>
+        <p id="presetDescription" class="hint"></p>
+        <div class="row">
+          <label class="field"><span>Width</span><input id="cardWidth" class="input" type="number" min="100" max="4000"></label>
+          <label class="field"><span>Height</span><input id="cardHeight" class="input" type="number" min="100" max="4000"></label>
+          <label class="field"><span>Corner radius</span><input id="cardRadius" class="input" type="number" min="0" max="500"></label>
+        </div>
+        <details class="advanced">
+          <summary>Import / export preset JSON</summary>
+          <div class="row">
+            <button id="btnExportPreset" class="btn btn-sm"><i class="fa-solid fa-file-export"></i> Export current as preset</button>
+            <label class="btn btn-sm btn-ghost file-btn"><i class="fa-solid fa-file-import"></i> Load preset JSON<input id="presetFile" type="file" accept="application/json" hidden></label>
+          </div>
+          <p class="hint">Exports the preset with all your edits baked in. Load it later or drop it into <code>presets.json</code>.</p>
+        </details>
+      </section>
+
+      <section class="panel">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-side="front" role="tab">Front</button>
+          <button class="tab" data-side="back" role="tab">Back</button>
+        </div>
+
+        <h2><i class="fa-solid fa-image"></i> Background</h2>
+        <div class="seg" id="bgType">
+          <button data-type="color" class="active">Color</button>
+          <button data-type="gradient">Gradient</button>
+          <button data-type="image">Image</button>
+        </div>
+        <div id="bgColorBox" class="bg-box">
+          <label class="field"><span>Color</span><input id="bgColor" type="color" class="input color"></label>
+        </div>
+        <div id="bgGradientBox" class="bg-box hidden">
+          <label class="field"><span>Angle</span><input id="bgAngle" class="input" type="range" min="0" max="360" step="1"><output id="bgAngleOut"></output></label>
+          <div id="gradStops" class="stops"></div>
+          <div class="row">
+            <button id="btnAddStop" class="btn btn-sm"><i class="fa-solid fa-plus"></i> Add stop</button>
+            <button id="btnHardStops" class="btn btn-sm btn-ghost" title="Turn the stops into flat stripes"><i class="fa-solid fa-bars"></i> Make stripes</button>
+          </div>
+        </div>
+        <div id="bgImageBox" class="bg-box hidden">
+          <div class="row">
+            <label class="btn btn-sm file-btn"><i class="fa-solid fa-upload"></i> Upload<input id="bgFile" type="file" accept="image/*" hidden></label>
+            <input id="bgUrl" class="input grow" type="url" placeholder="https://…/image.png">
+            <button id="btnBgUrl" class="btn btn-sm">Use URL</button>
+          </div>
+          <div class="row">
+            <label class="field"><span>Fit</span>
+              <select id="bgFit" class="input"><option value="cover">Cover</option><option value="contain">Contain</option><option value="stretch">Stretch</option></select>
+            </label>
+            <label class="field"><span>Behind image</span><input id="bgImageColor" type="color" class="input color"></label>
+          </div>
+          <p class="hint">Uploaded images stay in your browser and are not part of the share link. URL images are, but the host must allow cross-origin use or the download will fail.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2><i class="fa-solid fa-font"></i> Layers <span class="hint">(drag on the preview to move)</span></h2>
+        <div id="layerList" class="layers"></div>
+        <div class="row">
+          <button id="btnAddText" class="btn btn-sm"><i class="fa-solid fa-plus"></i> Text</button>
+          <button id="btnAddImage" class="btn btn-sm"><i class="fa-solid fa-plus"></i> Image</button>
+          <button id="btnAddRect" class="btn btn-sm"><i class="fa-solid fa-plus"></i> Rectangle</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2><i class="fa-solid fa-download"></i> Download</h2>
+        <div class="row">
+          <label class="field"><span>Scale</span>
+            <select id="exportScale" class="input"><option value="1">1× (native)</option><option value="2">2×</option><option value="3">3×</option><option value="0.5">0.5×</option></select>
+          </label>
+          <label class="field"><span>Format</span>
+            <select id="exportFormat" class="input"><option value="image/png">PNG</option><option value="image/jpeg">JPEG</option><option value="image/webp">WebP</option></select>
+          </label>
+        </div>
+        <div class="row">
+          <button id="btnDlFront" class="btn"><i class="fa-solid fa-download"></i> Front</button>
+          <button id="btnDlBack" class="btn"><i class="fa-solid fa-download"></i> Back</button>
+          <button id="btnDlBoth" class="btn"><i class="fa-solid fa-download"></i> Both (one image)</button>
+        </div>
+      </section>
+    </aside>
+
+    <section class="preview">
+      <div class="card-wrap" data-side="front">
+        <h3>Front</h3>
+        <canvas id="canvasFront"></canvas>
+      </div>
+      <div class="card-wrap" data-side="back">
+        <h3>Back</h3>
+        <canvas id="canvasBack"></canvas>
+      </div>
+      <p class="hint center">Everything runs in your browser. Nothing is uploaded. The URL updates as you edit, so bookmark or copy it to share.</p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

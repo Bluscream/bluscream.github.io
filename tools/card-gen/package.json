@@ -1,0 +1,16 @@
+{
+  "name": "card-gen",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Client-side ID card / BahnCard style image generator",
+  "type": "module",
+  "scripts": {
+    "check": "tsc -p jsconfig.json",
+    "test": "node --test \"test/**/*.test.js\"",
+    "verify": "npm run check && npm test"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^5.9.3"
+  }
+}
