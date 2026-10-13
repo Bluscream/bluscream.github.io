@@ -49,10 +49,22 @@ function syncPresetInputs() {
   el('presetSelect', HTMLSelectElement).value = store.state.presetId;
 }
 
+/** Fills the preset dropdown, one optgroup per `group` in first-seen order; ungrouped presets go last. */
 function buildPresetSelect() {
   const sel = el('presetSelect', HTMLSelectElement);
   sel.innerHTML = '';
-  for (const p of allPresets()) sel.appendChild(Object.assign(document.createElement('option'), { value: p.id, textContent: p.name }));
+  /** @type {Map<string, HTMLElement>} */
+  const groups = new Map();
+  for (const p of allPresets()) {
+    const key = p.group ?? '';
+    let parent = groups.get(key);
+    if (!parent) {
+      parent = key ? Object.assign(document.createElement('optgroup'), { label: key }) : sel;
+      groups.set(key, parent);
+      if (parent !== sel) sel.appendChild(parent);
+    }
+    parent.appendChild(Object.assign(document.createElement('option'), { value: p.id, textContent: p.name }));
+  }
 }
 
 /** Full rebuild of the sidebar after the preset or the whole state changed; fonts load in the background. */

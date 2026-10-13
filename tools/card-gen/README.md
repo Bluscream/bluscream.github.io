@@ -9,7 +9,7 @@ Fully client-side ID-card / BahnCard-style image generator. Nothing leaves the b
 
 ## Presets (`presets.json`)
 
-Each preset has `width`, `height`, `radius`, a default `font`, Google Fonts `fonts` to load and
+Each preset has a `group` (dropdown heading), `width`, `height`, `radius`, a default `font`, Google Fonts `fonts` to load and
 `sides.front` / `sides.back`, each with a `background` and ordered `layers`. Layer types are
 `text`, `rect` and `image`; the `_schema` block at the top of the file lists every property.
 A preset may `extends` another one and only supply `background`, per-layer `overrides` and

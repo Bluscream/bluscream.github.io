@@ -37,6 +37,8 @@ export function resolvePreset(raw, lookup, depth = 0) {
   const out = { ...base, id: raw.id, name: raw.name, sides: clone(base.sides) };
   const description = raw.description ?? base.description;
   if (description !== undefined) out.description = description;
+  const group = raw.group ?? base.group;
+  if (group !== undefined) out.group = group;
   if (raw.width !== undefined) out.width = raw.width;
   if (raw.height !== undefined) out.height = raw.height;
   if (raw.radius !== undefined) out.radius = raw.radius;

@@ -11,54 +11,52 @@
   },
   "presets": [
     {
-      "id": "bahncard-100",
-      "name": "BahnCard 100 (black)",
-      "description": "Black 100 card, ID-1 proportions at 300 dpi.",
-      "width": 1012,
-      "height": 638,
-      "radius": 36,
-      "font": "Nunito Sans",
-      "fonts": ["Nunito Sans:ital,wght@0,400;0,600;0,700;0,800;1,400", "Caveat:wght@500"],
-      "sides": {
+      "id": "bahncard-25",
+      "group": "BahnCard 2020 design",
+      "name": "BahnCard 25 (red)",
+      "description": "Red 2nd-class 25 card.",
+      "extends": "bahncard-50",
+      "overrides": {
         "front": {
-          "background": { "type": "color", "color": "#21211f" },
-          "layers": [
-            { "id": "logoBox", "type": "rect", "label": "Logo frame", "x": 867, "y": 40, "w": 100, "h": 68, "stroke": "#ffffff", "strokeWidth": 7, "radius": 9 },
-            { "id": "logo", "type": "text", "label": "Logo text", "text": "DB", "x": 917, "y": 76, "size": 50, "weight": 800, "color": "#ffffff", "align": "center", "baseline": "middle", "letterSpacing": -1 },
-            { "id": "photo", "type": "image", "label": "Photo", "x": 40, "y": 40, "w": 150, "h": 190, "fit": "cover", "radius": 8, "visible": false },
-            { "id": "title", "type": "text", "label": "Title", "text": "BahnCard 100", "x": 38, "y": 350, "size": 86, "weight": 800, "color": "#ffffff", "letterSpacing": -1 },
-            { "id": "subtitle", "type": "text", "label": "Subtitle", "text": "+City", "x": 618, "y": 346, "size": 30, "weight": 600, "color": "#ffffff" },
-            { "id": "number", "type": "text", "label": "Card number", "text": "7081 0000 0000 0000", "x": 38, "y": 522, "size": 36, "weight": 700, "color": "#ffffff" },
-            { "id": "check", "type": "text", "label": "Check digits", "text": "920", "x": 497, "y": 522, "size": 36, "weight": 700, "color": "#ffffff" },
-            { "id": "validFrom", "type": "text", "label": "Valid from", "text": "GÜLTIG VOM 01.01.23 BIS", "x": 968, "y": 520, "size": 25, "weight": 700, "color": "#ffffff", "align": "right" },
-            { "id": "name", "type": "text", "label": "Name", "text": "Andrea Kirchhoff", "x": 38, "y": 592, "size": 36, "weight": 700, "color": "#ffffff" },
-            { "id": "validTo", "type": "text", "label": "Valid until", "text": "31.12.23", "x": 968, "y": 594, "size": 52, "weight": 700, "color": "#ffffff", "align": "right" }
-          ]
+          "ghost": { "text": "25" },
+          "title": { "text": "BahnCard 25" },
+          "name": { "text": "Max Mustermann" }
         },
         "back": {
-          "background": { "type": "color", "color": "#2a2a28" },
-          "layers": [
-            { "id": "foundLine", "type": "text", "label": "If found", "text": "Wird diese Karte gefunden, bitte an untenstehende Anschrift senden.", "x": 40, "y": 48, "size": 17, "weight": 600, "color": "#e8e8e8" },
-            { "id": "batch", "type": "text", "label": "Batch no.", "text": "041", "x": 972, "y": 48, "size": 17, "weight": 600, "color": "#e8e8e8", "align": "right" },
-            { "id": "magstripe", "type": "rect", "label": "Magnetic stripe", "x": 0, "y": 66, "w": 1012, "h": 100, "fill": "#050505" },
-            { "id": "sigLabel", "type": "text", "label": "Signature label", "text": "Unterschrift Karteninhaber/-in", "x": 40, "y": 198, "size": 17, "weight": 600, "color": "#e8e8e8" },
-            { "id": "sigDate", "type": "text", "label": "Issue code", "text": "01/23", "x": 972, "y": 198, "size": 17, "weight": 600, "color": "#e8e8e8", "align": "right" },
-            { "id": "sigBox", "type": "rect", "label": "Signature field", "x": 40, "y": 210, "w": 932, "h": 100, "fill": "#f7f7f7", "radius": 4 },
-            { "id": "sigPattern", "type": "text", "label": "Signature field pattern", "text": "BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard\nBahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard\nBahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard\nBahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard", "x": 46, "y": 232, "size": 15, "weight": 400, "italic": true, "lineHeight": 1.5, "color": "#c9c9c9", "maxWidth": 920, "editable": false },
-            { "id": "signature", "type": "text", "label": "Signature", "text": "Andrea Kirchhoff", "x": 70, "y": 282, "size": 48, "weight": 500, "font": "Caveat", "color": "#1b2a6b", "rotate": -2 },
-            { "id": "legal", "type": "text", "label": "Legal text", "text": "Diese Karte ist Eigentum der Deutschen Bahn AG und bei der Fahrkartenkontrolle vorzulegen. Sie ist nur\nzusammen mit einem amtlichen Lichtbildausweis gültig und nicht übertragbar. Es gelten die Beförderungs-\nbedingungen der Deutschen Bahn AG.", "x": 40, "y": 358, "size": 17, "weight": 600, "lineHeight": 1.35, "color": "#e8e8e8" },
-            { "id": "bonus", "type": "text", "label": "Program", "text": "bahn.bonus", "x": 40, "y": 468, "size": 28, "weight": 800, "color": "#ffffff" },
-            { "id": "url", "type": "text", "label": "Website", "text": "www.bahn.de/bahncard", "x": 300, "y": 462, "size": 21, "weight": 800, "color": "#ffffff" },
-            { "id": "address", "type": "text", "label": "Address", "text": "Anschrift: BahnCard-Service, 60643 Frankfurt | E-Mail: bahncard-service@bahn.de\nTelefon: 01806 340035* (Mo.–Fr. 7–21 Uhr, Sa. 9–18 Uhr)", "x": 300, "y": 494, "size": 15, "weight": 600, "lineHeight": 1.35, "color": "#e8e8e8" },
-            { "id": "footnote", "type": "text", "label": "Footnote", "text": "*20 ct/Anruf aus dem Festnetz, Tarif bei Mobilfunk max. 60 ct/Anruf.", "x": 300, "y": 548, "size": 13, "weight": 400, "italic": true, "color": "#cfcfcf" },
-            { "id": "railplusBox", "type": "rect", "label": "RailPlus badge", "x": 40, "y": 528, "w": 150, "h": 40, "fill": "#ffd100", "stroke": "#111111", "strokeWidth": 2, "radius": 3 },
-            { "id": "railplus", "type": "text", "label": "RailPlus text", "text": "RAIL+PLUS", "x": 115, "y": 549, "size": 22, "weight": 800, "color": "#111111", "align": "center", "baseline": "middle", "letterSpacing": 1 }
-          ]
+          "signature": { "text": "Max Mustermann" }
+        }
+      }
+    },
+    {
+      "id": "bahncard-25-1st",
+      "group": "BahnCard 2020 design",
+      "name": "BahnCard 25 1. Klasse (white)",
+      "description": "White 1st-class card with grey text.",
+      "extends": "bahncard-50",
+      "background": {
+        "front": { "type": "gradient", "angle": 160, "stops": [ { "pos": 0, "color": "#ffffff" }, { "pos": 1, "color": "#e9e9e9" } ] }
+      },
+      "overrides": {
+        "front": {
+          "ghost": { "text": "25", "color": "#e3e3e3" },
+          "logoBox": { "stroke": "#d4001a" },
+          "logo": { "color": "#d4001a" },
+          "title": { "text": "BahnCard 25", "color": "#333333" },
+          "subtitle": { "text": "1. Klasse", "x": 590, "color": "#333333" },
+          "number": { "color": "#333333" },
+          "check": { "color": "#333333" },
+          "validFrom": { "color": "#333333" },
+          "name": { "text": "Max Mustermann", "color": "#333333" },
+          "validTo": { "color": "#333333" }
+        },
+        "back": {
+          "signature": { "text": "Max Mustermann" }
         }
       }
     },
     {
       "id": "bahncard-50",
+      "group": "BahnCard 2020 design",
       "name": "BahnCard 50 (red)",
       "description": "Red 2nd-class 50 card with ghost numeral.",
       "width": 1012,
@@ -106,110 +104,56 @@
       }
     },
     {
-      "id": "bahncard-25",
-      "name": "BahnCard 25 (red)",
-      "description": "Red 2nd-class 25 card.",
-      "extends": "bahncard-50",
-      "overrides": {
+      "id": "bahncard-100",
+      "group": "BahnCard 2020 design",
+      "name": "BahnCard 100 (black)",
+      "description": "Black 100 card, ID-1 proportions at 300 dpi.",
+      "width": 1012,
+      "height": 638,
+      "radius": 36,
+      "font": "Nunito Sans",
+      "fonts": ["Nunito Sans:ital,wght@0,400;0,600;0,700;0,800;1,400", "Caveat:wght@500"],
+      "sides": {
         "front": {
-          "ghost": { "text": "25" },
-          "title": { "text": "BahnCard 25" },
-          "name": { "text": "Max Mustermann" }
-        },
-        "back": {
-          "signature": { "text": "Max Mustermann" }
-        }
-      }
-    },
-    {
-      "id": "bahncard-25-1st",
-      "name": "BahnCard 25 1. Klasse (white)",
-      "description": "White 1st-class card with grey text.",
-      "extends": "bahncard-50",
-      "background": {
-        "front": { "type": "gradient", "angle": 160, "stops": [ { "pos": 0, "color": "#ffffff" }, { "pos": 1, "color": "#e9e9e9" } ] }
-      },
-      "overrides": {
-        "front": {
-          "ghost": { "text": "25", "color": "#e3e3e3" },
-          "logoBox": { "stroke": "#d4001a" },
-          "logo": { "color": "#d4001a" },
-          "title": { "text": "BahnCard 25", "color": "#333333" },
-          "subtitle": { "text": "1. Klasse", "x": 590, "color": "#333333" },
-          "number": { "color": "#333333" },
-          "check": { "color": "#333333" },
-          "validFrom": { "color": "#333333" },
-          "name": { "text": "Max Mustermann", "color": "#333333" },
-          "validTo": { "color": "#333333" }
-        },
-        "back": {
-          "signature": { "text": "Max Mustermann" }
-        }
-      }
-    },
-    {
-      "id": "femcard-100",
-      "name": "FemCard 100 (pride flag)",
-      "description": "BahnCard 100 layout on a femboy pride flag.",
-      "extends": "bahncard-100",
-      "background": {
-        "front": {
-          "type": "gradient",
-          "angle": 180,
-          "stops": [
-            { "pos": 0.0, "color": "#d260a5" }, { "pos": 0.1429, "color": "#d260a5" },
-            { "pos": 0.1429, "color": "#e4afcd" }, { "pos": 0.2857, "color": "#e4afcd" },
-            { "pos": 0.2857, "color": "#fefefe" }, { "pos": 0.4286, "color": "#fefefe" },
-            { "pos": 0.4286, "color": "#57cef8" }, { "pos": 0.5714, "color": "#57cef8" },
-            { "pos": 0.5714, "color": "#fefefe" }, { "pos": 0.7143, "color": "#fefefe" },
-            { "pos": 0.7143, "color": "#e4afcd" }, { "pos": 0.8571, "color": "#e4afcd" },
-            { "pos": 0.8571, "color": "#d260a5" }, { "pos": 1.0, "color": "#d260a5" }
+          "background": { "type": "color", "color": "#21211f" },
+          "layers": [
+            { "id": "logoBox", "type": "rect", "label": "Logo frame", "x": 867, "y": 40, "w": 100, "h": 68, "stroke": "#ffffff", "strokeWidth": 7, "radius": 9 },
+            { "id": "logo", "type": "text", "label": "Logo text", "text": "DB", "x": 917, "y": 76, "size": 50, "weight": 800, "color": "#ffffff", "align": "center", "baseline": "middle", "letterSpacing": -1 },
+            { "id": "photo", "type": "image", "label": "Photo", "x": 40, "y": 40, "w": 150, "h": 190, "fit": "cover", "radius": 8, "visible": false },
+            { "id": "title", "type": "text", "label": "Title", "text": "BahnCard 100", "x": 38, "y": 350, "size": 86, "weight": 800, "color": "#ffffff", "letterSpacing": -1 },
+            { "id": "subtitle", "type": "text", "label": "Subtitle", "text": "+City", "x": 618, "y": 346, "size": 30, "weight": 600, "color": "#ffffff" },
+            { "id": "number", "type": "text", "label": "Card number", "text": "7081 0000 0000 0000", "x": 38, "y": 522, "size": 36, "weight": 700, "color": "#ffffff" },
+            { "id": "check", "type": "text", "label": "Check digits", "text": "920", "x": 497, "y": 522, "size": 36, "weight": 700, "color": "#ffffff" },
+            { "id": "validFrom", "type": "text", "label": "Valid from", "text": "GÜLTIG VOM 01.01.23 BIS", "x": 968, "y": 520, "size": 25, "weight": 700, "color": "#ffffff", "align": "right" },
+            { "id": "name", "type": "text", "label": "Name", "text": "Andrea Kirchhoff", "x": 38, "y": 592, "size": 36, "weight": 700, "color": "#ffffff" },
+            { "id": "validTo", "type": "text", "label": "Valid until", "text": "31.12.23", "x": 968, "y": 594, "size": 52, "weight": 700, "color": "#ffffff", "align": "right" }
           ]
         },
         "back": {
-          "type": "gradient",
-          "angle": 180,
-          "stops": [
-            { "pos": 0.0, "color": "#d260a5" }, { "pos": 0.1429, "color": "#d260a5" },
-            { "pos": 0.1429, "color": "#e4afcd" }, { "pos": 0.2857, "color": "#e4afcd" },
-            { "pos": 0.2857, "color": "#fefefe" }, { "pos": 0.4286, "color": "#fefefe" },
-            { "pos": 0.4286, "color": "#57cef8" }, { "pos": 0.5714, "color": "#57cef8" },
-            { "pos": 0.5714, "color": "#fefefe" }, { "pos": 0.7143, "color": "#fefefe" },
-            { "pos": 0.7143, "color": "#e4afcd" }, { "pos": 0.8571, "color": "#e4afcd" },
-            { "pos": 0.8571, "color": "#d260a5" }, { "pos": 1.0, "color": "#d260a5" }
+          "background": { "type": "color", "color": "#2a2a28" },
+          "layers": [
+            { "id": "foundLine", "type": "text", "label": "If found", "text": "Wird diese Karte gefunden, bitte an untenstehende Anschrift senden.", "x": 40, "y": 48, "size": 17, "weight": 600, "color": "#e8e8e8" },
+            { "id": "batch", "type": "text", "label": "Batch no.", "text": "041", "x": 972, "y": 48, "size": 17, "weight": 600, "color": "#e8e8e8", "align": "right" },
+            { "id": "magstripe", "type": "rect", "label": "Magnetic stripe", "x": 0, "y": 66, "w": 1012, "h": 100, "fill": "#050505" },
+            { "id": "sigLabel", "type": "text", "label": "Signature label", "text": "Unterschrift Karteninhaber/-in", "x": 40, "y": 198, "size": 17, "weight": 600, "color": "#e8e8e8" },
+            { "id": "sigDate", "type": "text", "label": "Issue code", "text": "01/23", "x": 972, "y": 198, "size": 17, "weight": 600, "color": "#e8e8e8", "align": "right" },
+            { "id": "sigBox", "type": "rect", "label": "Signature field", "x": 40, "y": 210, "w": 932, "h": 100, "fill": "#f7f7f7", "radius": 4 },
+            { "id": "sigPattern", "type": "text", "label": "Signature field pattern", "text": "BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard\nBahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard\nBahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard\nBahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard", "x": 46, "y": 232, "size": 15, "weight": 400, "italic": true, "lineHeight": 1.5, "color": "#c9c9c9", "maxWidth": 920, "editable": false },
+            { "id": "signature", "type": "text", "label": "Signature", "text": "Andrea Kirchhoff", "x": 70, "y": 282, "size": 48, "weight": 500, "font": "Caveat", "color": "#1b2a6b", "rotate": -2 },
+            { "id": "legal", "type": "text", "label": "Legal text", "text": "Diese Karte ist Eigentum der Deutschen Bahn AG und bei der Fahrkartenkontrolle vorzulegen. Sie ist nur\nzusammen mit einem amtlichen Lichtbildausweis gültig und nicht übertragbar. Es gelten die Beförderungs-\nbedingungen der Deutschen Bahn AG.", "x": 40, "y": 358, "size": 17, "weight": 600, "lineHeight": 1.35, "color": "#e8e8e8" },
+            { "id": "bonus", "type": "text", "label": "Program", "text": "bahn.bonus", "x": 40, "y": 468, "size": 28, "weight": 800, "color": "#ffffff" },
+            { "id": "url", "type": "text", "label": "Website", "text": "www.bahn.de/bahncard", "x": 300, "y": 462, "size": 21, "weight": 800, "color": "#ffffff" },
+            { "id": "address", "type": "text", "label": "Address", "text": "Anschrift: BahnCard-Service, 60643 Frankfurt | E-Mail: bahncard-service@bahn.de\nTelefon: 01806 340035* (Mo.–Fr. 7–21 Uhr, Sa. 9–18 Uhr)", "x": 300, "y": 494, "size": 15, "weight": 600, "lineHeight": 1.35, "color": "#e8e8e8" },
+            { "id": "footnote", "type": "text", "label": "Footnote", "text": "*20 ct/Anruf aus dem Festnetz, Tarif bei Mobilfunk max. 60 ct/Anruf.", "x": 300, "y": 548, "size": 13, "weight": 400, "italic": true, "color": "#cfcfcf" },
+            { "id": "railplusBox", "type": "rect", "label": "RailPlus badge", "x": 40, "y": 528, "w": 150, "h": 40, "fill": "#ffd100", "stroke": "#111111", "strokeWidth": 2, "radius": 3 },
+            { "id": "railplus", "type": "text", "label": "RailPlus text", "text": "RAIL+PLUS", "x": 115, "y": 549, "size": 22, "weight": 800, "color": "#111111", "align": "center", "baseline": "middle", "letterSpacing": 1 }
           ]
-        }
-      },
-      "overrides": {
-        "front": {
-          "logoBox": { "stroke": "#3b2140" },
-          "logo": { "text": "FB", "color": "#3b2140" },
-          "title": { "text": "FemCard 100", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 6 },
-          "subtitle": { "text": "+Cuddles", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
-          "number": { "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
-          "check": { "text": "uwu", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
-          "validFrom": { "text": "GÜLTIG VOM 01.01.24 BIS", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
-          "name": { "text": "Your Name", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
-          "validTo": { "text": "FOREVER", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 5 }
-        },
-        "back": {
-          "foundLine": { "text": "Wird diese Karte gefunden, bitte Kopfkraulen und zurückgeben.", "color": "#3b2140" },
-          "batch": { "color": "#3b2140" },
-          "sigLabel": { "color": "#3b2140" },
-          "sigDate": { "text": "01/24", "color": "#3b2140" },
-          "signature": { "text": "Your Name" },
-          "legal": { "text": "Diese Karte ist Eigentum der Inhaberin und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit einem Thigh-High-Nachweis gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der FemBahn.", "color": "#3b2140" },
-          "bonus": { "text": "fem.bonus", "color": "#3b2140" },
-          "url": { "text": "www.femboy.express/card", "color": "#3b2140" },
-          "address": { "text": "Anschrift: FemCard-Service, 60643 Frankfurt | E-Mail: hello@femboy.express\nSprechzeiten: immer, außer beim Nickerchen", "color": "#3b2140" },
-          "footnote": { "text": "*Kuscheln kostenlos. Blushing inklusive.", "color": "#3b2140" },
-          "railplusBox": { "fill": "#57cef8", "stroke": "#3b2140" },
-          "railplus": { "text": "FEM+PLUS", "color": "#3b2140" }
         }
       }
     },
     {
       "id": "bahncard-100-comfort",
+      "group": "BahnCard 2020 design",
       "name": "BahnCard 100 BahnComfort (black, photo)",
       "description": "2020 black card with the BahnComfort mark top-left and a photo on the right.",
       "extends": "bahncard-100",
@@ -230,6 +174,7 @@
     },
     {
       "id": "bahncard-leaf-25",
+      "group": "BahnCard 2010s leaf design",
       "name": "BahnCard 25 2010s (green leaf)",
       "description": "Pre-2020 design: white card, green leaf band, Ökostrom stripe, vertical expiry.",
       "width": 1012,
@@ -292,6 +237,7 @@
     },
     {
       "id": "bahncard-leaf-50",
+      "group": "BahnCard 2010s leaf design",
       "name": "BahnCard 50 2010s (green leaf)",
       "description": "Pre-2020 design, 50 variant.",
       "extends": "bahncard-leaf-25",
@@ -302,6 +248,7 @@
     },
     {
       "id": "bahncard-leaf-100",
+      "group": "BahnCard 2010s leaf design",
       "name": "BahnCard 100 2010s (green leaf, black)",
       "description": "Pre-2020 black 100 card with bahn.bonus comfort mark, leaf band and photo.",
       "extends": "bahncard-leaf-25",
@@ -342,6 +289,7 @@
     },
     {
       "id": "bahncard-leaf-100-probe",
+      "group": "BahnCard 2010s leaf design",
       "name": "Probe BahnCard 100 2015 (green leaf)",
       "description": "Three-month trial card as issued in 2015.",
       "extends": "bahncard-leaf-100",
@@ -356,6 +304,7 @@
     },
     {
       "id": "fan-bahncard-25",
+      "group": "Special editions",
       "name": "Fan BahnCard 25 (EURO 2024)",
       "description": "Red tournament card with ball silhouette, tilted climate badge and partner mark.",
       "extends": "bahncard-50",
@@ -388,7 +337,70 @@
       }
     },
     {
+      "id": "femcard-100",
+      "group": "Special editions",
+      "name": "FemCard 100 (pride flag)",
+      "description": "BahnCard 100 layout on a femboy pride flag.",
+      "extends": "bahncard-100",
+      "background": {
+        "front": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0.0, "color": "#d260a5" }, { "pos": 0.1429, "color": "#d260a5" },
+            { "pos": 0.1429, "color": "#e4afcd" }, { "pos": 0.2857, "color": "#e4afcd" },
+            { "pos": 0.2857, "color": "#fefefe" }, { "pos": 0.4286, "color": "#fefefe" },
+            { "pos": 0.4286, "color": "#57cef8" }, { "pos": 0.5714, "color": "#57cef8" },
+            { "pos": 0.5714, "color": "#fefefe" }, { "pos": 0.7143, "color": "#fefefe" },
+            { "pos": 0.7143, "color": "#e4afcd" }, { "pos": 0.8571, "color": "#e4afcd" },
+            { "pos": 0.8571, "color": "#d260a5" }, { "pos": 1.0, "color": "#d260a5" }
+          ]
+        },
+        "back": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0.0, "color": "#d260a5" }, { "pos": 0.1429, "color": "#d260a5" },
+            { "pos": 0.1429, "color": "#e4afcd" }, { "pos": 0.2857, "color": "#e4afcd" },
+            { "pos": 0.2857, "color": "#fefefe" }, { "pos": 0.4286, "color": "#fefefe" },
+            { "pos": 0.4286, "color": "#57cef8" }, { "pos": 0.5714, "color": "#57cef8" },
+            { "pos": 0.5714, "color": "#fefefe" }, { "pos": 0.7143, "color": "#fefefe" },
+            { "pos": 0.7143, "color": "#e4afcd" }, { "pos": 0.8571, "color": "#e4afcd" },
+            { "pos": 0.8571, "color": "#d260a5" }, { "pos": 1.0, "color": "#d260a5" }
+          ]
+        }
+      },
+      "overrides": {
+        "front": {
+          "logoBox": { "stroke": "#3b2140" },
+          "logo": { "text": "FB", "color": "#3b2140" },
+          "title": { "text": "FemCard 100", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 6 },
+          "subtitle": { "text": "+Cuddles", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "number": { "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "check": { "text": "uwu", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "validFrom": { "text": "GÜLTIG VOM 01.01.24 BIS", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "name": { "text": "Your Name", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "validTo": { "text": "FOREVER", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 5 }
+        },
+        "back": {
+          "foundLine": { "text": "Wird diese Karte gefunden, bitte Kopfkraulen und zurückgeben.", "color": "#3b2140" },
+          "batch": { "color": "#3b2140" },
+          "sigLabel": { "color": "#3b2140" },
+          "sigDate": { "text": "01/24", "color": "#3b2140" },
+          "signature": { "text": "Your Name" },
+          "legal": { "text": "Diese Karte ist Eigentum der Inhaberin und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit einem Thigh-High-Nachweis gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der FemBahn.", "color": "#3b2140" },
+          "bonus": { "text": "fem.bonus", "color": "#3b2140" },
+          "url": { "text": "www.femboy.express/card", "color": "#3b2140" },
+          "address": { "text": "Anschrift: FemCard-Service, 60643 Frankfurt | E-Mail: hello@femboy.express\nSprechzeiten: immer, außer beim Nickerchen", "color": "#3b2140" },
+          "footnote": { "text": "*Kuscheln kostenlos. Blushing inklusive.", "color": "#3b2140" },
+          "railplusBox": { "fill": "#57cef8", "stroke": "#3b2140" },
+          "railplus": { "text": "FEM+PLUS", "color": "#3b2140" }
+        }
+      }
+    },
+    {
       "id": "staff-id",
+      "group": "Other cards",
       "name": "Staff ID card (fictional issuer)",
       "description": "Generic service ID: photo left, issuer header, name fields, validity and card number.",
       "width": 1012,
@@ -435,6 +447,7 @@
     },
     {
       "id": "blank",
+      "group": "Other cards",
       "name": "Blank ID card",
       "description": "Generic ID-1 card with a handful of text lines to start from.",
       "width": 1012,

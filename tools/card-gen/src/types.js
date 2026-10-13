@@ -60,6 +60,7 @@
  * @typedef {object} Preset
  * @property {string} id
  * @property {string} name
+ * @property {string} [group] heading the preset is listed under
  * @property {string} [description]
  * @property {number} width
  * @property {number} height
@@ -74,6 +75,7 @@
  * @typedef {object} DerivedPreset
  * @property {string} id
  * @property {string} name
+ * @property {string} [group]
  * @property {string} [description]
  * @property {string} extends id of the base preset
  * @property {number} [width]

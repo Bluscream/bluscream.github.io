@@ -72,6 +72,9 @@ describe('presets.json', () => {
       assert.ok(p.sides.back.layers.length > 0, `${p.id} back has no layers`);
     }
   });
+  it('gives every shipped preset a group, inherited through extends', () => {
+    for (const raw of file) assert.ok(resolvePreset(raw, lookupShipped).group, `${raw.id} has no group`);
+  });
   it('uses unique layer ids per side', () => {
     for (const raw of file) {
       const p = resolvePreset(raw, lookupShipped);
