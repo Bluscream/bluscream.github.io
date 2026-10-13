@@ -35,8 +35,9 @@ const IMAGE_FIELDS = [
 ];
 /** @type {Record<LayerType, FieldSpec[]>} */
 const FIELDS = { text: TEXT_FIELDS, rect: RECT_FIELDS, image: IMAGE_FIELDS };
+/** Short glyph shown before the layer name. */
 /** @type {Record<LayerType, string>} */
-const TYPE_ICON = { text: 'fa-font', rect: 'fa-square', image: 'fa-image' };
+const TYPE_GLYPH = { text: 'T', rect: '▭', image: '▣' };
 
 /** @param {Layer} layer */
 const layerValues = (layer) => /** @type {Record<string, unknown>} */ (layer);
@@ -92,15 +93,15 @@ function layerCard(side, layer) {
   vis.addEventListener('change', () => store.setLayerProp(side, layer.id, 'visible', vis.checked));
   const label = document.createElement('span');
   label.className = 'label';
-  label.innerHTML = `<i class="fa-solid ${TYPE_ICON[layer.type]}"></i><span>${escapeHtml(layer.label ?? layer.id)}</span>`;
+  label.innerHTML = `<span class="kind" aria-hidden="true">${TYPE_GLYPH[layer.type]}</span><span>${escapeHtml(layer.label ?? layer.id)}</span>`;
   label.addEventListener('click', () => { store.selected = { side, id: layer.id }; highlightSelected(); renderPreviews(); });
   const action = Object.assign(document.createElement('button'), { className: 'btn-icon' });
   if (layer.custom) {
-    action.innerHTML = '<i class="fa-solid fa-trash"></i>';
+    action.textContent = '×';
     action.title = 'Delete layer';
     action.addEventListener('click', () => { store.removeCustomLayer(side, layer.id); buildLayerList(); });
   } else {
-    action.innerHTML = '<i class="fa-solid fa-rotate-left"></i>';
+    action.textContent = '↺';
     action.title = 'Reset layer to the preset';
     action.addEventListener('click', () => { store.resetLayer(side, layer.id); buildLayerList(); });
   }
@@ -139,7 +140,7 @@ function imageSourceRow(side, layer, visCheckbox) {
     store.setLayerProp(side, layer.id, 'src', src);
     if (!visCheckbox.checked) { visCheckbox.checked = true; store.setLayerProp(side, layer.id, 'visible', true); }
   };
-  const up = Object.assign(document.createElement('label'), { className: 'btn btn-sm file-btn', innerHTML: '<i class="fa-solid fa-upload"></i> Upload' });
+  const up = Object.assign(document.createElement('label'), { className: 'btn btn-sm file-btn', textContent: 'Upload' });
   const file = Object.assign(document.createElement('input'), { type: 'file', accept: 'image/*', hidden: true });
   file.addEventListener('change', async () => { const f = file.files?.[0]; if (f) setSrc(await fileToDataUrl(f)); });
   up.appendChild(file);

@@ -61,7 +61,7 @@ function stopRow(stop, index) {
   const color = Object.assign(document.createElement('input'), { type: 'color', className: 'input color', value: toHex6(stop.color), title: 'Stop colour' });
   const range = Object.assign(document.createElement('input'), { type: 'range', className: 'input', min: '0', max: '1', step: '0.001', value: String(stop.pos), title: 'Stop position' });
   const pct = Object.assign(document.createElement('input'), { type: 'number', className: 'input', min: '0', max: '100', step: '0.1', value: (stop.pos * 100).toFixed(1), title: 'Stop position in percent' });
-  const del = Object.assign(document.createElement('button'), { className: 'btn-icon', title: 'Remove stop', innerHTML: '<i class="fa-solid fa-xmark"></i>' });
+  const del = Object.assign(document.createElement('button'), { className: 'btn-icon', title: 'Remove stop', textContent: '×' });
   const stopAt = () => {
     const s = editableGradient().stops[index];
     if (!s) throw new Error(`Gradient stop ${index} vanished.`);
