@@ -26,12 +26,12 @@ const TEXT_FIELDS = [
 const RECT_FIELDS = [
   { key: 'x', name: 'X', kind: 'number' }, { key: 'y', name: 'Y', kind: 'number' }, { key: 'w', name: 'Width', kind: 'number' }, { key: 'h', name: 'Height', kind: 'number' },
   { key: 'fill', name: 'Fill', kind: 'color' }, { key: 'stroke', name: 'Stroke', kind: 'color' }, { key: 'strokeWidth', name: 'Stroke w.', kind: 'number' },
-  { key: 'radius', name: 'Radius', kind: 'number' }, { key: 'opacity', name: 'Opacity', kind: 'number', step: 0.05 },
+  { key: 'radius', name: 'Radius', kind: 'number' }, { key: 'rotate', name: 'Rotate', kind: 'number' }, { key: 'opacity', name: 'Opacity', kind: 'number', step: 0.05 },
 ];
 /** @type {FieldSpec[]} */
 const IMAGE_FIELDS = [
   { key: 'x', name: 'X', kind: 'number' }, { key: 'y', name: 'Y', kind: 'number' }, { key: 'w', name: 'Width', kind: 'number' }, { key: 'h', name: 'Height', kind: 'number' },
-  { key: 'fit', name: 'Fit', kind: 'select', options: ['cover', 'contain', 'stretch'] }, { key: 'radius', name: 'Radius', kind: 'number' }, { key: 'opacity', name: 'Opacity', kind: 'number', step: 0.05 },
+  { key: 'fit', name: 'Fit', kind: 'select', options: ['cover', 'contain', 'stretch'] }, { key: 'radius', name: 'Radius', kind: 'number' }, { key: 'rotate', name: 'Rotate', kind: 'number' }, { key: 'opacity', name: 'Opacity', kind: 'number', step: 0.05 },
 ];
 /** @type {Record<LayerType, FieldSpec[]>} */
 const FIELDS = { text: TEXT_FIELDS, rect: RECT_FIELDS, image: IMAGE_FIELDS };

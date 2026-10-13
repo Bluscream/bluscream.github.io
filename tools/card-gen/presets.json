@@ -209,6 +209,185 @@
       }
     },
     {
+      "id": "bahncard-100-comfort",
+      "name": "BahnCard 100 BahnComfort (black, photo)",
+      "description": "2020 black card with the BahnComfort mark top-left and a photo on the right.",
+      "extends": "bahncard-100",
+      "overrides": {
+        "front": {
+          "photo": { "x": 760, "y": 200, "w": 180, "h": 230, "radius": 4, "visible": true },
+          "title": { "size": 74, "y": 352 },
+          "subtitle": { "x": 548, "y": 348 }
+        }
+      },
+      "layers": {
+        "front": [
+          { "id": "comfortDots", "type": "text", "label": "BahnComfort dots", "text": "•••", "x": 40, "y": 70, "size": 34, "weight": 800, "color": "#ffffff", "letterSpacing": -8, "rotate": -30 },
+          { "id": "comfortBahn", "type": "text", "label": "BahnComfort (light)", "text": "Bahn", "x": 92, "y": 82, "size": 30, "weight": 400, "italic": true, "color": "#ffffff" },
+          { "id": "comfortComfort", "type": "text", "label": "BahnComfort (bold)", "text": "Comfort", "x": 158, "y": 82, "size": 30, "weight": 800, "italic": true, "color": "#ffffff" }
+        ]
+      }
+    },
+    {
+      "id": "bahncard-leaf-25",
+      "name": "BahnCard 25 2010s (green leaf)",
+      "description": "Pre-2020 design: white card, green leaf band, Ökostrom stripe, vertical expiry.",
+      "width": 1012,
+      "height": 638,
+      "radius": 36,
+      "font": "Nunito Sans",
+      "fonts": ["Nunito Sans:ital,wght@0,400;0,600;0,700;0,800;1,400", "Caveat:wght@500"],
+      "sides": {
+        "front": {
+          "background": {
+            "type": "gradient",
+            "angle": 180,
+            "stops": [
+              { "pos": 0, "color": "#f3f3f3" }, { "pos": 0.21, "color": "#f3f3f3" },
+              { "pos": 0.21, "color": "#6f9c3a" }, { "pos": 0.40, "color": "#9bb95e" }, { "pos": 0.55, "color": "#c3d49a" },
+              { "pos": 0.55, "color": "#d6e5b8" }, { "pos": 0.61, "color": "#d6e5b8" },
+              { "pos": 0.61, "color": "#f3f3f3" }, { "pos": 1, "color": "#f3f3f3" }
+            ]
+          },
+          "layers": [
+            { "id": "leafTexture", "type": "image", "label": "Leaf texture (upload one)", "x": 0, "y": 134, "w": 1012, "h": 217, "fit": "cover", "opacity": 0.55, "visible": false },
+            { "id": "ghost", "type": "text", "label": "Ghost numeral", "text": "25", "x": 700, "y": 345, "size": 290, "weight": 800, "color": "#b7cc83", "align": "center", "opacity": 0.6, "letterSpacing": -10 },
+            { "id": "logoBox", "type": "rect", "label": "Logo box", "x": 720, "y": 56, "w": 84, "h": 58, "fill": "#ec0016", "radius": 6 },
+            { "id": "logo", "type": "text", "label": "Logo text", "text": "DB", "x": 762, "y": 86, "size": 40, "weight": 800, "color": "#ffffff", "align": "center", "baseline": "middle", "letterSpacing": -1 },
+            { "id": "wordmark", "type": "text", "label": "Wordmark", "text": "BAHN", "x": 820, "y": 104, "size": 44, "weight": 800, "color": "#1f1f1d", "letterSpacing": -1 },
+            { "id": "bonus", "type": "text", "label": "Program (top-left)", "text": "", "x": 65, "y": 103, "size": 36, "weight": 800, "color": "#1f1f1d" },
+            { "id": "title", "type": "text", "label": "Title", "text": "BahnCard", "x": 62, "y": 262, "size": 64, "weight": 800, "color": "#ffffff", "letterSpacing": -1 },
+            { "id": "bigNumber", "type": "text", "label": "Big number", "text": "25", "x": 955, "y": 300, "size": 130, "weight": 800, "color": "#ffffff", "align": "right", "letterSpacing": -4 },
+            { "id": "photo", "type": "image", "label": "Photo", "x": 775, "y": 148, "w": 175, "h": 200, "fit": "cover", "visible": false },
+            { "id": "oeko", "type": "text", "label": "Ökostrom stripe", "text": "100% ÖKOSTROM        100% ÖKOSTROM        100% ÖKOSTROM        100% ÖKOSTROM        100% ÖKOSTROM        100% ÖKOSTROM", "x": 20, "y": 378, "size": 19, "weight": 600, "color": "#8fb24e", "letterSpacing": 1, "maxWidth": 2000 },
+            { "id": "expiry", "type": "text", "label": "Expiry (vertical)", "text": "02.20", "x": 100, "y": 598, "size": 46, "weight": 800, "color": "#1f1f1d", "rotate": -90 },
+            { "id": "valid", "type": "text", "label": "Validity", "text": "GÜLTIG VOM: 01.03.19 BIS: 29.02.20", "x": 150, "y": 456, "size": 27, "weight": 600, "color": "#1f1f1d" },
+            { "id": "classCode", "type": "text", "label": "Class code", "text": "HK", "x": 950, "y": 456, "size": 28, "weight": 600, "color": "#1f1f1d", "align": "right" },
+            { "id": "name", "type": "text", "label": "Name", "text": "Markus Becker", "x": 150, "y": 512, "size": 34, "weight": 800, "color": "#1f1f1d" },
+            { "id": "check", "type": "text", "label": "Check digits", "text": "943", "x": 950, "y": 512, "size": 28, "weight": 600, "color": "#1f1f1d", "align": "right" },
+            { "id": "number", "type": "text", "label": "Card number", "text": "7081 0000 0000 0000", "x": 150, "y": 566, "size": 32, "weight": 600, "color": "#1f1f1d" }
+          ]
+        },
+        "back": {
+          "background": { "type": "color", "color": "#f3f3f1" },
+          "layers": [
+            { "id": "foundLine", "type": "text", "label": "If found", "text": "Wird diese Karte gefunden, bitte an untenstehende Anschrift senden.", "x": 40, "y": 48, "size": 17, "weight": 600, "color": "#222222" },
+            { "id": "batch", "type": "text", "label": "Batch no.", "text": "041", "x": 972, "y": 48, "size": 17, "weight": 600, "color": "#222222", "align": "right" },
+            { "id": "magstripe", "type": "rect", "label": "Magnetic stripe", "x": 0, "y": 66, "w": 1012, "h": 100, "fill": "#0a0a0a" },
+            { "id": "sigLabel", "type": "text", "label": "Signature label", "text": "Unterschrift Karteninhaber/-in", "x": 40, "y": 198, "size": 17, "weight": 600, "color": "#222222" },
+            { "id": "sigDate", "type": "text", "label": "Issue code", "text": "02/19", "x": 972, "y": 198, "size": 17, "weight": 600, "color": "#222222", "align": "right" },
+            { "id": "sigBox", "type": "rect", "label": "Signature field", "x": 40, "y": 210, "w": 932, "h": 100, "fill": "#ffffff", "stroke": "#d8d8d8", "strokeWidth": 1, "radius": 4 },
+            { "id": "sigPattern", "type": "text", "label": "Signature field pattern", "text": "BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard\nBahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard\nBahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard\nBahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard BahnCard", "x": 46, "y": 232, "size": 15, "weight": 400, "italic": true, "lineHeight": 1.5, "color": "#d6d6d6", "maxWidth": 920, "editable": false },
+            { "id": "signature", "type": "text", "label": "Signature", "text": "Markus Becker", "x": 70, "y": 282, "size": 48, "weight": 500, "font": "Caveat", "color": "#1b2a6b", "rotate": -2 },
+            { "id": "legal", "type": "text", "label": "Legal text", "text": "Diese Karte ist Eigentum der Deutschen Bahn AG und bei der Fahrkartenkontrolle vorzulegen. Sie ist nur\nzusammen mit einem amtlichen Lichtbildausweis gültig und nicht übertragbar. Es gelten die Beförderungs-\nbedingungen der Deutschen Bahn AG.", "x": 40, "y": 358, "size": 17, "weight": 600, "lineHeight": 1.35, "color": "#222222" },
+            { "id": "bonusBack", "type": "text", "label": "Program", "text": "bahn.bonus", "x": 40, "y": 468, "size": 28, "weight": 800, "color": "#111111" },
+            { "id": "url", "type": "text", "label": "Website", "text": "www.bahn.de/bahncard", "x": 300, "y": 462, "size": 21, "weight": 800, "color": "#111111" },
+            { "id": "address", "type": "text", "label": "Address", "text": "Anschrift: BahnCard-Service, 60643 Frankfurt | E-Mail: bahncard-service@bahn.de\nTelefon: 01806 340035* (Mo.–Fr. 7–21 Uhr, Sa. 9–18 Uhr)", "x": 300, "y": 494, "size": 15, "weight": 600, "lineHeight": 1.35, "color": "#222222" },
+            { "id": "footnote", "type": "text", "label": "Footnote", "text": "*20 ct/Anruf aus dem Festnetz, Tarif bei Mobilfunk max. 60 ct/Anruf.", "x": 300, "y": 548, "size": 13, "weight": 400, "italic": true, "color": "#444444" },
+            { "id": "railplusBox", "type": "rect", "label": "RailPlus badge", "x": 40, "y": 528, "w": 150, "h": 40, "fill": "#ffd100", "stroke": "#111111", "strokeWidth": 2, "radius": 3 },
+            { "id": "railplus", "type": "text", "label": "RailPlus text", "text": "RAIL+PLUS", "x": 115, "y": 549, "size": 22, "weight": 800, "color": "#111111", "align": "center", "baseline": "middle", "letterSpacing": 1 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "bahncard-leaf-50",
+      "name": "BahnCard 50 2010s (green leaf)",
+      "description": "Pre-2020 design, 50 variant.",
+      "extends": "bahncard-leaf-25",
+      "overrides": {
+        "front": { "ghost": { "text": "50" }, "bigNumber": { "text": "50" }, "name": { "text": "Anne Reiser" } },
+        "back": { "signature": { "text": "Anne Reiser" } }
+      }
+    },
+    {
+      "id": "bahncard-leaf-100",
+      "name": "BahnCard 100 2010s (green leaf, black)",
+      "description": "Pre-2020 black 100 card with bahn.bonus comfort mark, leaf band and photo.",
+      "extends": "bahncard-leaf-25",
+      "background": {
+        "front": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0, "color": "#1a1a18" }, { "pos": 0.21, "color": "#1a1a18" },
+            { "pos": 0.21, "color": "#6f9c3a" }, { "pos": 0.40, "color": "#9bb95e" }, { "pos": 0.55, "color": "#c3d49a" },
+            { "pos": 0.55, "color": "#d6e5b8" }, { "pos": 0.61, "color": "#d6e5b8" },
+            { "pos": 0.61, "color": "#191917" }, { "pos": 1, "color": "#191917" }
+          ]
+        },
+        "back": { "type": "color", "color": "#2a2a28" }
+      },
+      "overrides": {
+        "front": {
+          "ghost": { "text": "100", "x": 560 },
+          "wordmark": { "color": "#ffffff" },
+          "bonus": { "text": "bahn.bonus  comfort", "color": "#ffffff" },
+          "title": { "text": "BahnCard 100", "size": 60 },
+          "bigNumber": { "visible": false },
+          "photo": { "visible": true },
+          "expiry": { "text": "12.20", "color": "#ffffff" },
+          "valid": { "text": "GÜLTIG VOM: 01.01.20 BIS: 31.12.20", "color": "#ffffff" },
+          "classCode": { "color": "#ffffff" },
+          "name": { "text": "Andrea Kirchhoff", "color": "#ffffff" },
+          "check": { "color": "#ffffff" },
+          "number": { "color": "#ffffff" }
+        },
+        "back": {
+          "foundLine": { "color": "#e8e8e8" }, "batch": { "color": "#e8e8e8" }, "sigLabel": { "color": "#e8e8e8" }, "sigDate": { "color": "#e8e8e8" },
+          "sigBox": { "fill": "#f7f7f7" }, "signature": { "text": "Andrea Kirchhoff" }, "legal": { "color": "#e8e8e8" },
+          "bonusBack": { "color": "#ffffff" }, "url": { "color": "#ffffff" }, "address": { "color": "#e8e8e8" }, "footnote": { "color": "#cfcfcf" }
+        }
+      }
+    },
+    {
+      "id": "bahncard-leaf-100-probe",
+      "name": "Probe BahnCard 100 2015 (green leaf)",
+      "description": "Three-month trial card as issued in 2015.",
+      "extends": "bahncard-leaf-100",
+      "overrides": {
+        "front": {
+          "ghost": { "visible": false },
+          "title": { "text": "Probe BahnCard 100", "size": 58, "y": 258 },
+          "expiry": { "text": "10.15" },
+          "valid": { "text": "GÜLTIG VOM: 01.08.15 BIS: 31.10.15" }
+        }
+      }
+    },
+    {
+      "id": "fan-bahncard-25",
+      "name": "Fan BahnCard 25 (EURO 2024)",
+      "description": "Red tournament card with ball silhouette, tilted climate badge and partner mark.",
+      "extends": "bahncard-50",
+      "background": {
+        "front": { "type": "gradient", "angle": 160, "stops": [ { "pos": 0, "color": "#c9031a" }, { "pos": 1, "color": "#b30014" } ] }
+      },
+      "overrides": {
+        "front": {
+          "ghost": { "text": "●", "x": 1120, "y": 700, "size": 760, "color": "#9c1216", "letterSpacing": 0 },
+          "logoBox": { "x": 640, "y": 40, "w": 90, "h": 62 },
+          "logo": { "x": 685, "y": 72, "size": 44 },
+          "title": { "text": "Fan BahnCard 25", "size": 68, "y": 350 },
+          "subtitle": { "visible": false },
+          "name": { "text": "Marie-Christine Walder" },
+          "validFrom": { "text": "GÜLTIG VOM 15.05.24 BIS" },
+          "validTo": { "text": "14.08.24" }
+        },
+        "back": { "signature": { "text": "Marie-Christine Walder" } }
+      },
+      "layers": {
+        "front": [
+          { "id": "track", "type": "text", "label": "Track arcs", "text": "((((", "x": 20, "y": 330, "size": 260, "weight": 300, "color": "#9c1216", "letterSpacing": -40, "rotate": -35, "opacity": 0.9 },
+          { "id": "badge", "type": "rect", "label": "Climate badge", "x": 300, "y": 44, "w": 230, "h": 92, "fill": "#b9cf7f", "radius": 8, "rotate": -7 },
+          { "id": "badgeText", "type": "text", "label": "Climate badge text", "text": "Ein Team.\nFürs Klima.", "x": 415, "y": 78, "size": 30, "weight": 800, "color": "#ffffff", "align": "center", "lineHeight": 1.15, "rotate": -7 },
+          { "id": "partnerDivider", "type": "rect", "label": "Partner divider", "x": 752, "y": 36, "w": 2, "h": 70, "fill": "#ffffff" },
+          { "id": "partnerBox", "type": "rect", "label": "Tournament mark", "x": 776, "y": 34, "w": 196, "h": 74, "stroke": "#ffffff", "strokeWidth": 3, "radius": 8 },
+          { "id": "partnerMark", "type": "text", "label": "Tournament mark text", "text": "EURO 2024", "x": 874, "y": 72, "size": 26, "weight": 800, "color": "#ffffff", "align": "center", "baseline": "middle", "letterSpacing": 1 },
+          { "id": "partnerLabel", "type": "text", "label": "Partner label", "text": "Nationaler Partner", "x": 874, "y": 136, "size": 19, "weight": 600, "color": "#ffffff", "align": "center" }
+        ]
+      }
+    },
+    {
       "id": "blank",
       "name": "Blank ID card",
       "description": "Generic ID-1 card with a handful of text lines to start from.",

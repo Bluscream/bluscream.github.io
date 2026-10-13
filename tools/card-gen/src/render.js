@@ -208,6 +208,21 @@ function drawText(ctx, layer, defaultFont) {
 }
 
 /**
+ * Applies a box layer's rotation around its centre; the caller keeps drawing in unrotated coordinates.
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {RectLayer | ImageLayer} layer
+ */
+function rotateAboutCentre(ctx, layer) {
+  const rot = num(layer.rotate, 0);
+  if (!rot) return;
+  const cx = layer.x + layer.w / 2;
+  const cy = layer.y + layer.h / 2;
+  ctx.translate(cx, cy);
+  ctx.rotate((rot * Math.PI) / 180);
+  ctx.translate(-cx, -cy);
+}
+
+/**
  * @param {CanvasRenderingContext2D} ctx
  * @param {RectLayer} layer
  * @returns {Box}
@@ -215,6 +230,7 @@ function drawText(ctx, layer, defaultFont) {
 function drawRect(ctx, layer) {
   ctx.save();
   ctx.globalAlpha = num(layer.opacity, 1);
+  rotateAboutCentre(ctx, layer);
   roundedRectPath(ctx, layer.x, layer.y, layer.w, layer.h, num(layer.radius, 0));
   if (layer.fill) { ctx.fillStyle = layer.fill; ctx.fill(); }
   if (layer.stroke && num(layer.strokeWidth, 0) > 0) { ctx.strokeStyle = layer.stroke; ctx.lineWidth = num(layer.strokeWidth); ctx.stroke(); }
@@ -231,6 +247,7 @@ function drawImageLayer(ctx, layer) {
   const box = { x: layer.x, y: layer.y, w: layer.w, h: layer.h };
   ctx.save();
   ctx.globalAlpha = num(layer.opacity, 1);
+  rotateAboutCentre(ctx, layer);
   roundedRectPath(ctx, box.x, box.y, box.w, box.h, num(layer.radius, 0));
   ctx.clip();
   const entry = getImage(layer.src);

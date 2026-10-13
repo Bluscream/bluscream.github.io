@@ -21,6 +21,7 @@
  * @property {number} x
  * @property {number} y
  * @property {number} [opacity]
+ * @property {number} [rotate] degrees; text rotates around its anchor, rects and images around their centre
  * @property {boolean} [visible]
  * @property {boolean} [custom] true for layers the user added (not part of the preset)
  */
@@ -29,7 +30,7 @@
  * @typedef {LayerBase & {
  *   type: 'text', text?: string, size?: number, weight?: number, color?: string, font?: string,
  *   align?: TextAlign, baseline?: TextBaseline, letterSpacing?: number, italic?: boolean,
- *   lineHeight?: number, maxWidth?: number, rotate?: number, strokeColor?: string,
+ *   lineHeight?: number, maxWidth?: number, strokeColor?: string,
  *   strokeWidth?: number, uppercase?: boolean, editable?: boolean,
  * }} TextLayer
  */
