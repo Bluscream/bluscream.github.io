@@ -722,7 +722,7 @@
       },
       "layers": {
         "front": [
-          { "id": "violet", "type": "text", "label": "Violet", "text": "✿", "x": 900, "y": 372, "size": 150, "weight": 400, "color": "#8a4db8", "align": "center", "editable": false, "insertBefore": "title" }
+          { "id": "violet", "type": "text", "label": "Violet", "text": "✿", "x": 935, "y": 372, "size": 150, "weight": 400, "color": "#8a4db8", "align": "center", "editable": false, "insertBefore": "title" }
         ]
       }
     },
