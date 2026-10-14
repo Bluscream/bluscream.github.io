@@ -9,16 +9,22 @@ import { el, fileToDataUrl, num, stripesFromStops, toHex6, toast } from './util.
 
 const DEFAULT_GRADIENT = ['#ec4899', '#38bdf8'];
 
-/** @returns {GradientBackground} */
-function editableGradient() {
-  const bg = store.editableBackground(store.side);
+/**
+ * @param {string} key groups rapid edits of one control into a single undo step
+ * @returns {GradientBackground}
+ */
+function editableGradient(key) {
+  const bg = store.editableBackground(store.side, key);
   if (bg.type !== 'gradient') throw new Error('The current background is not a gradient.');
   return bg;
 }
 
-/** @returns {ImageBackground} */
-function editableImage() {
-  const bg = store.editableBackground(store.side);
+/**
+ * @param {string} key groups rapid edits of one control into a single undo step
+ * @returns {ImageBackground}
+ */
+function editableImage(key) {
+  const bg = store.editableBackground(store.side, key);
   if (bg.type !== 'image') throw new Error('The current background is not an image.');
   return bg;
 }
@@ -62,16 +68,16 @@ function stopRow(stop, index) {
   const range = Object.assign(document.createElement('input'), { type: 'range', className: 'input', min: '0', max: '1', step: '0.001', value: String(stop.pos), title: 'Stop position' });
   const pct = Object.assign(document.createElement('input'), { type: 'number', className: 'input', min: '0', max: '100', step: '0.1', value: (stop.pos * 100).toFixed(1), title: 'Stop position in percent' });
   const del = Object.assign(document.createElement('button'), { className: 'btn-icon', title: 'Remove stop', textContent: '×' });
-  const stopAt = () => {
-    const s = editableGradient().stops[index];
+  const stopAt = (/** @type {string} */ key) => {
+    const s = editableGradient(`stop${index}/${key}`).stops[index];
     if (!s) throw new Error(`Gradient stop ${index} vanished.`);
     return s;
   };
-  color.addEventListener('input', () => { stopAt().color = color.value; store.emit(); });
-  range.addEventListener('input', () => { const s = stopAt(); s.pos = num(range.value); pct.value = (s.pos * 100).toFixed(1); store.emit(); });
-  pct.addEventListener('input', () => { const s = stopAt(); s.pos = num(pct.value) / 100; range.value = String(s.pos); store.emit(); });
+  color.addEventListener('input', () => { stopAt('color').color = color.value; store.emit(); });
+  range.addEventListener('input', () => { const s = stopAt('pos'); s.pos = num(range.value); pct.value = (s.pos * 100).toFixed(1); store.emit(); });
+  pct.addEventListener('input', () => { const s = stopAt('pos'); s.pos = num(pct.value) / 100; range.value = String(s.pos); store.emit(); });
   del.addEventListener('click', () => {
-    const g = editableGradient();
+    const g = editableGradient('removeStop');
     if (g.stops.length <= 2) { toast('A gradient needs at least two stops.', true); return; }
     g.stops.splice(index, 1);
     store.emit();
@@ -112,17 +118,17 @@ export function wireBackgroundUI() {
     buildBackgroundUI();
   });
   const bgColor = el('bgColor', HTMLInputElement);
-  bgColor.addEventListener('input', () => { const b = store.editableBackground(store.side); if (b.type === 'color') { b.color = bgColor.value; store.emit(); } });
+  bgColor.addEventListener('input', () => { const b = store.editableBackground(store.side, 'color'); if (b.type === 'color') { b.color = bgColor.value; store.emit(); } });
   const bgAngle = el('bgAngle', HTMLInputElement);
-  bgAngle.addEventListener('input', () => { const g = editableGradient(); g.angle = num(bgAngle.value); el('bgAngleOut', HTMLOutputElement).value = `${g.angle}°`; store.emit(); });
+  bgAngle.addEventListener('input', () => { const g = editableGradient('angle'); g.angle = num(bgAngle.value); el('bgAngleOut', HTMLOutputElement).value = `${g.angle}°`; store.emit(); });
   el('btnAddStop', HTMLButtonElement).addEventListener('click', () => {
-    const g = editableGradient();
+    const g = editableGradient('addStop');
     g.stops.push({ pos: g.stops[g.stops.length - 1]?.pos ?? 0.5, color: '#ffffff' });
     store.emit();
     buildBackgroundUI();
   });
   el('btnHardStops', HTMLButtonElement).addEventListener('click', () => {
-    const g = editableGradient();
+    const g = editableGradient('stripes');
     g.stops = stripesFromStops(g.stops);
     store.emit();
     buildBackgroundUI();
@@ -132,16 +138,16 @@ export function wireBackgroundUI() {
     const file = bgFile.files?.[0];
     if (!file) return;
     const src = await fileToDataUrl(file);
-    editableImage().src = src;
+    editableImage('upload').src = src;
     store.emit();
     toast('Background image loaded. Uploads are not part of share links.');
   });
   const bgUrl = el('bgUrl', HTMLInputElement);
-  const useUrl = () => { editableImage().src = bgUrl.value.trim(); store.emit(); };
+  const useUrl = () => { editableImage('url').src = bgUrl.value.trim(); store.emit(); };
   el('btnBgUrl', HTMLButtonElement).addEventListener('click', useUrl);
   bgUrl.addEventListener('keydown', (e) => { if (e.key === 'Enter') useUrl(); });
   const bgFit = el('bgFit', HTMLSelectElement);
-  bgFit.addEventListener('change', () => { if (isImageFit(bgFit.value)) { editableImage().fit = /** @type {ImageFit} */ (bgFit.value); store.emit(); } });
+  bgFit.addEventListener('change', () => { if (isImageFit(bgFit.value)) { editableImage('fit').fit = /** @type {ImageFit} */ (bgFit.value); store.emit(); } });
   const bgImageColor = el('bgImageColor', HTMLInputElement);
-  bgImageColor.addEventListener('input', () => { editableImage().color = bgImageColor.value; store.emit(); });
+  bgImageColor.addEventListener('input', () => { editableImage('color').color = bgImageColor.value; store.emit(); });
 }

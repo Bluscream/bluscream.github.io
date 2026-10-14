@@ -84,6 +84,9 @@ code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-si
 .btn-ghost { background: var(--surface); color: var(--text); border-color: var(--text); }
 .btn-ghost:hover { background: var(--surface-2); border-color: var(--text); }
 .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+.btn-icon-text { padding: 8px 12px; font-size: 1.2rem; line-height: 1; }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn-ghost:disabled:hover { background: var(--surface); }
 .btn-icon { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 2px 8px; border-radius: var(--radius); font: inherit; font-size: 1rem; line-height: 1; }
 .btn-icon:hover { color: var(--text); background: var(--surface-2); }
 .file-btn { cursor: pointer; }

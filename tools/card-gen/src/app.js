@@ -88,6 +88,7 @@ function wireDrag(side) {
     const rect = canvas.getBoundingClientRect();
     return { x: ((e.clientX - rect.left) / rect.width) * canvas.width, y: ((e.clientY - rect.top) / rect.height) * canvas.height };
   };
+  /** The first click on a layer only selects it; a drag starts when the already selected layer is pressed. */
   const onDown = (/** @type {PointerEvent} */ e) => {
     const p = toCard(e);
     const hit = [...previewBoxes[side]].reverse().find((b) => p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h);
@@ -95,10 +96,14 @@ function wireDrag(side) {
     const layer = store.findLayer(side, hit.id);
     if (!layer) return;
     if (store.side !== side) switchSide(side);
+    const wasSelected = store.selected?.side === side && store.selected.id === hit.id;
     store.selected = { side, id: hit.id };
-    drag = { id: hit.id, ox: p.x - layer.x, oy: p.y - layer.y };
-    canvas.setPointerCapture(e.pointerId);
-    canvas.classList.add('dragging');
+    if (wasSelected) {
+      drag = { id: hit.id, ox: p.x - layer.x, oy: p.y - layer.y };
+      store.beginBatch();
+      canvas.setPointerCapture(e.pointerId);
+      canvas.classList.add('dragging');
+    }
     highlightSelected();
     renderPreviews();
   };
@@ -111,11 +116,42 @@ function wireDrag(side) {
     store.setLayerProp(side, drag.id, 'y', y);
     syncPositionInputs(drag.id, x, y);
   };
-  const onEnd = () => { drag = null; canvas.classList.remove('dragging'); };
+  const onEnd = () => {
+    if (!drag) return;
+    drag = null;
+    store.endBatch();
+    canvas.classList.remove('dragging');
+  };
   canvas.addEventListener('pointerdown', onDown);
   canvas.addEventListener('pointermove', onMove);
   canvas.addEventListener('pointerup', onEnd);
   canvas.addEventListener('pointercancel', onEnd);
+}
+
+// ------------------------------------------------------------------ undo / redo
+
+/** @param {'undo' | 'redo'} which */
+function stepHistory(which) {
+  const done = which === 'undo' ? store.undo() : store.redo();
+  if (!done) { toast(which === 'undo' ? 'Nothing to undo.' : 'Nothing to redo.'); return; }
+  void rebuildAll();
+}
+
+function syncHistoryButtons() {
+  el('btnUndo', HTMLButtonElement).disabled = !store.canUndo();
+  el('btnRedo', HTMLButtonElement).disabled = !store.canRedo();
+}
+
+/** Ctrl/Cmd+Z and Ctrl/Cmd+Shift+Z or Ctrl+Y, except while typing, where the browser's own text undo applies. */
+function wireKeyboard() {
+  window.addEventListener('keydown', (e) => {
+    if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+    const t = e.target;
+    if (t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement) return;
+    const key = e.key.toLowerCase();
+    if (key === 'z') { e.preventDefault(); stepHistory(e.shiftKey ? 'redo' : 'undo'); }
+    else if (key === 'y') { e.preventDefault(); stepHistory('redo'); }
+  });
 }
 
 // ------------------------------------------------------------------ download & presets
@@ -200,13 +236,16 @@ function wireUI() {
   presetFile.addEventListener('change', () => { const f = presetFile.files?.[0]; if (f) void importPresetFile(f); presetFile.value = ''; });
   el('btnReset', HTMLButtonElement).addEventListener('click', () => { if (confirm('Discard all changes for this preset?')) { store.reset(store.state.presetId); void rebuildAll(); } });
   el('btnShare', HTMLButtonElement).addEventListener('click', () => void copyShareLink());
+  el('btnUndo', HTMLButtonElement).addEventListener('click', () => stepHistory('undo'));
+  el('btnRedo', HTMLButtonElement).addEventListener('click', () => stepHistory('redo'));
+  wireKeyboard();
   window.addEventListener('hashchange', () => {
     const found = stateFromUrl(new URL(location.href), hasPreset);
     if (found && 'state' in found) { store.replace(found.state); void rebuildAll(); }
   });
   wireBackgroundUI();
   for (const side of SIDES) wireDrag(side);
-  store.subscribe(() => { renderPreviews(); scheduleUrlUpdate(); });
+  store.subscribe(() => { renderPreviews(); scheduleUrlUpdate(); syncHistoryButtons(); });
 }
 
 async function init() {
@@ -230,6 +269,7 @@ async function init() {
     store.state.presetId = defaultPresetId();
   }
   buildPresetSelect();
+  syncHistoryButtons();
   await rebuildAll();
 }
 

@@ -82,6 +82,11 @@ export function applyOrder(layers, order) {
 /** @type {Set<() => void>} */
 const listeners = new Set();
 
+/** How many undo steps are kept. */
+export const HISTORY_LIMIT = 100;
+/** Repeated edits of the same property (typing, dragging a slider) within this window collapse into one undo step. */
+export const COALESCE_MS = 800;
+
 class Store {
   /** @type {CardState} */
   state = emptyState('');
@@ -89,12 +94,79 @@ class Store {
   side = 'front';
   /** @type {LayerRef | null} */
   selected = null;
+  /** Snapshots taken before each change, oldest first. */
+  /** @type {CardState[]} */
+  past = [];
+  /** States undone and available for redo, most recent last. */
+  /** @type {CardState[]} */
+  future = [];
+  /** @type {{ key: string, at: number } | null} */
+  lastEdit = null;
+  /** While a batch is open, only its first change takes a snapshot (one undo step per drag). */
+  batching = false;
+  batchSnapshotted = false;
+  /** @type {() => number} */
+  now = () => Date.now();
 
   /** @param {() => void} fn */
   subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); }
 
   /** Notifies subscribers that the state changed. */
   emit() { for (const fn of listeners) fn(); }
+
+  /**
+   * Records the current state as an undo step before it is changed. Changes with the same `key` in quick
+   * succession share one step so every keystroke does not become its own.
+   * @param {string} [key]
+   */
+  snapshot(key) {
+    if (this.batching) {
+      if (this.batchSnapshotted) return;
+      this.batchSnapshotted = true;
+    } else if (key !== undefined && this.lastEdit?.key === key && this.now() - this.lastEdit.at < COALESCE_MS) {
+      this.lastEdit.at = this.now();
+      return;
+    }
+    this.lastEdit = key === undefined ? null : { key, at: this.now() };
+    this.past.push(clone(this.state));
+    if (this.past.length > HISTORY_LIMIT) this.past.shift();
+    this.future = [];
+  }
+
+  /** Starts grouping changes into one undo step; ends with {@link endBatch}. */
+  beginBatch() { this.batching = true; this.batchSnapshotted = false; }
+
+  endBatch() { this.batching = false; this.lastEdit = null; }
+
+  canUndo() { return this.past.length > 0; }
+
+  canRedo() { return this.future.length > 0; }
+
+  /** @returns {boolean} whether there was something to undo */
+  undo() {
+    const prev = this.past.pop();
+    if (!prev) return false;
+    this.future.push(clone(this.state));
+    this.restore(prev);
+    return true;
+  }
+
+  /** @returns {boolean} whether there was something to redo */
+  redo() {
+    const next = this.future.pop();
+    if (!next) return false;
+    this.past.push(clone(this.state));
+    this.restore(next);
+    return true;
+  }
+
+  /** @param {CardState} state */
+  restore(state) {
+    this.state = state;
+    this.lastEdit = null;
+    if (this.selected && !this.findLayer(this.selected.side, this.selected.id)) this.selected = null;
+    this.emit();
+  }
 
   /** @returns {Preset} */
   preset() {
@@ -104,7 +176,7 @@ class Store {
   }
 
   /** @param {CardState} next */
-  replace(next) { this.state = next; this.selected = null; this.emit(); }
+  replace(next) { this.snapshot(); this.state = next; this.selected = null; this.emit(); }
 
   /** @param {string} presetId */
   reset(presetId) { this.replace(emptyState(presetId)); }
@@ -119,7 +191,7 @@ class Store {
    * @param {'w' | 'h' | 'r'} key
    * @param {number} value
    */
-  setDim(key, value) { this.state.dims[key] = value; this.emit(); }
+  setDim(key, value) { this.snapshot(`dim/${key}`); this.state.dims[key] = value; this.emit(); }
 
   /**
    * @param {SideName} side
@@ -131,10 +203,13 @@ class Store {
 
   /**
    * Returns the side's background as an owned copy stored in the state, so the caller can mutate it in place.
+   * An undo step is recorded first; `key` groups rapid edits of the same control.
    * @param {SideName} side
+   * @param {string} key
    * @returns {Background}
    */
-  editableBackground(side) {
+  editableBackground(side, key) {
+    this.snapshot(`bg/${side}/${key}`);
     const own = this.state.sides[side].background;
     if (own) return own;
     const copy = clone(this.background(side));
@@ -146,7 +221,7 @@ class Store {
    * @param {SideName} side
    * @param {Background} bg
    */
-  setBackground(side, bg) { this.state.sides[side].background = bg; this.emit(); }
+  setBackground(side, bg) { this.snapshot(); this.state.sides[side].background = bg; this.emit(); }
 
   /**
    * Preset layers with the user's patches applied, followed by custom layers.
@@ -173,6 +248,7 @@ class Store {
     if (from === -1) return;
     const to = where === 'top' ? ids.length - 1 : where === 'bottom' ? 0 : where === 'up' ? from + 1 : from - 1;
     if (to < 0 || to >= ids.length || to === from) return;
+    this.snapshot();
     ids.splice(from, 1);
     ids.splice(to, 0, id);
     this.state.sides[side].order = ids;
@@ -193,6 +269,7 @@ class Store {
    * @param {unknown} value
    */
   setLayerProp(side, id, key, value) {
+    this.snapshot(`layer/${side}/${id}/${key}`);
     const custom = this.state.sides[side].custom.find((l) => l.id === id);
     /** @type {Record<string, unknown>} */
     const target = custom ?? (this.state.sides[side].layers[id] ??= {});
@@ -206,13 +283,14 @@ class Store {
    * @param {SideName} side
    * @param {string} id
    */
-  resetLayer(side, id) { delete this.state.sides[side].layers[id]; this.emit(); }
+  resetLayer(side, id) { this.snapshot(); delete this.state.sides[side].layers[id]; this.emit(); }
 
   /**
    * @param {SideName} side
    * @param {Layer} layer
    */
   addCustomLayer(side, layer) {
+    this.snapshot();
     this.state.sides[side].custom.push(layer);
     this.selected = { side, id: layer.id };
     this.emit();
@@ -223,6 +301,7 @@ class Store {
    * @param {string} id
    */
   removeCustomLayer(side, id) {
+    this.snapshot();
     this.state.sides[side].custom = this.state.sides[side].custom.filter((l) => l.id !== id);
     const order = this.state.sides[side].order;
     if (order) this.state.sides[side].order = order.filter((o) => o !== id);

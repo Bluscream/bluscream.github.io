@@ -3,7 +3,9 @@
 Fully client-side ID-card / BahnCard-style image generator. Nothing leaves the browser.
 
 - Pick a layout preset, set a background (colour, gradient / stripes, uploaded or URL image),
-  edit every text, drag layers on the preview, download front/back/both as PNG/JPEG/WebP.
+  edit every text, click a layer on the preview to select it and drag it, download front/back/both
+  as PNG/JPEG/WebP. Every change can be undone (Ctrl+Z / Ctrl+Shift+Z or the header buttons); a drag
+  or a burst of typing counts as one step.
 - The URL fragment (`#s=…`) always holds the current state, so copying the address shares the
   card. `?preset=<id>` opens a preset fresh. Uploaded images are never put in the link.
 
