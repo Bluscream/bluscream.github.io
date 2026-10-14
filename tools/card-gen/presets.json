@@ -274,7 +274,7 @@
       },
       "layers": {
         "front": [
-          { "id": "track", "type": "text", "label": "Track arcs", "text": "((((", "x": 20, "y": 330, "size": 260, "weight": 300, "color": "#9c1216", "letterSpacing": -40, "rotate": -35, "opacity": 0.9 },
+          { "id": "track", "insertBefore": "logoBox", "type": "text", "label": "Track arcs", "text": "((((", "x": 20, "y": 330, "size": 260, "weight": 300, "color": "#9c1216", "letterSpacing": -40, "rotate": -35, "opacity": 0.9 },
           { "id": "badge", "type": "rect", "label": "Climate badge", "x": 300, "y": 44, "w": 230, "h": 92, "fill": "#b9cf7f", "radius": 8, "rotate": -7 },
           { "id": "badgeText", "type": "text", "label": "Climate badge text", "text": "Ein Team.\nFürs Klima.", "x": 415, "y": 78, "size": 30, "weight": 800, "color": "#ffffff", "align": "center", "lineHeight": 1.15, "rotate": -7 },
           { "id": "partnerDivider", "type": "rect", "label": "Partner divider", "x": 752, "y": 36, "w": 2, "h": 70, "fill": "#ffffff" },

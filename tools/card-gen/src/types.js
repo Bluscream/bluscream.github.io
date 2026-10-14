@@ -86,7 +86,7 @@
  * @property {Partial<Record<SideName, Side>>} [sides] whole sides that replace the base's (applied first)
  * @property {Partial<Record<SideName, Background>>} [background]
  * @property {Partial<Record<SideName, Record<string, LayerPatch>>>} [overrides] per layer id
- * @property {Partial<Record<SideName, Layer[]>>} [layers] extra layers appended to the base
+ * @property {Partial<Record<SideName, (Layer & { insertBefore?: string })[]>>} [layers] extra layers; appended, or inserted before the named base layer
  */
 
 /** @typedef {Preset | DerivedPreset} RawPreset */
@@ -98,6 +98,7 @@
  * @property {Background | null} background
  * @property {Record<string, LayerPatch>} layers patches keyed by preset layer id
  * @property {Layer[]} custom layers the user added
+ * @property {string[]} [order] draw order (bottom first) once the user reordered; ids not listed keep their place
  */
 
 /**

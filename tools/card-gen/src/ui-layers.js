@@ -42,11 +42,11 @@ const TYPE_GLYPH = { text: 'T', rect: '▭', image: '▣' };
 /** @param {Layer} layer */
 const layerValues = (layer) => /** @type {Record<string, unknown>} */ (layer);
 
-/** Rebuilds the list for the current side. */
+/** Rebuilds the list for the current side, topmost layer first so the list reads like a stack. */
 export function buildLayerList() {
   const list = el('layerList', HTMLDivElement);
   list.innerHTML = '';
-  for (const layer of store.layers(store.side)) list.appendChild(layerCard(store.side, layer));
+  for (const layer of [...store.layers(store.side)].reverse()) list.appendChild(layerCard(store.side, layer));
 }
 
 /** Marks the selected layer's card and scrolls the list (never the page) so it is visible. */
@@ -105,7 +105,7 @@ function layerCard(side, layer) {
     action.title = 'Reset layer to the preset';
     action.addEventListener('click', () => { store.resetLayer(side, layer.id); buildLayerList(); });
   }
-  head.append(vis, label, action);
+  head.append(vis, label, orderMenu(side, layer.id), action);
 
   const body = document.createElement('div');
   body.className = 'layer-body';
@@ -114,6 +114,44 @@ function layerCard(side, layer) {
   body.appendChild(advancedGrid(side, layer, label));
   card.append(head, body);
   return card;
+}
+
+/** @type {ReadonlyArray<{ where: 'top' | 'up' | 'down' | 'bottom', label: string }>} */
+const MOVES = [
+  { where: 'top', label: 'Bring to front' },
+  { where: 'up', label: 'Move forward' },
+  { where: 'down', label: 'Move backward' },
+  { where: 'bottom', label: 'Send to back' },
+];
+
+/**
+ * A "⋮" disclosure with the draw-order moves. Native <details> gives open/close and keyboard support for free;
+ * one open menu at a time is enforced by closing the others on toggle.
+ * @param {SideName} side
+ * @param {string} id
+ */
+function orderMenu(side, id) {
+  const menu = document.createElement('details');
+  menu.className = 'order-menu';
+  const summary = Object.assign(document.createElement('summary'), { title: 'Change draw order', textContent: '⋮' });
+  const list = document.createElement('div');
+  list.className = 'order-menu-list';
+  for (const { where, label } of MOVES) {
+    const btn = Object.assign(document.createElement('button'), { type: 'button', textContent: label });
+    btn.addEventListener('click', () => {
+      store.selected = { side, id };
+      store.moveLayer(side, id, where);
+      buildLayerList();
+      highlightSelected();
+    });
+    list.appendChild(btn);
+  }
+  menu.addEventListener('toggle', () => {
+    if (!menu.open) return;
+    for (const other of document.querySelectorAll('details.order-menu[open]')) if (other !== menu && other instanceof HTMLDetailsElement) other.open = false;
+  });
+  menu.append(summary, list);
+  return menu;
 }
 
 /**

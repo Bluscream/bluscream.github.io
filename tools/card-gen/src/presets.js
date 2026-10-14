@@ -54,8 +54,11 @@ export function resolvePreset(raw, lookup, depth = 0) {
       const patch = patches[layer.id];
       if (patch) Object.assign(layer, patch);
     }
-    const extra = raw.layers?.[side];
-    if (extra) out.sides[side].layers.push(...clone(extra));
+    for (const { insertBefore, ...layer } of clone(raw.layers?.[side] ?? [])) {
+      const at = insertBefore ? out.sides[side].layers.findIndex((l) => l.id === insertBefore) : -1;
+      if (at === -1) out.sides[side].layers.push(layer);
+      else out.sides[side].layers.splice(at, 0, layer);
+    }
   }
   return out;
 }

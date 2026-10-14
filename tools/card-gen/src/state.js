@@ -53,8 +53,30 @@ export function stateFromJson(parsed, hasPreset) {
     if (s.background && typeof s.background === 'object') fresh.sides[side].background = s.background;
     if (s.layers && typeof s.layers === 'object') fresh.sides[side].layers = s.layers;
     if (Array.isArray(s.custom)) fresh.sides[side].custom = s.custom.filter((l) => l && typeof l === 'object' && typeof l.id === 'string');
+    if (Array.isArray(s.order) && s.order.every((id) => typeof id === 'string')) fresh.sides[side].order = s.order;
   }
   return fresh;
+}
+
+/**
+ * Sorts layers by a saved id order. Ids missing from the order (e.g. layers added later) keep their natural
+ * position relative to their neighbours; ids in the order that no longer exist are ignored.
+ * @param {Layer[]} layers
+ * @param {string[] | undefined} order
+ * @returns {Layer[]}
+ */
+export function applyOrder(layers, order) {
+  if (!order?.length) return layers;
+  const rank = new Map(order.map((id, i) => [id, i]));
+  const known = layers.filter((l) => rank.has(l.id)).sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0));
+  const out = [...known];
+  layers.forEach((l, i) => {
+    if (rank.has(l.id)) return;
+    const prev = layers.slice(0, i).reverse().find((p) => rank.has(p.id));
+    const at = prev ? out.findIndex((o) => o.id === prev.id) + 1 : 0;
+    out.splice(at, 0, l);
+  });
+  return out;
 }
 
 /** @type {Set<() => void>} */
@@ -136,7 +158,25 @@ class Store {
     /** @type {Layer[]} */
     const base = this.preset().sides[side].layers.map((l) => /** @type {Layer} */ ({ ...l, ...(patches[l.id] ?? {}) }));
     const custom = this.state.sides[side].custom.map((l) => /** @type {Layer} */ ({ ...l, custom: true }));
-    return base.concat(custom);
+    return applyOrder(base.concat(custom), this.state.sides[side].order);
+  }
+
+  /**
+   * Moves a layer in the draw order. "up" means drawn later, i.e. closer to the viewer.
+   * @param {SideName} side
+   * @param {string} id
+   * @param {'up' | 'down' | 'top' | 'bottom'} where
+   */
+  moveLayer(side, id, where) {
+    const ids = this.layers(side).map((l) => l.id);
+    const from = ids.indexOf(id);
+    if (from === -1) return;
+    const to = where === 'top' ? ids.length - 1 : where === 'bottom' ? 0 : where === 'up' ? from + 1 : from - 1;
+    if (to < 0 || to >= ids.length || to === from) return;
+    ids.splice(from, 1);
+    ids.splice(to, 0, id);
+    this.state.sides[side].order = ids;
+    this.emit();
   }
 
   /**
@@ -182,6 +222,8 @@ class Store {
    */
   removeCustomLayer(side, id) {
     this.state.sides[side].custom = this.state.sides[side].custom.filter((l) => l.id !== id);
+    const order = this.state.sides[side].order;
+    if (order) this.state.sides[side].order = order.filter((o) => o !== id);
     if (this.selected?.id === id) this.selected = null;
     this.emit();
   }

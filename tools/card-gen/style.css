@@ -94,11 +94,19 @@ code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-si
 .stop { display: grid; grid-template-columns: 44px 1fr 64px 28px; gap: 6px; align-items: center; }
 
 .layers { display: flex; flex-direction: column; gap: 8px; max-height: 60vh; overflow: auto; padding: 2px; margin: -2px; }
+.layers .layer-head { overflow: visible; }
 .layer { border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface); }
 .layer.selected { border-color: var(--red); box-shadow: inset 3px 0 0 var(--red); }
 .layer-head { display: flex; align-items: center; gap: 10px; padding: 8px 10px; }
 .layer-head .label { flex: 1; font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 8px; min-width: 0; cursor: pointer; }
 .layer-head .label .kind { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 3px; background: var(--surface-2); color: var(--text-muted); font-size: 0.7rem; font-weight: 700; }
+.order-menu { position: relative; }
+.order-menu summary { list-style: none; cursor: pointer; color: var(--text-muted); padding: 2px 8px; border-radius: var(--radius); font-weight: 700; font-size: 1.1rem; line-height: 1; user-select: none; }
+.order-menu summary::-webkit-details-marker { display: none; }
+.order-menu summary:hover, .order-menu[open] summary { color: var(--text); background: var(--surface-2); }
+.order-menu-list { position: absolute; right: 0; top: calc(100% + 4px); z-index: 5; min-width: 160px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 4px; display: flex; flex-direction: column; }
+.order-menu-list button { background: none; border: none; text-align: left; padding: 8px 12px; font: inherit; font-size: 0.9rem; color: var(--text); cursor: pointer; border-radius: 3px; }
+.order-menu-list button:hover { background: var(--surface-2); }
 .layer-body { padding: 0 10px 10px; display: flex; flex-direction: column; gap: 8px; }
 .layer-adv { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .layer-adv .field { min-width: 0; }

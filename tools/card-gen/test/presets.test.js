@@ -47,6 +47,13 @@ describe('resolvePreset', () => {
     assert.equal(only?.type === 'text' ? only.size : undefined, 7);
     assert.equal(out.sides.back.background.type, 'color');
   });
+  it('inserts extra layers before a named base layer', () => {
+    /** @type {RawPreset} */
+    const ins = { id: 'ins', name: 'Ins', extends: 'base', layers: { front: [{ id: 'under', insertBefore: 't', type: 'rect', x: 0, y: 0, w: 1, h: 1 }, { id: 'after', type: 'rect', x: 0, y: 0, w: 1, h: 1 }] } };
+    const out = resolvePreset(ins, (id) => (id === 'base' ? base : undefined));
+    assert.deepEqual(out.sides.front.layers.map((l) => l.id), ['under', 't', 'after']);
+    assert.ok(!('insertBefore' in (out.sides.front.layers[0] ?? {})));
+  });
   it('does not mutate the base', () => {
     resolvePreset(derived, lookup);
     const first = base.sides.front.layers[0];
