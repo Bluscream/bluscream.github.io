@@ -620,8 +620,8 @@
       }
     },
     {
-      "id": "sapphicard-100",
-      "name": "SapphiCard 100 1. Klasse (lesbian flag)",
+      "id": "lesbicard-100",
+      "name": "LesbiCard 100 1. Klasse (lesbian flag)",
       "description": "1st-class 100 layout on the lesbian flag.",
       "extends": "femcard-100",
       "background": {
@@ -648,7 +648,7 @@
           "logoBox": { "stroke": "#5a1a0a", "y": 40 },
           "logo": { "color": "#5a1a0a", "y": 76 },
           "classLabel": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 246 },
-          "title": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 6, "text": "SapphiCard 100" },
+          "title": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 6, "text": "LesbiCard 100" },
           "subtitle": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
           "number": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 498 },
           "check": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 498 },
@@ -663,13 +663,67 @@
           "sigDate": { "color": "#5a1a0a" },
           "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit einem U-Haul-Mietvertrag gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#5a1a0a" },
           "bonus": { "color": "#5a1a0a" },
-          "url": { "text": "fem.minopia.de/sapphicard", "color": "#5a1a0a" },
-          "address": { "text": "Anschrift: SapphiCard-Service, 12345 Flauschhausen | E-Mail: sapphic@fem.minopia.de\nSprechzeiten: immer, außer beim zweiten Date (Einzug)", "color": "#5a1a0a" },
+          "url": { "text": "fem.minopia.de/lesbicard", "color": "#5a1a0a" },
+          "address": { "text": "Anschrift: LesbiCard-Service, 12345 Flauschhausen | E-Mail: lesbian@fem.minopia.de\nSprechzeiten: immer, außer beim zweiten Date (Einzug)", "color": "#5a1a0a" },
           "footnote": { "text": "*Umzugskartons kostenlos. Katze inklusive.", "color": "#5a1a0a" },
+          "sigPattern": { "text": "LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard\nLesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard\nLesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard\nLesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard LesbiCard", "color": "#d6d6d6" },
+          "railplusBox": { "fill": "#ff9a56", "stroke": "#5a1a0a" },
+          "railplus": { "text": "LESBI+PLUS", "color": "#1a1a1a" }
+        }
+      }
+    },
+    {
+      "id": "sapphicard-100",
+      "name": "SapphiCard 100 1. Klasse (sapphic flag)",
+      "description": "1st-class 100 layout on the sapphic flag, violet included.",
+      "extends": "femcard-100",
+      "background": {
+        "front": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0.0, "color": "#fd8ba8" },
+            { "pos": 0.3333, "color": "#fd8ba8" },
+            { "pos": 0.3333, "color": "#ffffff" },
+            { "pos": 0.6667, "color": "#ffffff" },
+            { "pos": 0.6667, "color": "#fd8ba8" },
+            { "pos": 1.0, "color": "#fd8ba8" }
+          ]
+        },
+        "back": { "type": "color", "color": "#fff0f4" }
+      },
+      "overrides": {
+        "front": {
+          "logoBox": { "stroke": "#5b2a6e", "y": 40 },
+          "logo": { "color": "#5b2a6e", "y": 76 },
+          "classLabel": { "color": "#5b2a6e", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "title": { "color": "#5b2a6e", "strokeColor": "#ffffff", "strokeWidth": 6, "text": "SapphiCard 100" },
+          "subtitle": { "color": "#5b2a6e", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "number": { "color": "#5b2a6e", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "check": { "color": "#5b2a6e", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "validFrom": { "color": "#5b2a6e", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "name": { "color": "#5b2a6e", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "validTo": { "color": "#5b2a6e", "strokeColor": "#ffffff", "strokeWidth": 4 }
+        },
+        "back": {
+          "foundLine": { "text": "Wird diese Karte gefunden, bitte mit einem Veilchen zurückgeben.", "color": "#5b2a6e" },
+          "batch": { "color": "#5b2a6e" },
+          "sigLabel": { "color": "#5b2a6e" },
+          "sigDate": { "color": "#5b2a6e" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit einem Gedichtband gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#5b2a6e" },
+          "bonus": { "color": "#5b2a6e" },
+          "url": { "text": "fem.minopia.de/sapphicard", "color": "#5b2a6e" },
+          "address": { "text": "Anschrift: SapphiCard-Service, 12345 Flauschhausen | E-Mail: sapphic@fem.minopia.de\nSprechzeiten: immer, nach Lesbos-Zeit", "color": "#5b2a6e" },
+          "footnote": { "text": "*Veilchen kostenlos. Sappho-Zitate inklusive.", "color": "#5b2a6e" },
           "sigPattern": { "text": "SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard\nSapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard\nSapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard\nSapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard", "color": "#d6d6d6" },
-          "railplusBox": { "fill": "#ff9a56", "stroke": "#5a1a0a", "w": 200 },
+          "railplusBox": { "fill": "#fd8ba8", "stroke": "#5b2a6e", "w": 200 },
           "railplus": { "text": "SAPPHIC+PLUS", "color": "#1a1a1a", "x": 140 }
         }
+      },
+      "layers": {
+        "front": [
+          { "id": "violet", "type": "text", "label": "Violet", "text": "✿", "x": 900, "y": 372, "size": 150, "weight": 400, "color": "#8a4db8", "align": "center", "editable": false, "insertBefore": "title" }
+        ]
       }
     },
     {
