@@ -334,7 +334,7 @@
         "back": {
           "foundLine": { "text": "Wird diese Karte gefunden, bitte Kopfkraulen und zurückgeben.", "color": "#3b2140" },
           "batch": { "color": "#3b2140" },
-          "sigLabel": { "color": "#3b2140" },
+          "sigLabel": { "text": "Unterschrift Karteninhaber", "color": "#3b2140" },
           "sigDate": { "color": "#3b2140" },
           "legal": { "text": "Diese Karte ist Eigentum des Inhabers und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit einem Thigh-High-Nachweis gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#3b2140" },
           "bonus": { "color": "#3b2140" },
@@ -402,7 +402,7 @@
         "back": {
           "foundLine": { "text": "Wird diese Karte gefunden, bitte mit den richtigen Pronomen zurückgeben.", "color": "#1d3557" },
           "batch": { "color": "#1d3557" },
-          "sigLabel": { "color": "#1d3557" },
+          "sigLabel": { "text": "Unterschrift Karteninhaber/-in", "color": "#1d3557" },
           "sigDate": { "color": "#1d3557" },
           "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit den richtigen Pronomen gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#1d3557" },
           "bonus": { "color": "#1d3557" },
@@ -453,7 +453,7 @@
         "back": {
           "foundLine": { "text": "Wird diese Karte gefunden, bitte ohne Gender-Annahmen zurückgeben.", "color": "#2c2c2c" },
           "batch": { "color": "#2c2c2c" },
-          "sigLabel": { "color": "#2c2c2c" },
+          "sigLabel": { "text": "Unterschrift Karteninhaber/-in", "color": "#2c2c2c" },
           "sigDate": { "color": "#2c2c2c" },
           "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit guter Laune gültig, unabhängig vom Geschlecht, und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#2c2c2c" },
           "bonus": { "color": "#2c2c2c" },
@@ -504,7 +504,7 @@
         "back": {
           "foundLine": { "text": "Wird diese Karte gefunden, bitte mit einem Stück Kuchen zurückgeben.", "color": "#f0f0f0" },
           "batch": { "color": "#f0f0f0" },
-          "sigLabel": { "color": "#f0f0f0" },
+          "sigLabel": { "text": "Unterschrift Karteninhaber/-in", "color": "#f0f0f0" },
           "sigDate": { "color": "#f0f0f0" },
           "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit Kuchen gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#f0f0f0" },
           "bonus": { "color": "#f0f0f0" },
@@ -553,7 +553,7 @@
         "back": {
           "foundLine": { "text": "Wird diese Karte gefunden, bitte zurückgeben – egal von wem.", "color": "#3a2a5e" },
           "batch": { "color": "#3a2a5e" },
-          "sigLabel": { "color": "#3a2a5e" },
+          "sigLabel": { "text": "Unterschrift Karteninhaber/-in", "color": "#3a2a5e" },
           "sigDate": { "color": "#3a2a5e" },
           "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit guter Laune gültig, ganz egal wer kontrolliert, und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#3a2a5e" },
           "bonus": { "color": "#3a2a5e" },
@@ -606,7 +606,7 @@
         "back": {
           "foundLine": { "text": "Wird diese Karte gefunden, bitte zurückgeben – gilt in beide Richtungen.", "color": "#f0eaf7" },
           "batch": { "color": "#f0eaf7" },
-          "sigLabel": { "color": "#f0eaf7" },
+          "sigLabel": { "text": "Unterschrift Karteninhaber/-in", "color": "#f0eaf7" },
           "sigDate": { "color": "#f0eaf7" },
           "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit mindestens einem Flanellhemd gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#f0eaf7" },
           "bonus": { "color": "#f0eaf7" },
@@ -659,7 +659,7 @@
         "back": {
           "foundLine": { "text": "Wird diese Karte gefunden, bitte an die Ex der Ex der Ex zurückgeben.", "color": "#5a1a0a" },
           "batch": { "color": "#5a1a0a" },
-          "sigLabel": { "color": "#5a1a0a" },
+          "sigLabel": { "text": "Unterschrift Karteninhaber/-in", "color": "#5a1a0a" },
           "sigDate": { "color": "#5a1a0a" },
           "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit einem U-Haul-Mietvertrag gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#5a1a0a" },
           "bonus": { "color": "#5a1a0a" },
@@ -708,7 +708,7 @@
         "back": {
           "foundLine": { "text": "Wird diese Karte gefunden, bitte mit einem Veilchen zurückgeben.", "color": "#5b2a6e" },
           "batch": { "color": "#5b2a6e" },
-          "sigLabel": { "color": "#5b2a6e" },
+          "sigLabel": { "text": "Unterschrift Karteninhaber/-in", "color": "#5b2a6e" },
           "sigDate": { "color": "#5b2a6e" },
           "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit einem Gedichtband gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#5b2a6e" },
           "bonus": { "color": "#5b2a6e" },
@@ -768,7 +768,7 @@
         "back": {
           "foundLine": { "text": "Wird diese Karte gefunden, bitte mit Glitzer zurückgeben.", "color": "#f2f2f2" },
           "batch": { "color": "#f2f2f2" },
-          "sigLabel": { "color": "#f2f2f2" },
+          "sigLabel": { "text": "Unterschrift Karteninhaber/-in", "color": "#f2f2f2" },
           "sigDate": { "color": "#f2f2f2" },
           "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit mindestens einem Regenbogen gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#f2f2f2" },
           "bonus": { "color": "#f2f2f2" },
@@ -821,7 +821,7 @@
         "back": {
           "foundLine": { "text": "Wird diese Karte gefunden, bitte Ohren kraulen und zurückgeben.", "color": "#4a2c17" },
           "batch": { "color": "#4a2c17" },
-          "sigLabel": { "color": "#4a2c17" },
+          "sigLabel": { "text": "Unterschrift Karteninhaber/-in", "color": "#4a2c17" },
           "sigDate": { "color": "#4a2c17" },
           "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit Fursuit oder Schwanz gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#4a2c17" },
           "bonus": { "color": "#4a2c17" },
