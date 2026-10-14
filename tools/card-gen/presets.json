@@ -320,8 +320,8 @@
       },
       "overrides": {
         "front": {
-          "logoBox": { "stroke": "#3b2140" },
-          "logo": { "color": "#3b2140" },
+          "logoBox": { "stroke": "#3b2140", "y": 103 },
+          "logo": { "color": "#3b2140", "y": 137 },
           "classLabel": { "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
           "title": { "text": "FemCard 100", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 6 },
           "subtitle": { "text": "+City", "after": "title", "y": 346, "size": 30, "weight": 600, "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
@@ -387,14 +387,14 @@
       },
       "overrides": {
         "front": {
-          "logoBox": { "stroke": "#1d3557" },
-          "logo": { "color": "#1d3557" },
-          "classLabel": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "logoBox": { "stroke": "#1d3557", "y": 40 },
+          "logo": { "color": "#1d3557", "y": 76 },
+          "classLabel": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 246 },
           "title": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 6, "text": "TransCard 100" },
           "subtitle": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 },
-          "number": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 },
-          "check": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 },
-          "validFrom": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "number": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 498 },
+          "check": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 498 },
+          "validFrom": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 496 },
           "name": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 },
           "validTo": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 }
         },
@@ -438,11 +438,11 @@
       },
       "overrides": {
         "front": {
-          "logoBox": { "stroke": "#2c2c2c" },
-          "logo": { "color": "#2c2c2c" },
-          "classLabel": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 },
-          "title": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 6, "text": "EnbyCard 100" },
-          "subtitle": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "logoBox": { "stroke": "#2c2c2c", "y": 40 },
+          "logo": { "color": "#2c2c2c", "y": 76 },
+          "classLabel": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 300 },
+          "title": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 6, "text": "EnbyCard 100", "y": 397 },
+          "subtitle": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 393 },
           "number": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 },
           "check": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 },
           "validFrom": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 },
@@ -489,11 +489,11 @@
       },
       "overrides": {
         "front": {
-          "logoBox": { "stroke": "#ffffff" },
-          "logo": { "color": "#ffffff" },
-          "classLabel": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 },
-          "title": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 6, "text": "AceCard 100" },
-          "subtitle": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 },
+          "logoBox": { "stroke": "#ffffff", "y": 40 },
+          "logo": { "color": "#ffffff", "y": 76 },
+          "classLabel": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4, "y": 300 },
+          "title": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 6, "text": "AceCard 100", "y": 397 },
+          "subtitle": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4, "y": 393 },
           "number": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 },
           "check": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 },
           "validFrom": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 },
@@ -538,8 +538,8 @@
       },
       "overrides": {
         "front": {
-          "logoBox": { "stroke": "#3a2a5e" },
-          "logo": { "color": "#3a2a5e" },
+          "logoBox": { "stroke": "#3a2a5e", "y": 40 },
+          "logo": { "color": "#3a2a5e", "y": 76 },
           "classLabel": { "color": "#3a2a5e", "strokeColor": "#ffffff", "strokeWidth": 4 },
           "title": { "color": "#3a2a5e", "strokeColor": "#ffffff", "strokeWidth": 6, "text": "PanCard 100" },
           "subtitle": { "color": "#3a2a5e", "strokeColor": "#ffffff", "strokeWidth": 4 },
@@ -591,14 +591,14 @@
       },
       "overrides": {
         "front": {
-          "logoBox": { "stroke": "#ffffff" },
-          "logo": { "color": "#ffffff" },
-          "classLabel": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 },
+          "logoBox": { "stroke": "#ffffff", "y": 40 },
+          "logo": { "color": "#ffffff", "y": 76 },
+          "classLabel": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4, "y": 246 },
           "title": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 6, "text": "BiCard 100" },
           "subtitle": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 },
-          "number": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 },
-          "check": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 },
-          "validFrom": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 },
+          "number": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4, "y": 498 },
+          "check": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4, "y": 498 },
+          "validFrom": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4, "y": 496 },
           "name": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 },
           "validTo": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 }
         },
@@ -644,14 +644,14 @@
       },
       "overrides": {
         "front": {
-          "logoBox": { "stroke": "#5a1a0a" },
-          "logo": { "color": "#5a1a0a" },
-          "classLabel": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "logoBox": { "stroke": "#5a1a0a", "y": 40 },
+          "logo": { "color": "#5a1a0a", "y": 76 },
+          "classLabel": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 246 },
           "title": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 6, "text": "SapphiCard 100" },
           "subtitle": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
-          "number": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
-          "check": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
-          "validFrom": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "number": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 498 },
+          "check": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 498 },
+          "validFrom": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4, "y": 496 },
           "name": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
           "validTo": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 }
         },
@@ -699,11 +699,11 @@
       },
       "overrides": {
         "front": {
-          "logoBox": { "stroke": "#ffffff" },
-          "logo": { "color": "#ffffff" },
-          "classLabel": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 },
-          "title": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 6, "text": "PrideCard 100" },
-          "subtitle": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 },
+          "logoBox": { "stroke": "#ffffff", "y": 125 },
+          "logo": { "color": "#ffffff", "y": 159 },
+          "classLabel": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4, "y": 300 },
+          "title": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 6, "text": "PrideCard 100", "y": 397 },
+          "subtitle": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4, "y": 393 },
           "number": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 },
           "check": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 },
           "validFrom": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 },

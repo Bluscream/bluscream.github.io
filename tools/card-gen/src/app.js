@@ -142,12 +142,16 @@ function syncHistoryButtons() {
   el('btnRedo', HTMLButtonElement).disabled = !store.canRedo();
 }
 
+/** Input types with their own text-editing undo; everything else (selects, checkboxes, sliders, colours) has none. */
+const TEXT_INPUT_TYPES = new Set(['text', 'url', 'number', 'search', 'email', 'password', 'tel']);
+
+/** @param {EventTarget | null} t */
+const isTyping = (t) => t instanceof HTMLTextAreaElement || (t instanceof HTMLInputElement && TEXT_INPUT_TYPES.has(t.type));
+
 /** Ctrl/Cmd+Z and Ctrl/Cmd+Shift+Z or Ctrl+Y, except while typing, where the browser's own text undo applies. */
 function wireKeyboard() {
   window.addEventListener('keydown', (e) => {
-    if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
-    const t = e.target;
-    if (t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement) return;
+    if (!(e.ctrlKey || e.metaKey) || e.altKey || isTyping(e.target)) return;
     const key = e.key.toLowerCase();
     if (key === 'z') { e.preventDefault(); stepHistory(e.shiftKey ? 'redo' : 'undo'); }
     else if (key === 'y') { e.preventDefault(); stepHistory('redo'); }
