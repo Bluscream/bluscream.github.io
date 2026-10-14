@@ -336,7 +336,7 @@
           "batch": { "color": "#3b2140" },
           "sigLabel": { "color": "#3b2140" },
           "sigDate": { "color": "#3b2140" },
-          "legal": { "text": "Diese Karte ist Eigentum der Inhaberin und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit einem Thigh-High-Nachweis gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#3b2140" },
+          "legal": { "text": "Diese Karte ist Eigentum des Inhabers und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit einem Thigh-High-Nachweis gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#3b2140" },
           "bonus": { "color": "#3b2140" },
           "url": { "text": "fem.minopia.de/femcard", "color": "#3b2140" },
           "address": { "text": "Anschrift: FemCard-Service, 12345 Flauschhausen | E-Mail: hello@fem.minopia.de\nSprechzeiten: immer, außer beim Nickerchen", "color": "#3b2140" },
