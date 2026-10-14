@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" width="300" height="400">
+  <!-- Portrait-ratio passport "photo": a smug white cat in the boykisser meme style. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8e6f3"/>
+      <stop offset="1" stop-color="#b9cfe4"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="400" fill="url(#bg)"/>
+  <!-- body / shoulders -->
+  <path d="M30 400 C40 300 90 262 150 262 C210 262 260 300 270 400 Z" fill="#ffffff" stroke="#1c1c1c" stroke-width="6" stroke-linejoin="round"/>
+  <!-- ears -->
+  <path d="M72 150 L58 58 L132 112 Z" fill="#ffffff" stroke="#1c1c1c" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M228 150 L242 58 L168 112 Z" fill="#ffffff" stroke="#1c1c1c" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M82 138 L73 82 L118 116 Z" fill="#f6b6c8"/>
+  <path d="M218 138 L227 82 L182 116 Z" fill="#f6b6c8"/>
+  <!-- head -->
+  <ellipse cx="150" cy="180" rx="96" ry="86" fill="#ffffff" stroke="#1c1c1c" stroke-width="6"/>
+  <!-- cheek fluff -->
+  <path d="M56 190 L38 186 M56 204 L36 206 M244 190 L262 186 M244 204 L264 206" stroke="#1c1c1c" stroke-width="5" stroke-linecap="round"/>
+  <!-- eyes: half-lidded, looking to the side -->
+  <path d="M92 168 Q116 150 140 168 L140 184 Q116 176 92 184 Z" fill="#1c1c1c"/>
+  <path d="M160 168 Q184 150 208 168 L208 184 Q184 176 160 184 Z" fill="#1c1c1c"/>
+  <circle cx="128" cy="178" r="4.5" fill="#ffffff"/>
+  <circle cx="196" cy="178" r="4.5" fill="#ffffff"/>
+  <path d="M88 160 Q116 140 146 158" fill="none" stroke="#1c1c1c" stroke-width="6" stroke-linecap="round"/>
+  <path d="M154 158 Q184 140 212 160" fill="none" stroke="#1c1c1c" stroke-width="6" stroke-linecap="round"/>
+  <!-- blush -->
+  <ellipse cx="96" cy="206" rx="16" ry="8" fill="#f6b6c8" opacity="0.8"/>
+  <ellipse cx="204" cy="206" rx="16" ry="8" fill="#f6b6c8" opacity="0.8"/>
+  <!-- nose and smug smile -->
+  <path d="M144 200 L156 200 L150 208 Z" fill="#1c1c1c"/>
+  <path d="M150 208 Q150 222 132 226 M150 208 Q150 222 168 226 Q190 228 198 214" fill="none" stroke="#1c1c1c" stroke-width="5" stroke-linecap="round"/>
+  <!-- paw on chest -->
+  <ellipse cx="200" cy="330" rx="30" ry="22" fill="#ffffff" stroke="#1c1c1c" stroke-width="5"/>
+  <path d="M182 322 L184 338 M198 318 L198 336 M214 322 L212 338" stroke="#1c1c1c" stroke-width="4" stroke-linecap="round"/>
+</svg>
