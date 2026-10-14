@@ -45,6 +45,8 @@ export function resolvePreset(raw, lookup, depth = 0) {
   if (raw.font !== undefined) out.font = raw.font;
   if (raw.fonts) out.fonts = [...new Set([...(base.fonts ?? []), ...raw.fonts])];
   for (const side of SIDES) {
+    const replacement = raw.sides?.[side];
+    if (replacement) out.sides[side] = clone(replacement);
     const bg = raw.background?.[side];
     if (bg) out.sides[side].background = clone(bg);
     const patches = raw.overrides?.[side] ?? {};

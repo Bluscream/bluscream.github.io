@@ -2,6 +2,7 @@
 import { store } from './state.js';
 import { SIDES } from './presets.js';
 import { log, num, roundedRectPath, toast } from './util.js';
+import { resolveTemplate } from './vars.js';
 
 /** @typedef {import('./types.js').SideName} SideName */
 /** @typedef {import('./types.js').Layer} Layer */
@@ -167,10 +168,12 @@ function drawBackground(ctx, bg, w, h) {
  * @param {CanvasRenderingContext2D} ctx
  * @param {TextLayer} layer
  * @param {string} defaultFont
+ * @param {SideName} side part of the key that keeps `{{random}}` digits stable per layer
  * @returns {Box}
  */
-function drawText(ctx, layer, defaultFont) {
-  const text = layer.uppercase ? String(layer.text ?? '').toUpperCase() : String(layer.text ?? '');
+function drawText(ctx, layer, defaultFont, side) {
+  const raw = resolveTemplate(String(layer.text ?? ''), { now: new Date(), seed: store.state.seed, key: `${side}/${layer.id}` });
+  const text = layer.uppercase ? raw.toUpperCase() : raw;
   const lines = text.split('\n');
   let size = num(layer.size, 24);
   const lh = num(layer.lineHeight, 1.2);
@@ -276,7 +279,7 @@ export function drawSide(ctx, side, scale) {
   const boxes = [];
   for (const layer of store.layers(side)) {
     if (layer.visible === false) continue;
-    const box = layer.type === 'text' ? drawText(ctx, layer, defaultFont) : layer.type === 'rect' ? drawRect(ctx, layer) : drawImageLayer(ctx, layer);
+    const box = layer.type === 'text' ? drawText(ctx, layer, defaultFont, side) : layer.type === 'rect' ? drawRect(ctx, layer) : drawImageLayer(ctx, layer);
     boxes.push({ id: layer.id, ...box });
   }
   ctx.restore();

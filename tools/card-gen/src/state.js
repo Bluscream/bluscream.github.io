@@ -4,6 +4,7 @@
  */
 import { SIDES, getPreset } from './presets.js';
 import { clone, num } from './util.js';
+import { newSeed } from './vars.js';
 
 /** @typedef {import('./types.js').CardState} CardState */
 /** @typedef {import('./types.js').SideName} SideName */
@@ -21,6 +22,7 @@ import { clone, num } from './util.js';
 export function emptyState(presetId) {
   return {
     presetId,
+    seed: newSeed(),
     dims: {},
     sides: {
       front: { background: null, layers: {}, custom: [] },
@@ -38,6 +40,7 @@ export function emptyState(presetId) {
 export function stateFromJson(parsed, hasPreset) {
   if (!parsed || typeof parsed !== 'object' || !('presetId' in parsed) || typeof parsed.presetId !== 'string' || !hasPreset(parsed.presetId)) return null;
   const fresh = emptyState(parsed.presetId);
+  if ('seed' in parsed && typeof parsed.seed === 'number' && Number.isInteger(parsed.seed)) fresh.seed = parsed.seed;
   const dims = 'dims' in parsed && parsed.dims && typeof parsed.dims === 'object' ? /** @type {Record<string, unknown>} */ (parsed.dims) : {};
   for (const key of /** @type {const} */ (['w', 'h', 'r'])) {
     if (typeof dims[key] === 'number') fresh.dims[key] = dims[key];

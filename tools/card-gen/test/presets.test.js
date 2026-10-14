@@ -38,6 +38,15 @@ describe('resolvePreset', () => {
     assert.equal(out.sides.back.layers[0]?.id, 'r');
     assert.deepEqual(out.fonts, ['A:wght@400', 'B:wght@700']);
   });
+  it('replaces a whole side when the derived preset supplies one', () => {
+    /** @type {RawPreset} */
+    const swap = { id: 'swap', name: 'Swap', extends: 'base', sides: { front: { background: { type: 'color', color: '#abc' }, layers: [{ id: 'only', type: 'text', text: 'x', x: 0, y: 0 }] } }, overrides: { front: { only: { size: 7 } } } };
+    const out = resolvePreset(swap, (id) => (id === 'base' ? base : undefined));
+    assert.deepEqual(out.sides.front.layers.map((l) => l.id), ['only']);
+    const only = out.sides.front.layers[0];
+    assert.equal(only?.type === 'text' ? only.size : undefined, 7);
+    assert.equal(out.sides.back.background.type, 'color');
+  });
   it('does not mutate the base', () => {
     resolvePreset(derived, lookup);
     const first = base.sides.front.layers[0];

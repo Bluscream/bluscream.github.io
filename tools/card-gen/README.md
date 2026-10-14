@@ -12,8 +12,13 @@ Fully client-side ID-card / BahnCard-style image generator. Nothing leaves the b
 Each preset has a `group` (dropdown heading), `width`, `height`, `radius`, a default `font`, Google Fonts `fonts` to load and
 `sides.front` / `sides.back`, each with a `background` and ordered `layers`. Layer types are
 `text`, `rect` and `image`; the `_schema` block at the top of the file lists every property.
-A preset may `extends` another one and only supply `background`, per-layer `overrides` and
-extra `layers`. "Export current as preset" in the UI produces a ready-to-paste preset.
+A preset may `extends` another one and only supply what changed: `sides` (replace a whole side),
+`background` (per side), per-layer `overrides` (changed fields only) and extra `layers` (appended).
+"Export current as preset" in the UI produces a ready-to-paste preset.
+
+Texts may contain variables, resolved when the card is drawn: `{{date}}` (today), `{{date+1y-1d:DD.MM.YY}}`
+(offsets in `d`/`m`/`y`, format from `DD`, `MM`, `YYYY`, `YY`) and `{{random:4}}` (digits). Random digits
+come from a seed stored in the card state, so a share link reproduces them and "Reset" rolls new ones.
 
 ## Development
 

@@ -83,6 +83,7 @@
  * @property {number} [radius]
  * @property {string} [font]
  * @property {string[]} [fonts]
+ * @property {Partial<Record<SideName, Side>>} [sides] whole sides that replace the base's (applied first)
  * @property {Partial<Record<SideName, Background>>} [background]
  * @property {Partial<Record<SideName, Record<string, LayerPatch>>>} [overrides] per layer id
  * @property {Partial<Record<SideName, Layer[]>>} [layers] extra layers appended to the base
@@ -102,6 +103,7 @@
 /**
  * @typedef {object} CardState
  * @property {string} presetId
+ * @property {number} seed drives `{{random}}` digits so a share link reproduces them
  * @property {{ w?: number, h?: number, r?: number }} dims
  * @property {Record<SideName, SideState>} sides
  */
