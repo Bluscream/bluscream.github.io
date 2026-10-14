@@ -34,8 +34,21 @@ header {
 }
 .header-actions { display: flex; gap: 8px; }
 
-.container { display: grid; grid-template-columns: 420px 1fr; gap: 24px; padding: 24px 32px 48px; flex: 1; max-width: 1600px; margin: 0 auto; width: 100%; }
-@media (max-width: 1000px) { .container { grid-template-columns: 1fr; padding: 16px; } }
+/* Three columns on wide screens: settings | cards | layers. The layers column stretches to the viewport so the
+ * list can be tall; below 1400px the layers drop under the left column, below 1000px everything stacks. */
+.container { display: grid; grid-template-columns: 380px minmax(0, 1fr) 440px; gap: 24px; padding: 24px 32px 48px; flex: 1; max-width: 1900px; margin: 0 auto; width: 100%; align-items: start; }
+.sidebar-right { position: sticky; top: 16px; max-height: calc(100vh - 32px); }
+.panel-layers { max-height: calc(100vh - 32px); }
+@media (max-width: 1400px) {
+  .container { grid-template-columns: 420px 1fr; }
+  .sidebar-right { position: static; max-height: none; grid-column: 1; }
+  .preview { grid-column: 2; grid-row: 1 / span 2; }
+  .panel-layers { max-height: none; }
+}
+@media (max-width: 1000px) {
+  .container { grid-template-columns: 1fr; padding: 16px; }
+  .sidebar-right, .preview { grid-column: 1; grid-row: auto; }
+}
 
 .sidebar { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .panel { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
@@ -94,6 +107,8 @@ code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-si
 .stop { display: grid; grid-template-columns: 44px 1fr 64px 28px; gap: 6px; align-items: center; }
 
 .layers { display: flex; flex-direction: column; gap: 8px; max-height: 60vh; overflow: auto; padding: 2px; margin: -2px; }
+.panel-layers .layers { flex: 1; min-height: 240px; max-height: none; }
+@media (max-width: 1400px) { .panel-layers .layers { max-height: 60vh; } }
 .layers .layer-head { overflow: visible; }
 .layer { border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface); }
 .layer.selected { border-color: var(--red); box-shadow: inset 3px 0 0 var(--red); }
@@ -118,7 +133,7 @@ details.advanced summary::-webkit-details-marker { display: none; }
 details.advanced > *:not(summary) { margin-top: 10px; }
 
 .preview { display: flex; flex-direction: column; gap: 24px; align-items: center; min-width: 0; }
-.card-wrap { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 10px; }
+.card-wrap { width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 10px; }
 .card-wrap h3 { font-size: 1rem; }
 .card-wrap canvas { width: 100%; height: auto; display: block; filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3)); cursor: grab; touch-action: none; }
 .card-wrap canvas.dragging { cursor: grabbing; }
