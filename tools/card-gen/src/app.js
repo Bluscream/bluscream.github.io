@@ -6,6 +6,7 @@ import { ensureFonts, exportCanvas, fontSpecs, hasTaintedImages, previewBoxes, p
 import { buildBackgroundUI, wireBackgroundUI } from './ui-background.js';
 import { addCustomLayer, buildLayerList, highlightSelected, syncPositionInputs } from './ui-layers.js';
 import { downloadBlob, el, log, num, toast } from './util.js';
+import { wireTheme } from './theme.js';
 
 /** @typedef {import('./types.js').SideName} SideName */
 /** @typedef {import('./types.js').Preset} Preset */
@@ -243,6 +244,7 @@ function wireUI() {
   el('btnUndo', HTMLButtonElement).addEventListener('click', () => stepHistory('undo'));
   el('btnRedo', HTMLButtonElement).addEventListener('click', () => stepHistory('redo'));
   wireKeyboard();
+  wireTheme();
   window.addEventListener('hashchange', () => {
     const found = stateFromUrl(new URL(location.href), hasPreset);
     if (found && 'state' in found) { store.replace(found.state); void rebuildAll(); }
