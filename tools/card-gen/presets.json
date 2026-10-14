@@ -337,13 +337,13 @@
           "sigLabel": { "text": "Unterschrift Karteninhaber", "color": "#3b2140" },
           "sigDate": { "color": "#3b2140" },
           "legal": { "text": "Diese Karte ist Eigentum des Inhabers und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit einem Thigh-High-Nachweis gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#3b2140" },
-          "bonus": { "color": "#3b2140" },
-          "url": { "text": "fem.minopia.de/femcard", "color": "#3b2140" },
-          "address": { "text": "Anschrift: FemCard-Service, 12345 Flauschhausen | E-Mail: hello@fem.minopia.de\nSprechzeiten: immer, außer beim Nickerchen", "color": "#3b2140" },
+          "bonus": { "color": "#3b2140", "y": 482 },
+          "url": { "text": "fem.minopia.de/femcard", "color": "#3b2140", "y": 478 },
+          "address": { "text": "Anschrift: FemCard-Service, 12345 Flauschhausen | E-Mail: hello@fem.minopia.de\nSprechzeiten: immer, außer beim Nickerchen", "color": "#3b2140", "y": 506 },
           "sigPattern": { "text": "FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard\nFemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard\nFemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard\nFemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard", "color": "#d6d6d6" },
-          "footnote": { "text": "*Kuscheln kostenlos. Blushing inklusive.", "color": "#3b2140" },
-          "railplusBox": { "fill": "#57cef8", "stroke": "#3b2140" },
-          "railplus": { "color": "#3b2140" }
+          "footnote": { "text": "*Kuscheln kostenlos. Blushing inklusive.", "color": "#3b2140", "y": 585 },
+          "railplusBox": { "fill": "#57cef8", "stroke": "#3b2140", "y": 570 },
+          "railplus": { "color": "#3b2140", "y": 590 }
         }
       }
     },
