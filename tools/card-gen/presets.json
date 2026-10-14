@@ -341,7 +341,7 @@
           "url": { "text": "fem.minopia.de/femcard", "color": "#3b2140", "y": 478 },
           "address": { "text": "Anschrift: FemCard-Service, 12345 Flauschhausen | E-Mail: hello@fem.minopia.de\nSprechzeiten: immer, außer beim Nickerchen", "color": "#3b2140", "y": 506 },
           "sigPattern": { "text": "FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard\nFemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard\nFemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard\nFemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard", "color": "#d6d6d6" },
-          "footnote": { "text": "*Kuscheln kostenlos. Blushing inklusive.", "color": "#3b2140", "y": 585 },
+          "footnote": { "text": "*Kuscheln kostenlos. Blushing inklusive.", "color": "#3b2140", "y": 570 },
           "railplusBox": { "fill": "#57cef8", "stroke": "#3b2140", "y": 570 },
           "railplus": { "color": "#3b2140", "y": 590 }
         }
@@ -404,14 +404,14 @@
           "batch": { "color": "#1d3557" },
           "sigLabel": { "text": "Unterschrift Karteninhaber/-in", "color": "#1d3557" },
           "sigDate": { "color": "#1d3557" },
-          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit den richtigen Pronomen gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#1d3557" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit den richtigen Pronomen gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#1d3557", "y": 334 },
           "bonus": { "color": "#1d3557" },
           "url": { "text": "fem.minopia.de/transcard", "color": "#1d3557" },
-          "address": { "text": "Anschrift: TransCard-Service, 12345 Flauschhausen | E-Mail: trans@fem.minopia.de\nSprechzeiten: immer, Deadnames werden nicht angenommen", "color": "#1d3557" },
-          "footnote": { "text": "*Pronomen kostenlos. Egg-Cracking inklusive.", "color": "#1d3557" },
+          "address": { "text": "Anschrift: TransCard-Service, 12345 Flauschhausen | E-Mail: trans@fem.minopia.de\nSprechzeiten: immer, Deadnames werden nicht angenommen", "color": "#1d3557", "y": 524 },
+          "footnote": { "text": "*Pronomen kostenlos. Egg-Cracking inklusive.", "color": "#1d3557", "y": 566 },
           "sigPattern": { "text": "TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard\nTransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard\nTransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard\nTransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard", "color": "#d6d6d6" },
-          "railplusBox": { "fill": "#f5a9b8", "stroke": "#1d3557" },
-          "railplus": { "text": "TRANS+PLUS", "color": "#1a1a1a" }
+          "railplusBox": { "fill": "#f5a9b8", "stroke": "#1d3557", "y": 516 },
+          "railplus": { "text": "TRANS+PLUS", "color": "#1a1a1a", "y": 537 }
         }
       }
     },
