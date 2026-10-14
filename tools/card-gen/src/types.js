@@ -32,7 +32,10 @@
  *   align?: TextAlign, baseline?: TextBaseline, letterSpacing?: number, italic?: boolean,
  *   lineHeight?: number, maxWidth?: number, strokeColor?: string,
  *   strokeWidth?: number, uppercase?: boolean, editable?: boolean,
+ *   after?: string, gap?: number,
  * }} TextLayer
+ * `after` names a layer drawn earlier on the same side; this layer's x then becomes that layer's right edge plus
+ * `gap` (default 14), so a subtitle follows a title of any width. An empty string switches it off.
  */
 
 /**

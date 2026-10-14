@@ -5,7 +5,7 @@
     "derived": "extends (base id) + any of: sides (whole-side replacement), background (per side), overrides (per side, per layer id: changed fields only), layers (per side, appended). Everything else is inherited.",
     "side": "background + layers[]",
     "background": "{type:'color', color} | {type:'gradient', angle, stops:[{pos:0..1, color}]} | {type:'image', src, fit:'cover'|'contain'|'stretch', color}",
-    "layer.text": "id, label, text, x, y, size, weight, color, font, align(left|center|right), baseline(alphabetic|middle|top), letterSpacing, italic, lineHeight, maxWidth, rotate, opacity, strokeColor, strokeWidth, uppercase, visible, editable",
+    "layer.text": "id, label, text, x, y, after (id of a layer this one is placed right of; gap px),  size, weight, color, font, align(left|center|right), baseline(alphabetic|middle|top), letterSpacing, italic, lineHeight, maxWidth, rotate, opacity, strokeColor, strokeWidth, uppercase, visible, editable",
     "layer.rect": "id, label, x, y, w, h, fill, stroke, strokeWidth, radius, rotate, opacity, visible",
     "layer.image": "id, label, x, y, w, h, src, fit, radius, rotate, opacity, visible",
     "variables": "texts may contain {{date}}, {{date+1y:DD.MM.YY}} (offsets d/m/y, format DD MM YYYY YY) and {{random:4}} (digits, stable per card seed)",
@@ -29,9 +29,9 @@
             { "id": "ghost", "type": "text", "label": "Ghost numeral", "text": "50", "x": 1030, "y": 540, "size": 440, "weight": 800, "color": "#ad1a1c", "align": "right", "letterSpacing": -20 },
             { "id": "logoBox", "type": "rect", "label": "Logo frame", "x": 867, "y": 40, "w": 100, "h": 68, "stroke": "#ffffff", "strokeWidth": 7, "radius": 9 },
             { "id": "logo", "type": "text", "label": "Logo text", "text": "FB", "x": 917, "y": 76, "size": 50, "weight": 800, "color": "#ffffff", "align": "center", "baseline": "middle", "letterSpacing": -1 },
-            { "id": "photo", "type": "image", "label": "Photo", "src": "assets/boykisser.svg", "x": 40, "y": 40, "w": 150, "h": 190, "fit": "cover", "radius": 8, "visible": false },
+            { "id": "photo", "type": "image", "label": "Photo", "src": "assets/boykisser.png", "x": 40, "y": 40, "w": 150, "h": 190, "fit": "cover", "radius": 8, "visible": false },
             { "id": "title", "type": "text", "label": "Title", "text": "BahnCard 50", "x": 38, "y": 350, "size": 86, "weight": 800, "color": "#ffffff", "letterSpacing": -1 },
-            { "id": "subtitle", "type": "text", "label": "Subtitle", "text": "", "x": 540, "y": 346, "size": 30, "weight": 600, "color": "#ffffff" },
+            { "id": "subtitle", "type": "text", "label": "Subtitle", "text": "", "x": 540, "y": 346, "size": 30, "weight": 600, "color": "#ffffff", "after": "title", "gap": 14 },
             { "id": "number", "type": "text", "label": "Card number", "text": "7081 {{random:4}} {{random:4}} {{random:4}}", "x": 38, "y": 522, "size": 36, "weight": 700, "color": "#ffffff" },
             { "id": "check", "type": "text", "label": "Check digits", "text": "{{random:3}}", "x": 497, "y": 522, "size": 36, "weight": 700, "color": "#ffffff" },
             { "id": "validFrom", "type": "text", "label": "Valid from", "text": "GÜLTIG VOM {{date:DD.MM.YY}} BIS", "x": 968, "y": 520, "size": 25, "weight": 700, "color": "#ffffff", "align": "right" },
@@ -84,7 +84,7 @@
           "logoBox": { "stroke": "#d4001a" },
           "logo": { "color": "#d4001a" },
           "title": { "text": "BahnCard 25", "color": "#333333" },
-          "subtitle": { "text": "1. Klasse", "x": 590, "color": "#333333" },
+          "subtitle": { "text": "1. Klasse", "color": "#333333" },
           "number": { "color": "#333333" },
           "check": { "color": "#333333" },
           "validFrom": { "color": "#333333" },
@@ -106,7 +106,7 @@
         "front": {
           "ghost": { "visible": false },
           "title": { "text": "BahnCard 100" },
-          "subtitle": { "text": "+City", "x": 618 }
+          "subtitle": { "text": "+City" }
         },
         "back": {
           "foundLine": { "color": "#e8e8e8" }, "batch": { "color": "#e8e8e8" }, "sigLabel": { "color": "#e8e8e8" }, "sigDate": { "color": "#e8e8e8" },
@@ -122,7 +122,7 @@
       "extends": "bahncard-100",
       "overrides": {
         "front": {
-          "subtitle": { "text": "inkl. Deutschland-Ticket", "x": 40, "y": 400, "size": 28, "weight": 400, "color": "#d9d9d9" }
+          "subtitle": { "text": "inkl. Deutschland-Ticket", "after": "", "x": 40, "y": 400, "size": 28, "weight": 400, "color": "#d9d9d9" }
         }
       },
       "layers": {
@@ -140,7 +140,7 @@
         "front": {
           "photo": { "x": 760, "y": 200, "w": 180, "h": 230, "radius": 4, "visible": true },
           "title": { "size": 74, "y": 352 },
-          "subtitle": { "x": 548, "y": 348 }
+          "subtitle": { "y": 348 }
         }
       },
       "layers": {
@@ -178,7 +178,7 @@
             { "id": "bonus", "type": "text", "label": "Program (top-left)", "text": "", "x": 65, "y": 103, "size": 36, "weight": 800, "color": "#1f1f1d" },
             { "id": "title", "type": "text", "label": "Title", "text": "BahnCard", "x": 62, "y": 262, "size": 64, "weight": 800, "color": "#ffffff", "letterSpacing": -1 },
             { "id": "bigNumber", "type": "text", "label": "Big number", "text": "25", "x": 955, "y": 300, "size": 130, "weight": 800, "color": "#ffffff", "align": "right", "letterSpacing": -4 },
-            { "id": "photo", "type": "image", "label": "Photo", "src": "assets/boykisser.svg", "x": 775, "y": 148, "w": 175, "h": 200, "fit": "cover", "visible": false },
+            { "id": "photo", "type": "image", "label": "Photo", "src": "assets/boykisser.png", "x": 775, "y": 148, "w": 175, "h": 200, "fit": "cover", "visible": false },
             { "id": "oeko", "type": "text", "label": "Ökostrom stripe", "text": "100% ÖKOSTROM        100% ÖKOSTROM        100% ÖKOSTROM        100% ÖKOSTROM        100% ÖKOSTROM        100% ÖKOSTROM", "x": 20, "y": 378, "size": 19, "weight": 600, "color": "#8fb24e", "letterSpacing": 1, "maxWidth": 2000 },
             { "id": "expiry", "type": "text", "label": "Expiry (vertical)", "text": "{{date+1y:MM.YY}}", "x": 100, "y": 598, "size": 46, "weight": 800, "color": "#1f1f1d", "rotate": -90 },
             { "id": "valid", "type": "text", "label": "Validity", "text": "GÜLTIG VOM: {{date:DD.MM.YY}} BIS: {{date+1y:DD.MM.YY}}", "x": 150, "y": 456, "size": 27, "weight": 600, "color": "#1f1f1d" },
@@ -324,7 +324,7 @@
           "logo": { "color": "#3b2140" },
           "classLabel": { "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
           "title": { "text": "FemCard 100", "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 6 },
-          "subtitle": { "text": "+City", "x": 566, "y": 346, "size": 30, "weight": 600, "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "subtitle": { "text": "+City", "after": "title", "y": 346, "size": 30, "weight": 600, "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
           "number": { "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
           "check": { "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
           "validFrom": { "color": "#3b2140", "strokeColor": "#ffffff", "strokeWidth": 4 },
@@ -743,7 +743,7 @@
             { "id": "watermark", "type": "text", "label": "Watermark", "text": "FB", "x": 760, "y": 520, "size": 420, "weight": 800, "color": "#d8e2ec", "align": "center", "opacity": 0.5, "letterSpacing": -20 },
             { "id": "issuerLine", "type": "text", "label": "Issuer line", "text": "Femboy Express Betriebsgesellschaft", "x": 40, "y": 62, "size": 32, "weight": 800, "color": "#1d2a3a" },
             { "id": "photoFrame", "type": "rect", "label": "Photo frame", "x": 40, "y": 100, "w": 260, "h": 330, "fill": "#2b2b2b", "stroke": "#ffffff", "strokeWidth": 4, "radius": 6 },
-            { "id": "photo", "type": "image", "label": "Photo", "src": "assets/boykisser.svg", "x": 44, "y": 104, "w": 252, "h": 322, "fit": "cover", "radius": 4 },
+            { "id": "photo", "type": "image", "label": "Photo", "src": "assets/boykisser.png", "x": 44, "y": 104, "w": 252, "h": 322, "fit": "cover", "radius": 4 },
             { "id": "department", "type": "text", "label": "Department", "text": "Kuschelaufsicht", "x": 340, "y": 150, "size": 36, "weight": 800, "color": "#1d2a3a" },
             { "id": "docType", "type": "text", "label": "Document type", "text": "Dienstausweis", "x": 340, "y": 230, "size": 30, "weight": 600, "color": "#1d2a3a" },
             { "id": "validUntil", "type": "text", "label": "Valid until", "text": "gültig bis: {{date+10y:DD.MM.YYYY}}", "x": 340, "y": 282, "size": 24, "weight": 400, "color": "#1d2a3a" },
@@ -787,7 +787,7 @@
         "front": {
           "background": { "type": "gradient", "angle": 135, "stops": [ { "pos": 0, "color": "#5b6cff" }, { "pos": 1, "color": "#2bd4c2" } ] },
           "layers": [
-            { "id": "photo", "type": "image", "label": "Photo", "src": "assets/boykisser.svg", "x": 40, "y": 40, "w": 190, "h": 240, "fit": "cover", "radius": 12, "visible": false },
+            { "id": "photo", "type": "image", "label": "Photo", "src": "assets/boykisser.png", "x": 40, "y": 40, "w": 190, "h": 240, "fit": "cover", "radius": 12, "visible": false },
             { "id": "title", "type": "text", "label": "Title", "text": "MEMBER CARD", "x": 40, "y": 110, "size": 60, "weight": 800, "color": "#ffffff", "letterSpacing": 2 },
             { "id": "subtitle", "type": "text", "label": "Subtitle", "text": "Premium Access", "x": 40, "y": 160, "size": 28, "weight": 600, "color": "#ffffffcc" },
             { "id": "name", "type": "text", "label": "Name", "text": "Max Mustermann", "x": 40, "y": 520, "size": 44, "weight": 700, "color": "#ffffff" },

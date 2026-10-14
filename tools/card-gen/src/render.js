@@ -261,6 +261,19 @@ function drawImageLayer(ctx, layer) {
 }
 
 /**
+ * Resolves a text layer's `after` reference: its x becomes the referenced layer's right edge plus `gap`.
+ * Falls back to the layer's own x when the reference is empty, unknown or not yet drawn.
+ * @param {TextLayer} layer
+ * @param {BBox[]} drawn boxes of the layers drawn so far on this side
+ * @returns {TextLayer}
+ */
+function placeAfter(layer, drawn) {
+  if (!layer.after) return layer;
+  const ref = drawn.find((b) => b.id === layer.after);
+  return ref ? { ...layer, x: ref.x + ref.w + num(layer.gap, 14) } : layer;
+}
+
+/**
  * Draws one side of the card at the given scale and returns the layer bounding boxes in card space.
  * @param {CanvasRenderingContext2D} ctx
  * @param {SideName} side
@@ -279,7 +292,7 @@ export function drawSide(ctx, side, scale) {
   const boxes = [];
   for (const layer of store.layers(side)) {
     if (layer.visible === false) continue;
-    const box = layer.type === 'text' ? drawText(ctx, layer, defaultFont, side) : layer.type === 'rect' ? drawRect(ctx, layer) : drawImageLayer(ctx, layer);
+    const box = layer.type === 'text' ? drawText(ctx, placeAfter(layer, boxes), defaultFont, side) : layer.type === 'rect' ? drawRect(ctx, layer) : drawImageLayer(ctx, layer);
     boxes.push({ id: layer.id, ...box });
   }
   ctx.restore();

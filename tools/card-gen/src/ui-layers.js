@@ -21,6 +21,7 @@ const TEXT_FIELDS = [
   { key: 'rotate', name: 'Rotate', kind: 'number' }, { key: 'opacity', name: 'Opacity', kind: 'number', step: 0.05 },
   { key: 'strokeColor', name: 'Outline', kind: 'color' }, { key: 'strokeWidth', name: 'Outline w.', kind: 'number' },
   { key: 'maxWidth', name: 'Max width', kind: 'number' }, { key: 'italic', name: 'Italic', kind: 'check' }, { key: 'uppercase', name: 'Uppercase', kind: 'check' },
+  { key: 'after', name: 'Right of layer', kind: 'text', wide: true }, { key: 'gap', name: 'Gap', kind: 'number' },
 ];
 /** @type {FieldSpec[]} */
 const RECT_FIELDS = [

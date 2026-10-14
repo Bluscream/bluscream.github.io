@@ -197,6 +197,8 @@ class Store {
     /** @type {Record<string, unknown>} */
     const target = custom ?? (this.state.sides[side].layers[id] ??= {});
     target[key] = value;
+    // Dragging a layer that follows another one horizontally detaches it; otherwise the drag would be undone.
+    if (key === 'x' && !('after' in target) && this.findLayer(side, id)?.type === 'text') target['after'] = '';
     this.emit();
   }
 
