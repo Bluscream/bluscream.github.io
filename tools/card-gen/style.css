@@ -27,11 +27,7 @@ header {
   background: var(--surface); box-shadow: var(--shadow); position: relative; z-index: 2;
   padding: 12px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
 }
-.brand { display: flex; align-items: center; gap: 14px; font-size: 1.25rem; font-weight: 900; }
-.brand .mark {
-  display: inline-grid; place-items: center; width: 44px; height: 30px; border: 3px solid var(--red); border-radius: 4px;
-  color: var(--red); font-weight: 900; font-size: 0.95rem; letter-spacing: 0.02em;
-}
+.brand { display: flex; align-items: center; font-size: 1.25rem; font-weight: 900; }
 .header-actions { display: flex; gap: 8px; }
 
 /* Three columns on wide screens: settings | cards | layers. The layers column stretches to the viewport so the

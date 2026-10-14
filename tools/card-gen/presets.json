@@ -53,7 +53,7 @@
             { "id": "legal", "type": "text", "label": "Legal text", "text": "Diese Karte ist Eigentum der Femboy Express GmbH und bei der Fahrkartenkontrolle vorzulegen. Sie ist nur\nzusammen mit einem amtlichen Lichtbildausweis gültig und nicht übertragbar. Es gelten die Beförderungs-\nbedingungen der Femboy Express GmbH.", "x": 40, "y": 358, "size": 17, "weight": 600, "lineHeight": 1.35, "color": "#222222" },
             { "id": "bonus", "type": "text", "label": "Program", "text": "fem.bonus", "x": 40, "y": 468, "size": 28, "weight": 800, "color": "#111111" },
             { "id": "url", "type": "text", "label": "Website", "text": "fem.minopia.de/bahncard", "x": 300, "y": 462, "size": 21, "weight": 800, "color": "#111111" },
-            { "id": "address", "type": "text", "label": "Address", "text": "Anschrift: FemCard-Service, 12345 Flauschhausen | E-Mail: card@fem.minopia.de\nTelefon: 01806 336336* (Mo.–Fr. 7–21 Uhr, Sa. 9–18 Uhr)", "x": 300, "y": 494, "size": 15, "weight": 600, "lineHeight": 1.35, "color": "#222222" },
+            { "id": "address", "type": "text", "label": "Address", "text": "Anschrift: Kartenservice, 12345 Flauschhausen | E-Mail: card@fem.minopia.de\nTelefon: 01806 336336* (Mo.–Fr. 7–21 Uhr, Sa. 9–18 Uhr)", "x": 300, "y": 494, "size": 15, "weight": 600, "lineHeight": 1.35, "color": "#222222" },
             { "id": "footnote", "type": "text", "label": "Footnote", "text": "*20 ct/Anruf aus dem Festnetz, Tarif bei Mobilfunk max. 60 ct/Anruf.", "x": 300, "y": 548, "size": 13, "weight": 400, "italic": true, "color": "#444444" },
             { "id": "railplusBox", "type": "rect", "label": "Partner badge", "x": 40, "y": 528, "w": 150, "h": 40, "fill": "#ffd100", "stroke": "#111111", "strokeWidth": 2, "radius": 3 },
             { "id": "railplus", "type": "text", "label": "Partner badge text", "text": "FEM+PLUS", "x": 115, "y": 549, "size": 22, "weight": 800, "color": "#111111", "align": "center", "baseline": "middle", "letterSpacing": 1 }
@@ -340,6 +340,7 @@
           "bonus": { "color": "#3b2140" },
           "url": { "text": "fem.minopia.de/femcard", "color": "#3b2140" },
           "address": { "text": "Anschrift: FemCard-Service, 12345 Flauschhausen | E-Mail: hello@fem.minopia.de\nSprechzeiten: immer, außer beim Nickerchen", "color": "#3b2140" },
+          "sigPattern": { "text": "FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard\nFemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard\nFemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard\nFemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard FemCard", "color": "#d6d6d6" },
           "footnote": { "text": "*Kuscheln kostenlos. Blushing inklusive.", "color": "#3b2140" },
           "railplusBox": { "fill": "#57cef8", "stroke": "#3b2140" },
           "railplus": { "color": "#3b2140" }
@@ -399,18 +400,18 @@
           "validTo": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 }
         },
         "back": {
-          "foundLine": { "color": "#1d3557" },
+          "foundLine": { "text": "Wird diese Karte gefunden, bitte mit den richtigen Pronomen zurückgeben.", "color": "#1d3557" },
           "batch": { "color": "#1d3557" },
           "sigLabel": { "color": "#1d3557" },
           "sigDate": { "color": "#1d3557" },
-          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#1d3557" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit den richtigen Pronomen gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#1d3557" },
           "bonus": { "color": "#1d3557" },
           "url": { "text": "fem.minopia.de/transcard", "color": "#1d3557" },
-          "address": { "color": "#1d3557" },
-          "footnote": { "color": "#1d3557" },
-          "sigPattern": { "color": "#d6d6d6" },
+          "address": { "text": "Anschrift: TransCard-Service, 12345 Flauschhausen | E-Mail: trans@fem.minopia.de\nSprechzeiten: immer, Deadnames werden nicht angenommen", "color": "#1d3557" },
+          "footnote": { "text": "*Pronomen kostenlos. Egg-Cracking inklusive.", "color": "#1d3557" },
+          "sigPattern": { "text": "TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard\nTransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard\nTransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard\nTransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard TransCard", "color": "#d6d6d6" },
           "railplusBox": { "fill": "#f5a9b8", "stroke": "#1d3557" },
-          "railplus": { "color": "#1a1a1a" }
+          "railplus": { "text": "TRANS+PLUS", "color": "#1a1a1a" }
         }
       }
     },
@@ -450,18 +451,18 @@
           "validTo": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 }
         },
         "back": {
-          "foundLine": { "color": "#2c2c2c" },
+          "foundLine": { "text": "Wird diese Karte gefunden, bitte ohne Gender-Annahmen zurückgeben.", "color": "#2c2c2c" },
           "batch": { "color": "#2c2c2c" },
           "sigLabel": { "color": "#2c2c2c" },
           "sigDate": { "color": "#2c2c2c" },
-          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#2c2c2c" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit guter Laune gültig, unabhängig vom Geschlecht, und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#2c2c2c" },
           "bonus": { "color": "#2c2c2c" },
           "url": { "text": "fem.minopia.de/enbycard", "color": "#2c2c2c" },
-          "address": { "color": "#2c2c2c" },
-          "footnote": { "color": "#2c2c2c" },
-          "sigPattern": { "color": "#d6d6d6" },
+          "address": { "text": "Anschrift: EnbyCard-Service, 12345 Flauschhausen | E-Mail: enby@fem.minopia.de\nSprechzeiten: immer, Binarität optional", "color": "#2c2c2c" },
+          "footnote": { "text": "*They/them kostenlos. Verwirrte Verwandtschaft inklusive.", "color": "#2c2c2c" },
+          "sigPattern": { "text": "EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard\nEnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard\nEnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard\nEnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard EnbyCard", "color": "#d6d6d6" },
           "railplusBox": { "fill": "#9c59d1", "stroke": "#2c2c2c" },
-          "railplus": { "color": "#ffffff" }
+          "railplus": { "text": "ENBY+PLUS", "color": "#ffffff" }
         }
       }
     },
@@ -501,18 +502,18 @@
           "validTo": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 }
         },
         "back": {
-          "foundLine": { "color": "#f0f0f0" },
+          "foundLine": { "text": "Wird diese Karte gefunden, bitte mit einem Stück Kuchen zurückgeben.", "color": "#f0f0f0" },
           "batch": { "color": "#f0f0f0" },
           "sigLabel": { "color": "#f0f0f0" },
           "sigDate": { "color": "#f0f0f0" },
-          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#f0f0f0" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit Kuchen gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#f0f0f0" },
           "bonus": { "color": "#f0f0f0" },
           "url": { "text": "fem.minopia.de/acecard", "color": "#f0f0f0" },
-          "address": { "color": "#f0f0f0" },
-          "footnote": { "color": "#f0f0f0" },
-          "sigPattern": { "color": "#d6d6d6" },
+          "address": { "text": "Anschrift: AceCard-Service, 12345 Flauschhausen | E-Mail: ace@fem.minopia.de\nSprechzeiten: immer, Kuchen immer willkommen", "color": "#f0f0f0" },
+          "footnote": { "text": "*Kuchen kostenlos. Garlic Bread inklusive.", "color": "#f0f0f0" },
+          "sigPattern": { "text": "AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard\nAceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard\nAceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard\nAceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard AceCard", "color": "#d6d6d6" },
           "railplusBox": { "fill": "#800080", "stroke": "#f0f0f0" },
-          "railplus": { "color": "#ffffff" }
+          "railplus": { "text": "ACE+PLUS", "color": "#ffffff" }
         }
       }
     },
@@ -550,18 +551,18 @@
           "validTo": { "color": "#3a2a5e", "strokeColor": "#ffffff", "strokeWidth": 4 }
         },
         "back": {
-          "foundLine": { "color": "#3a2a5e" },
+          "foundLine": { "text": "Wird diese Karte gefunden, bitte zurückgeben – egal von wem.", "color": "#3a2a5e" },
           "batch": { "color": "#3a2a5e" },
           "sigLabel": { "color": "#3a2a5e" },
           "sigDate": { "color": "#3a2a5e" },
-          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#3a2a5e" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit guter Laune gültig, ganz egal wer kontrolliert, und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#3a2a5e" },
           "bonus": { "color": "#3a2a5e" },
           "url": { "text": "fem.minopia.de/pancard", "color": "#3a2a5e" },
-          "address": { "color": "#3a2a5e" },
-          "footnote": { "color": "#3a2a5e" },
-          "sigPattern": { "color": "#d6d6d6" },
+          "address": { "text": "Anschrift: PanCard-Service, 12345 Flauschhausen | E-Mail: pan@fem.minopia.de\nSprechzeiten: immer, für alle", "color": "#3a2a5e" },
+          "footnote": { "text": "*Pfannen nicht inklusive. Herzen schon.", "color": "#3a2a5e" },
+          "sigPattern": { "text": "PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard\nPanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard\nPanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard\nPanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard PanCard", "color": "#d6d6d6" },
           "railplusBox": { "fill": "#ffd800", "stroke": "#3a2a5e" },
-          "railplus": { "color": "#1a1a1a" }
+          "railplus": { "text": "PAN+PLUS", "color": "#1a1a1a" }
         }
       }
     },
@@ -603,18 +604,18 @@
           "validTo": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 }
         },
         "back": {
-          "foundLine": { "color": "#f0eaf7" },
+          "foundLine": { "text": "Wird diese Karte gefunden, bitte zurückgeben – gilt in beide Richtungen.", "color": "#f0eaf7" },
           "batch": { "color": "#f0eaf7" },
           "sigLabel": { "color": "#f0eaf7" },
           "sigDate": { "color": "#f0eaf7" },
-          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#f0eaf7" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit mindestens einem Flanellhemd gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#f0eaf7" },
           "bonus": { "color": "#f0eaf7" },
           "url": { "text": "fem.minopia.de/bicard", "color": "#f0eaf7" },
-          "address": { "color": "#f0eaf7" },
-          "footnote": { "color": "#f0eaf7" },
-          "sigPattern": { "color": "#d6d6d6" },
+          "address": { "text": "Anschrift: BiCard-Service, 12345 Flauschhausen | E-Mail: bi@fem.minopia.de\nSprechzeiten: immer, Sitzhaltung frei wählbar", "color": "#f0eaf7" },
+          "footnote": { "text": "*Hin und zurück kostenlos. Cuffed Jeans inklusive.", "color": "#f0eaf7" },
+          "sigPattern": { "text": "BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard\nBiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard\nBiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard\nBiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard BiCard", "color": "#d6d6d6" },
           "railplusBox": { "fill": "#9b4f96", "stroke": "#f0eaf7" },
-          "railplus": { "color": "#ffffff" }
+          "railplus": { "text": "BI+PLUS", "color": "#ffffff" }
         }
       }
     },
@@ -656,18 +657,18 @@
           "validTo": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 }
         },
         "back": {
-          "foundLine": { "color": "#5a1a0a" },
+          "foundLine": { "text": "Wird diese Karte gefunden, bitte an die Ex der Ex der Ex zurückgeben.", "color": "#5a1a0a" },
           "batch": { "color": "#5a1a0a" },
           "sigLabel": { "color": "#5a1a0a" },
           "sigDate": { "color": "#5a1a0a" },
-          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#5a1a0a" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit einem U-Haul-Mietvertrag gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#5a1a0a" },
           "bonus": { "color": "#5a1a0a" },
           "url": { "text": "fem.minopia.de/sapphicard", "color": "#5a1a0a" },
-          "address": { "color": "#5a1a0a" },
-          "footnote": { "color": "#5a1a0a" },
-          "sigPattern": { "color": "#d6d6d6" },
-          "railplusBox": { "fill": "#ff9a56", "stroke": "#5a1a0a" },
-          "railplus": { "color": "#1a1a1a" }
+          "address": { "text": "Anschrift: SapphiCard-Service, 12345 Flauschhausen | E-Mail: sapphic@fem.minopia.de\nSprechzeiten: immer, außer beim zweiten Date (Einzug)", "color": "#5a1a0a" },
+          "footnote": { "text": "*Umzugskartons kostenlos. Katze inklusive.", "color": "#5a1a0a" },
+          "sigPattern": { "text": "SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard\nSapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard\nSapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard\nSapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard SapphiCard", "color": "#d6d6d6" },
+          "railplusBox": { "fill": "#ff9a56", "stroke": "#5a1a0a", "w": 200 },
+          "railplus": { "text": "SAPPHIC+PLUS", "color": "#1a1a1a", "x": 140 }
         }
       }
     },
@@ -711,18 +712,71 @@
           "validTo": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 }
         },
         "back": {
-          "foundLine": { "color": "#f2f2f2" },
+          "foundLine": { "text": "Wird diese Karte gefunden, bitte mit Glitzer zurückgeben.", "color": "#f2f2f2" },
           "batch": { "color": "#f2f2f2" },
           "sigLabel": { "color": "#f2f2f2" },
           "sigDate": { "color": "#f2f2f2" },
-          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#f2f2f2" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit mindestens einem Regenbogen gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#f2f2f2" },
           "bonus": { "color": "#f2f2f2" },
           "url": { "text": "fem.minopia.de/pridecard", "color": "#f2f2f2" },
-          "address": { "color": "#f2f2f2" },
-          "footnote": { "color": "#f2f2f2" },
-          "sigPattern": { "color": "#d6d6d6" },
+          "address": { "text": "Anschrift: PrideCard-Service, 12345 Flauschhausen | E-Mail: pride@fem.minopia.de\nSprechzeiten: immer, im Juni rund um die Uhr", "color": "#f2f2f2" },
+          "footnote": { "text": "*Glitzer kostenlos. Konfetti inklusive.", "color": "#f2f2f2" },
+          "sigPattern": { "text": "PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard\nPrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard\nPrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard\nPrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard PrideCard", "color": "#d6d6d6" },
           "railplusBox": { "fill": "#ffed00", "stroke": "#f2f2f2" },
-          "railplus": { "color": "#1a1a1a" }
+          "railplus": { "text": "PRIDE+PLUS", "color": "#1a1a1a" }
+        }
+      }
+    },
+    {
+      "id": "furcard-100",
+      "name": "FurCard 100 1. Klasse (fur stripes)",
+      "description": "1st-class 100 layout in warm fur tones.",
+      "extends": "femcard-100",
+      "background": {
+        "front": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0.0, "color": "#4a2c17" },
+            { "pos": 0.2, "color": "#4a2c17" },
+            { "pos": 0.2, "color": "#c2733a" },
+            { "pos": 0.4, "color": "#c2733a" },
+            { "pos": 0.4, "color": "#f6e7cf" },
+            { "pos": 0.6, "color": "#f6e7cf" },
+            { "pos": 0.6, "color": "#c2733a" },
+            { "pos": 0.8, "color": "#c2733a" },
+            { "pos": 0.8, "color": "#4a2c17" },
+            { "pos": 1.0, "color": "#4a2c17" }
+          ]
+        },
+        "back": { "type": "color", "color": "#f6e7cf" }
+      },
+      "overrides": {
+        "front": {
+          "logoBox": { "stroke": "#ffffff", "y": 40 },
+          "logo": { "color": "#ffffff", "y": 76 },
+          "classLabel": { "color": "#ffffff", "strokeColor": "#4a2c17", "strokeWidth": 4, "y": 246 },
+          "title": { "color": "#ffffff", "strokeColor": "#4a2c17", "strokeWidth": 6, "text": "FurCard 100" },
+          "subtitle": { "color": "#ffffff", "strokeColor": "#4a2c17", "strokeWidth": 4, "text": "+Boops" },
+          "number": { "color": "#ffffff", "strokeColor": "#4a2c17", "strokeWidth": 4, "y": 498 },
+          "check": { "color": "#ffffff", "strokeColor": "#4a2c17", "strokeWidth": 4, "y": 498 },
+          "validFrom": { "color": "#ffffff", "strokeColor": "#4a2c17", "strokeWidth": 4, "y": 496 },
+          "name": { "color": "#ffffff", "strokeColor": "#4a2c17", "strokeWidth": 4 },
+          "validTo": { "color": "#ffffff", "strokeColor": "#4a2c17", "strokeWidth": 4 }
+        },
+        "back": {
+          "foundLine": { "text": "Wird diese Karte gefunden, bitte Ohren kraulen und zurückgeben.", "color": "#4a2c17" },
+          "batch": { "color": "#4a2c17" },
+          "sigLabel": { "color": "#4a2c17" },
+          "sigDate": { "color": "#4a2c17" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\nzusammen mit Fursuit oder Schwanz gültig und nicht übertragbar. Es gelten die\nKuschelbedingungen der Femboy Express GmbH.", "color": "#4a2c17" },
+          "bonus": { "color": "#4a2c17" },
+          "url": { "text": "fem.minopia.de/furcard", "color": "#4a2c17" },
+          "address": { "text": "Anschrift: FurCard-Service, 12345 Flauschhausen | E-Mail: fur@fem.minopia.de\nSprechzeiten: immer, außer während der Con", "color": "#4a2c17" },
+          "footnote": { "text": "*Boops kostenlos. Fell auf dem Sofa inklusive.", "color": "#4a2c17" },
+          "sigPattern": { "text": "FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard\nFurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard\nFurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard\nFurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard FurCard", "color": "#d6c9b4" },
+          "railplusBox": { "fill": "#c2733a", "stroke": "#4a2c17" },
+          "railplus": { "text": "FUR+PLUS", "color": "#ffffff" }
         }
       }
     },
