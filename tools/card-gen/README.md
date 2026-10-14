@@ -16,7 +16,7 @@ A preset may `extends` another one and only supply what changed: `sides` (replac
 `background` (per side), per-layer `overrides` (changed fields only) and extra `layers` (appended).
 "Export current as preset" in the UI produces a ready-to-paste preset.
 
-Texts may contain variables, resolved when the card is drawn: `{{date}}` (today), `{{date+1y-1d:DD.MM.YY}}`
+Texts may contain variables, resolved when the card is drawn: `{{date}}` (today), `{{date+1y:DD.MM.YY}}`
 (offsets in `d`/`m`/`y`, format from `DD`, `MM`, `YYYY`, `YY`) and `{{random:4}}` (digits). Random digits
 come from a seed stored in the card state, so a share link reproduces them and "Reset" rolls new ones.
 

@@ -8,7 +8,7 @@
     "layer.text": "id, label, text, x, y, size, weight, color, font, align(left|center|right), baseline(alphabetic|middle|top), letterSpacing, italic, lineHeight, maxWidth, rotate, opacity, strokeColor, strokeWidth, uppercase, visible, editable",
     "layer.rect": "id, label, x, y, w, h, fill, stroke, strokeWidth, radius, rotate, opacity, visible",
     "layer.image": "id, label, x, y, w, h, src, fit, radius, rotate, opacity, visible",
-    "variables": "texts may contain {{date}}, {{date+1y-1d:DD.MM.YY}} (offsets d/m/y, format DD MM YYYY YY) and {{random:4}} (digits, stable per card seed)",
+    "variables": "texts may contain {{date}}, {{date+1y:DD.MM.YY}} (offsets d/m/y, format DD MM YYYY YY) and {{random:4}} (digits, stable per card seed)",
     "coordinates": "pixels in the preset's own width x height space; text x/y is the anchor point according to align/baseline"
   },
   "presets": [
@@ -36,7 +36,7 @@
             { "id": "check", "type": "text", "label": "Check digits", "text": "{{random:3}}", "x": 497, "y": 522, "size": 36, "weight": 700, "color": "#ffffff" },
             { "id": "validFrom", "type": "text", "label": "Valid from", "text": "GÜLTIG VOM {{date:DD.MM.YY}} BIS", "x": 968, "y": 520, "size": 25, "weight": 700, "color": "#ffffff", "align": "right" },
             { "id": "name", "type": "text", "label": "Name", "text": "Max Mustermann", "x": 38, "y": 592, "size": 36, "weight": 700, "color": "#ffffff" },
-            { "id": "validTo", "type": "text", "label": "Valid until", "text": "{{date+1y-1d:DD.MM.YY}}", "x": 968, "y": 594, "size": 52, "weight": 700, "color": "#ffffff", "align": "right" }
+            { "id": "validTo", "type": "text", "label": "Valid until", "text": "{{date+1y:DD.MM.YY}}", "x": 968, "y": 594, "size": 52, "weight": 700, "color": "#ffffff", "align": "right" }
           ]
         },
         "back": {
@@ -180,8 +180,8 @@
             { "id": "bigNumber", "type": "text", "label": "Big number", "text": "25", "x": 955, "y": 300, "size": 130, "weight": 800, "color": "#ffffff", "align": "right", "letterSpacing": -4 },
             { "id": "photo", "type": "image", "label": "Photo", "x": 775, "y": 148, "w": 175, "h": 200, "fit": "cover", "visible": false },
             { "id": "oeko", "type": "text", "label": "Ökostrom stripe", "text": "100% ÖKOSTROM        100% ÖKOSTROM        100% ÖKOSTROM        100% ÖKOSTROM        100% ÖKOSTROM        100% ÖKOSTROM", "x": 20, "y": 378, "size": 19, "weight": 600, "color": "#8fb24e", "letterSpacing": 1, "maxWidth": 2000 },
-            { "id": "expiry", "type": "text", "label": "Expiry (vertical)", "text": "{{date+1y-1d:MM.YY}}", "x": 100, "y": 598, "size": 46, "weight": 800, "color": "#1f1f1d", "rotate": -90 },
-            { "id": "valid", "type": "text", "label": "Validity", "text": "GÜLTIG VOM: {{date:DD.MM.YY}} BIS: {{date+1y-1d:DD.MM.YY}}", "x": 150, "y": 456, "size": 27, "weight": 600, "color": "#1f1f1d" },
+            { "id": "expiry", "type": "text", "label": "Expiry (vertical)", "text": "{{date+1y:MM.YY}}", "x": 100, "y": 598, "size": 46, "weight": 800, "color": "#1f1f1d", "rotate": -90 },
+            { "id": "valid", "type": "text", "label": "Validity", "text": "GÜLTIG VOM: {{date:DD.MM.YY}} BIS: {{date+1y:DD.MM.YY}}", "x": 150, "y": 456, "size": 27, "weight": 600, "color": "#1f1f1d" },
             { "id": "classCode", "type": "text", "label": "Class code", "text": "HK", "x": 950, "y": 456, "size": 28, "weight": 600, "color": "#1f1f1d", "align": "right" },
             { "id": "name", "type": "text", "label": "Name", "text": "Max Mustermann", "x": 150, "y": 512, "size": 34, "weight": 800, "color": "#1f1f1d" },
             { "id": "check", "type": "text", "label": "Check digits", "text": "{{random:3}}", "x": 950, "y": 512, "size": 28, "weight": 600, "color": "#1f1f1d", "align": "right" },
@@ -248,8 +248,8 @@
         "front": {
           "ghost": { "visible": false },
           "title": { "text": "Probe BahnCard 100", "size": 58, "y": 258 },
-          "expiry": { "text": "{{date+3m-1d:MM.YY}}" },
-          "valid": { "text": "GÜLTIG VOM: {{date:DD.MM.YY}} BIS: {{date+3m-1d:DD.MM.YY}}" }
+          "expiry": { "text": "{{date+3m:MM.YY}}" },
+          "valid": { "text": "GÜLTIG VOM: {{date:DD.MM.YY}} BIS: {{date+3m:DD.MM.YY}}" }
         }
       }
     },
@@ -269,7 +269,7 @@
           "logo": { "x": 685, "y": 72, "size": 44 },
           "title": { "text": "Fan BahnCard 25", "size": 68, "y": 350 },
           "subtitle": { "visible": false },
-          "validTo": { "text": "{{date+3m-1d:DD.MM.YY}}" }
+          "validTo": { "text": "{{date+3m:DD.MM.YY}}" }
         }
       },
       "layers": {
@@ -286,6 +286,7 @@
     },
     {
       "id": "femcard-100",
+      "group": "Pride cards",
       "name": "FemCard 100 1. Klasse (pride flag)",
       "description": "1st-class 100 layout on a femboy pride flag.",
       "extends": "bahncard-100-1st",
@@ -342,6 +343,386 @@
           "footnote": { "text": "*Kuscheln kostenlos. Blushing inklusive.", "color": "#3b2140" },
           "railplusBox": { "fill": "#57cef8", "stroke": "#3b2140" },
           "railplus": { "color": "#3b2140" }
+        }
+      }
+    },
+    {
+      "id": "transcard-100",
+      "name": "TransCard 100 1. Klasse (trans flag)",
+      "description": "1st-class 100 layout on the trans flag.",
+      "extends": "femcard-100",
+      "background": {
+        "front": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0.0, "color": "#5bcefa" },
+            { "pos": 0.2, "color": "#5bcefa" },
+            { "pos": 0.2, "color": "#f5a9b8" },
+            { "pos": 0.4, "color": "#f5a9b8" },
+            { "pos": 0.4, "color": "#ffffff" },
+            { "pos": 0.6, "color": "#ffffff" },
+            { "pos": 0.6, "color": "#f5a9b8" },
+            { "pos": 0.8, "color": "#f5a9b8" },
+            { "pos": 0.8, "color": "#5bcefa" },
+            { "pos": 1.0, "color": "#5bcefa" }
+          ]
+        },
+        "back": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0.0, "color": "#5bcefa" },
+            { "pos": 0.2, "color": "#5bcefa" },
+            { "pos": 0.2, "color": "#f5a9b8" },
+            { "pos": 0.4, "color": "#f5a9b8" },
+            { "pos": 0.4, "color": "#ffffff" },
+            { "pos": 0.6, "color": "#ffffff" },
+            { "pos": 0.6, "color": "#f5a9b8" },
+            { "pos": 0.8, "color": "#f5a9b8" },
+            { "pos": 0.8, "color": "#5bcefa" },
+            { "pos": 1.0, "color": "#5bcefa" }
+          ]
+        }
+      },
+      "overrides": {
+        "front": {
+          "logoBox": { "stroke": "#1d3557" },
+          "logo": { "color": "#1d3557" },
+          "classLabel": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "title": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 6, "text": "TransCard 100" },
+          "subtitle": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "number": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "check": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "validFrom": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "name": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "validTo": { "color": "#1d3557", "strokeColor": "#ffffff", "strokeWidth": 4 }
+        },
+        "back": {
+          "foundLine": { "color": "#1d3557" },
+          "batch": { "color": "#1d3557" },
+          "sigLabel": { "color": "#1d3557" },
+          "sigDate": { "color": "#1d3557" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#1d3557" },
+          "bonus": { "color": "#1d3557" },
+          "url": { "text": "fem.minopia.de/transcard", "color": "#1d3557" },
+          "address": { "color": "#1d3557" },
+          "footnote": { "color": "#1d3557" },
+          "sigPattern": { "color": "#d6d6d6" },
+          "railplusBox": { "fill": "#f5a9b8", "stroke": "#1d3557" },
+          "railplus": { "color": "#1a1a1a" }
+        }
+      }
+    },
+    {
+      "id": "enbycard-100",
+      "name": "EnbyCard 100 1. Klasse (non-binary flag)",
+      "description": "1st-class 100 layout on the non-binary flag.",
+      "extends": "femcard-100",
+      "background": {
+        "front": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0.0, "color": "#fcf434" },
+            { "pos": 0.25, "color": "#fcf434" },
+            { "pos": 0.25, "color": "#ffffff" },
+            { "pos": 0.5, "color": "#ffffff" },
+            { "pos": 0.5, "color": "#9c59d1" },
+            { "pos": 0.75, "color": "#9c59d1" },
+            { "pos": 0.75, "color": "#2c2c2c" },
+            { "pos": 1.0, "color": "#2c2c2c" }
+          ]
+        },
+        "back": { "type": "color", "color": "#f6f1d6" }
+      },
+      "overrides": {
+        "front": {
+          "logoBox": { "stroke": "#2c2c2c" },
+          "logo": { "color": "#2c2c2c" },
+          "classLabel": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "title": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 6, "text": "EnbyCard 100" },
+          "subtitle": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "number": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "check": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "validFrom": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "name": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "validTo": { "color": "#2c2c2c", "strokeColor": "#ffffff", "strokeWidth": 4 }
+        },
+        "back": {
+          "foundLine": { "color": "#2c2c2c" },
+          "batch": { "color": "#2c2c2c" },
+          "sigLabel": { "color": "#2c2c2c" },
+          "sigDate": { "color": "#2c2c2c" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#2c2c2c" },
+          "bonus": { "color": "#2c2c2c" },
+          "url": { "text": "fem.minopia.de/enbycard", "color": "#2c2c2c" },
+          "address": { "color": "#2c2c2c" },
+          "footnote": { "color": "#2c2c2c" },
+          "sigPattern": { "color": "#d6d6d6" },
+          "railplusBox": { "fill": "#9c59d1", "stroke": "#2c2c2c" },
+          "railplus": { "color": "#ffffff" }
+        }
+      }
+    },
+    {
+      "id": "acecard-100",
+      "name": "AceCard 100 1. Klasse (asexual flag)",
+      "description": "1st-class 100 layout on the asexual flag.",
+      "extends": "femcard-100",
+      "background": {
+        "front": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0.0, "color": "#000000" },
+            { "pos": 0.25, "color": "#000000" },
+            { "pos": 0.25, "color": "#a3a3a3" },
+            { "pos": 0.5, "color": "#a3a3a3" },
+            { "pos": 0.5, "color": "#ffffff" },
+            { "pos": 0.75, "color": "#ffffff" },
+            { "pos": 0.75, "color": "#800080" },
+            { "pos": 1.0, "color": "#800080" }
+          ]
+        },
+        "back": { "type": "color", "color": "#2b2b2b" }
+      },
+      "overrides": {
+        "front": {
+          "logoBox": { "stroke": "#ffffff" },
+          "logo": { "color": "#ffffff" },
+          "classLabel": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 },
+          "title": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 6, "text": "AceCard 100" },
+          "subtitle": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 },
+          "number": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 },
+          "check": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 },
+          "validFrom": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 },
+          "name": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 },
+          "validTo": { "color": "#ffffff", "strokeColor": "#1a1a1a", "strokeWidth": 4 }
+        },
+        "back": {
+          "foundLine": { "color": "#f0f0f0" },
+          "batch": { "color": "#f0f0f0" },
+          "sigLabel": { "color": "#f0f0f0" },
+          "sigDate": { "color": "#f0f0f0" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#f0f0f0" },
+          "bonus": { "color": "#f0f0f0" },
+          "url": { "text": "fem.minopia.de/acecard", "color": "#f0f0f0" },
+          "address": { "color": "#f0f0f0" },
+          "footnote": { "color": "#f0f0f0" },
+          "sigPattern": { "color": "#d6d6d6" },
+          "railplusBox": { "fill": "#800080", "stroke": "#f0f0f0" },
+          "railplus": { "color": "#ffffff" }
+        }
+      }
+    },
+    {
+      "id": "pancard-100",
+      "name": "PanCard 100 1. Klasse (pansexual flag)",
+      "description": "1st-class 100 layout on the pansexual flag.",
+      "extends": "femcard-100",
+      "background": {
+        "front": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0.0, "color": "#ff218c" },
+            { "pos": 0.3333, "color": "#ff218c" },
+            { "pos": 0.3333, "color": "#ffd800" },
+            { "pos": 0.6667, "color": "#ffd800" },
+            { "pos": 0.6667, "color": "#21b1ff" },
+            { "pos": 1.0, "color": "#21b1ff" }
+          ]
+        },
+        "back": { "type": "color", "color": "#fff4cc" }
+      },
+      "overrides": {
+        "front": {
+          "logoBox": { "stroke": "#3a2a5e" },
+          "logo": { "color": "#3a2a5e" },
+          "classLabel": { "color": "#3a2a5e", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "title": { "color": "#3a2a5e", "strokeColor": "#ffffff", "strokeWidth": 6, "text": "PanCard 100" },
+          "subtitle": { "color": "#3a2a5e", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "number": { "color": "#3a2a5e", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "check": { "color": "#3a2a5e", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "validFrom": { "color": "#3a2a5e", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "name": { "color": "#3a2a5e", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "validTo": { "color": "#3a2a5e", "strokeColor": "#ffffff", "strokeWidth": 4 }
+        },
+        "back": {
+          "foundLine": { "color": "#3a2a5e" },
+          "batch": { "color": "#3a2a5e" },
+          "sigLabel": { "color": "#3a2a5e" },
+          "sigDate": { "color": "#3a2a5e" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#3a2a5e" },
+          "bonus": { "color": "#3a2a5e" },
+          "url": { "text": "fem.minopia.de/pancard", "color": "#3a2a5e" },
+          "address": { "color": "#3a2a5e" },
+          "footnote": { "color": "#3a2a5e" },
+          "sigPattern": { "color": "#d6d6d6" },
+          "railplusBox": { "fill": "#ffd800", "stroke": "#3a2a5e" },
+          "railplus": { "color": "#1a1a1a" }
+        }
+      }
+    },
+    {
+      "id": "bicard-100",
+      "name": "BiCard 100 1. Klasse (bisexual flag)",
+      "description": "1st-class 100 layout on the bisexual flag.",
+      "extends": "femcard-100",
+      "background": {
+        "front": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0.0, "color": "#d60270" },
+            { "pos": 0.2, "color": "#d60270" },
+            { "pos": 0.2, "color": "#d60270" },
+            { "pos": 0.4, "color": "#d60270" },
+            { "pos": 0.4, "color": "#9b4f96" },
+            { "pos": 0.6, "color": "#9b4f96" },
+            { "pos": 0.6, "color": "#0038a8" },
+            { "pos": 0.8, "color": "#0038a8" },
+            { "pos": 0.8, "color": "#0038a8" },
+            { "pos": 1.0, "color": "#0038a8" }
+          ]
+        },
+        "back": { "type": "color", "color": "#2a1a4a" }
+      },
+      "overrides": {
+        "front": {
+          "logoBox": { "stroke": "#ffffff" },
+          "logo": { "color": "#ffffff" },
+          "classLabel": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 },
+          "title": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 6, "text": "BiCard 100" },
+          "subtitle": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 },
+          "number": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 },
+          "check": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 },
+          "validFrom": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 },
+          "name": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 },
+          "validTo": { "color": "#ffffff", "strokeColor": "#4a1d6e", "strokeWidth": 4 }
+        },
+        "back": {
+          "foundLine": { "color": "#f0eaf7" },
+          "batch": { "color": "#f0eaf7" },
+          "sigLabel": { "color": "#f0eaf7" },
+          "sigDate": { "color": "#f0eaf7" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#f0eaf7" },
+          "bonus": { "color": "#f0eaf7" },
+          "url": { "text": "fem.minopia.de/bicard", "color": "#f0eaf7" },
+          "address": { "color": "#f0eaf7" },
+          "footnote": { "color": "#f0eaf7" },
+          "sigPattern": { "color": "#d6d6d6" },
+          "railplusBox": { "fill": "#9b4f96", "stroke": "#f0eaf7" },
+          "railplus": { "color": "#ffffff" }
+        }
+      }
+    },
+    {
+      "id": "sapphicard-100",
+      "name": "SapphiCard 100 1. Klasse (lesbian flag)",
+      "description": "1st-class 100 layout on the lesbian flag.",
+      "extends": "femcard-100",
+      "background": {
+        "front": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0.0, "color": "#d52d00" },
+            { "pos": 0.2, "color": "#d52d00" },
+            { "pos": 0.2, "color": "#ff9a56" },
+            { "pos": 0.4, "color": "#ff9a56" },
+            { "pos": 0.4, "color": "#ffffff" },
+            { "pos": 0.6, "color": "#ffffff" },
+            { "pos": 0.6, "color": "#d362a4" },
+            { "pos": 0.8, "color": "#d362a4" },
+            { "pos": 0.8, "color": "#a30262" },
+            { "pos": 1.0, "color": "#a30262" }
+          ]
+        },
+        "back": { "type": "color", "color": "#fff1e8" }
+      },
+      "overrides": {
+        "front": {
+          "logoBox": { "stroke": "#5a1a0a" },
+          "logo": { "color": "#5a1a0a" },
+          "classLabel": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "title": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 6, "text": "SapphiCard 100" },
+          "subtitle": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "number": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "check": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "validFrom": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "name": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 },
+          "validTo": { "color": "#5a1a0a", "strokeColor": "#ffffff", "strokeWidth": 4 }
+        },
+        "back": {
+          "foundLine": { "color": "#5a1a0a" },
+          "batch": { "color": "#5a1a0a" },
+          "sigLabel": { "color": "#5a1a0a" },
+          "sigDate": { "color": "#5a1a0a" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#5a1a0a" },
+          "bonus": { "color": "#5a1a0a" },
+          "url": { "text": "fem.minopia.de/sapphicard", "color": "#5a1a0a" },
+          "address": { "color": "#5a1a0a" },
+          "footnote": { "color": "#5a1a0a" },
+          "sigPattern": { "color": "#d6d6d6" },
+          "railplusBox": { "fill": "#ff9a56", "stroke": "#5a1a0a" },
+          "railplus": { "color": "#1a1a1a" }
+        }
+      }
+    },
+    {
+      "id": "pridecard-100",
+      "name": "PrideCard 100 1. Klasse (rainbow flag)",
+      "description": "1st-class 100 layout on the rainbow flag.",
+      "extends": "femcard-100",
+      "background": {
+        "front": {
+          "type": "gradient",
+          "angle": 180,
+          "stops": [
+            { "pos": 0.0, "color": "#e40303" },
+            { "pos": 0.1667, "color": "#e40303" },
+            { "pos": 0.1667, "color": "#ff8c00" },
+            { "pos": 0.3333, "color": "#ff8c00" },
+            { "pos": 0.3333, "color": "#ffed00" },
+            { "pos": 0.5, "color": "#ffed00" },
+            { "pos": 0.5, "color": "#008026" },
+            { "pos": 0.6667, "color": "#008026" },
+            { "pos": 0.6667, "color": "#24408e" },
+            { "pos": 0.8333, "color": "#24408e" },
+            { "pos": 0.8333, "color": "#732982" },
+            { "pos": 1.0, "color": "#732982" }
+          ]
+        },
+        "back": { "type": "color", "color": "#232323" }
+      },
+      "overrides": {
+        "front": {
+          "logoBox": { "stroke": "#ffffff" },
+          "logo": { "color": "#ffffff" },
+          "classLabel": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 },
+          "title": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 6, "text": "PrideCard 100" },
+          "subtitle": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 },
+          "number": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 },
+          "check": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 },
+          "validFrom": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 },
+          "name": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 },
+          "validTo": { "color": "#ffffff", "strokeColor": "#222222", "strokeWidth": 4 }
+        },
+        "back": {
+          "foundLine": { "color": "#f2f2f2" },
+          "batch": { "color": "#f2f2f2" },
+          "sigLabel": { "color": "#f2f2f2" },
+          "sigDate": { "color": "#f2f2f2" },
+          "legal": { "text": "Diese Karte ist Eigentum der inhabenden Person und bei der Flauschkontrolle vorzulegen. Sie ist nur\\nzusammen mit guter Laune gültig und nicht übertragbar. Es gelten die\\nKuschelbedingungen der Femboy Express GmbH.", "color": "#f2f2f2" },
+          "bonus": { "color": "#f2f2f2" },
+          "url": { "text": "fem.minopia.de/pridecard", "color": "#f2f2f2" },
+          "address": { "color": "#f2f2f2" },
+          "footnote": { "color": "#f2f2f2" },
+          "sigPattern": { "color": "#d6d6d6" },
+          "railplusBox": { "fill": "#ffed00", "stroke": "#f2f2f2" },
+          "railplus": { "color": "#1a1a1a" }
         }
       }
     },
@@ -411,7 +792,7 @@
             { "id": "subtitle", "type": "text", "label": "Subtitle", "text": "Premium Access", "x": 40, "y": 160, "size": 28, "weight": 600, "color": "#ffffffcc" },
             { "id": "name", "type": "text", "label": "Name", "text": "Max Mustermann", "x": 40, "y": 520, "size": 44, "weight": 700, "color": "#ffffff" },
             { "id": "number", "type": "text", "label": "Number", "text": "{{random:4}} {{random:4}} {{random:4}}", "x": 40, "y": 580, "size": 30, "weight": 600, "color": "#ffffff", "letterSpacing": 3 },
-            { "id": "valid", "type": "text", "label": "Valid", "text": "VALID THRU {{date+1y-1d:MM/YY}}", "x": 972, "y": 580, "size": 26, "weight": 700, "color": "#ffffff", "align": "right" }
+            { "id": "valid", "type": "text", "label": "Valid", "text": "VALID THRU {{date+1y:MM/YY}}", "x": 972, "y": 580, "size": 26, "weight": 700, "color": "#ffffff", "align": "right" }
           ]
         },
         "back": {
