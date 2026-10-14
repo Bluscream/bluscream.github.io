@@ -317,7 +317,45 @@ function context2d(canvas) {
   return ctx;
 }
 
-/** Redraws both preview canvases and the selection outline. */
+/** How long a layer picked in the sidebar glows on the preview. */
+export const FLASH_MS = 2000;
+const HIGHLIGHT = '#38bdf8';
+/** @type {{ side: SideName, id: string, until: number } | null} */
+let flash = null;
+let flashFrame = 0;
+
+/**
+ * Makes a layer glow on its preview for {@link FLASH_MS} so it can be spotted after a click in the sidebar.
+ * @param {SideName} side
+ * @param {string} id
+ */
+export function flashLayer(side, id) {
+  flash = { side, id, until: performance.now() + FLASH_MS };
+  if (!flashFrame) flashFrame = requestAnimationFrame(tickFlash);
+}
+
+function tickFlash() {
+  flashFrame = 0;
+  if (!flash) return;
+  if (performance.now() >= flash.until) flash = null;
+  renderPreviews();
+  if (flash) flashFrame = requestAnimationFrame(tickFlash);
+}
+
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {BBox} box
+ * @param {number} alpha
+ */
+function drawGlow(ctx, box, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = HIGHLIGHT;
+  ctx.fillRect(box.x - 6, box.y - 6, box.w + 12, box.h + 12);
+  ctx.restore();
+}
+
+/** Redraws both preview canvases, the selection outline and the sidebar-click glow. */
 export function renderPreviews() {
   const { w, h } = store.dims();
   for (const side of SIDES) {
@@ -326,11 +364,13 @@ export function renderPreviews() {
     const ctx = context2d(canvas);
     ctx.clearRect(0, 0, w, h);
     previewBoxes[side] = drawSide(ctx, side, 1);
+    const glow = flash?.side === side ? previewBoxes[side].find((b) => b.id === flash?.id) : undefined;
+    if (glow && flash) drawGlow(ctx, glow, 0.45 * Math.max(0, (flash.until - performance.now()) / FLASH_MS));
     const sel = store.selected;
     const box = sel?.side === side ? previewBoxes[side].find((b) => b.id === sel.id) : undefined;
     if (box) {
       ctx.save();
-      ctx.strokeStyle = '#38bdf8';
+      ctx.strokeStyle = HIGHLIGHT;
       ctx.lineWidth = 2;
       ctx.setLineDash([6, 4]);
       ctx.strokeRect(box.x - 4, box.y - 4, box.w + 8, box.h + 8);

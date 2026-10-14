@@ -1,6 +1,6 @@
 /** Sidebar layer list: one card per layer with its text and an advanced property grid. */
 import { store } from './state.js';
-import { renderPreviews } from './render.js';
+import { flashLayer, renderPreviews } from './render.js';
 import { el, escapeHtml, fileToDataUrl, toHex6 } from './util.js';
 
 /** @typedef {import('./types.js').Layer} Layer */
@@ -95,7 +95,7 @@ function layerCard(side, layer) {
   const label = document.createElement('span');
   label.className = 'label';
   label.innerHTML = `<span class="kind" aria-hidden="true">${TYPE_GLYPH[layer.type]}</span><span>${escapeHtml(layer.label ?? layer.id)}</span>`;
-  label.addEventListener('click', () => { store.selected = { side, id: layer.id }; highlightSelected(); renderPreviews(); });
+  label.addEventListener('click', () => { store.selected = { side, id: layer.id }; highlightSelected(); flashLayer(side, layer.id); renderPreviews(); });
   const action = Object.assign(document.createElement('button'), { className: 'btn-icon' });
   if (layer.custom) {
     action.textContent = '×';
