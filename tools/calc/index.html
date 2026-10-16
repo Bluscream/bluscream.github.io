@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calc</title>
+  <meta name="description" content="Client-side calculators and converters: how long ago a date was in every unit, unit conversions, number bases.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">Calc</div>
+    <nav class="tools" role="tablist" aria-label="Tools">
+      <button class="tab active" data-tool="date" role="tab">Date &amp; time</button>
+      <button class="tab" data-tool="units" role="tab">Units</button>
+      <button class="tab" data-tool="bases" role="tab">Number bases</button>
+    </nav>
+    <div class="header-actions">
+      <button id="btnTheme" class="btn btn-ghost btn-icon-text" title="Switch between light and dark mode" aria-label="Toggle dark mode">☾</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="tool" data-tool="date">
+      <div class="panel">
+        <h2>How long ago / until</h2>
+        <div class="row">
+          <label class="field grow"><span>Date, time or phrase</span>
+            <input id="dateInput" class="input big" type="text" autocomplete="off" spellcheck="false" placeholder="14.03.2009 · 2009-03-14 15:30 · March 14 2009 · 3 weeks ago · 1236988800">
+          </label>
+          <label class="field"><span>Relative to</span>
+            <input id="dateRef" class="input" type="text" autocomplete="off" spellcheck="false" placeholder="now">
+          </label>
+        </div>
+        <p id="dateNote" class="hint">Understands day.month.year, ISO, month names (English/German), times, unix timestamps, “yesterday”, “3 days ago”, “in 2 weeks”.</p>
+        <div id="dateOut" class="hidden">
+          <p id="dateHeadline" class="headline"></p>
+          <div class="grid">
+            <section><h3>Calendar breakdown</h3><div id="dateCalendar"></div></section>
+            <section><h3>Total in each unit</h3><div id="dateTotals"></div></section>
+            <section><h3>About that date</h3><div id="dateFacts"></div></section>
+            <section><h3>Reference point</h3><div id="dateRefFacts"></div></section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tool hidden" data-tool="units">
+      <div class="panel">
+        <h2>Unit converter</h2>
+        <div class="row">
+          <label class="field"><span>Category</span><select id="unitCategory" class="input"></select></label>
+          <label class="field"><span>Value</span><input id="unitValue" class="input big" type="text" inputmode="decimal" autocomplete="off" value="1"></label>
+          <label class="field"><span>From</span><select id="unitFrom" class="input"></select></label>
+          <label class="field"><span>To</span><select id="unitTo" class="input"></select></label>
+          <button id="unitSwap" class="btn btn-ghost" title="Swap from and to">⇄</button>
+        </div>
+        <p id="unitHeadline" class="headline"></p>
+        <h3>In every unit</h3>
+        <div id="unitAll"></div>
+      </div>
+    </section>
+
+    <section class="tool hidden" data-tool="bases">
+      <div class="panel">
+        <h2>Number bases</h2>
+        <label class="field"><span>Integer in any notation</span>
+          <input id="baseInput" class="input big" type="text" autocomplete="off" spellcheck="false" placeholder="255 · 0xFF · 0b1111_1111 · 0o377 · FFh · -42">
+        </label>
+        <p id="baseNote" class="hint">Plain digits are decimal; letters without a prefix are hex. Click a value to copy it.</p>
+        <div id="baseOut"></div>
+      </div>
+    </section>
+
+    <p class="hint center">Everything runs in your browser. The URL hash keeps your input, so copy the address to share a result.</p>
+  </main>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

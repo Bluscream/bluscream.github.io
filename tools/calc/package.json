@@ -1,0 +1,16 @@
+{
+  "name": "calc",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Client-side calculators and converters: dates, units, number bases",
+  "type": "module",
+  "scripts": {
+    "check": "tsc -p jsconfig.json",
+    "test": "node --test \"test/**/*.test.js\"",
+    "verify": "npm run check && npm test"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^5.9.3"
+  }
+}
