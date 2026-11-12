@@ -1,1 +1,14 @@
 .references/
+# Preserved ignores
+node_modules/
+target/
+build/
+dist/
+.cache/
+__pycache__/
+*.pyc
+*.AppImage
+.env
+.env.*
+!.env.example
+!.env.sample
